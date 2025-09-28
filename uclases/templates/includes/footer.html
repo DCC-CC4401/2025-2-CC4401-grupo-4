@@ -1,0 +1,72 @@
+
+<footer class="z-50 py-4 px-7 bg-card relative border-t border-border mt-10 pt-5 flex flex-wrap justify-between items-center">
+  <div class="flex items-center gap-4">
+    <a href="https://github.com/DCC-CC4401/2025-2-CC4401-grupo-4" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+      <!-- Github SVG -->
+      <svg class="text-primary hover:scale-110" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.867 8.166 6.839 9.489.5.092.682-.217.682-.483 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.07 1.532 1.032 1.532 1.032.892 1.529 2.341 1.088 2.91.832.091-.647.35-1.088.636-1.339-2.22-.253-4.555-1.112-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.748-1.025 2.748-1.025.546 1.378.202 2.397.1 2.65.64.7 1.028 1.595 1.028 2.688 0 3.848-2.338 4.695-4.566 4.944.359.309.678.919.678 1.852 0 1.336-.012 2.417-.012 2.747 0 .268.18.579.688.481C19.135 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+    </a>
+  </div>
+  <div class="flex items-center gap-5">
+    <!-- ThemeToggle -->
+    <button id="theme-toggle" class="p-2 rounded-full transition-colors duration-300 focus:outline-hidden hover:scale-110">
+      <svg id="theme-icon-sun" class="h-6 w-6 text-yellow-300 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <svg id="theme-icon-moon" class="h-6 w-6 text-blue-900 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+    </button>
+    <a href="#presentation" class="p-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-colors">
+      <!-- ArrowUp SVG -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+    </a>
+  </div>
+</footer>
+
+{% block scripts %}
+<script>
+// ThemeToggle logic
+const themeToggleBtn = document.getElementById('theme-toggle');
+const sunIcon = document.getElementById('theme-icon-sun');
+const moonIcon = document.getElementById('theme-icon-moon');
+
+function setThemeIcons(isDark) {
+  if (isDark) {
+    sunIcon.classList.remove('hidden');
+    moonIcon.classList.add('hidden');
+  } else {
+    sunIcon.classList.add('hidden');
+    moonIcon.classList.remove('hidden');
+  }
+}
+
+function getTheme() {
+  return localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+}
+
+function applyTheme(theme) {
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark');
+    setThemeIcons(true);
+  } else {
+    document.documentElement.classList.remove('dark');
+    setThemeIcons(false);
+  }
+}
+
+// Init theme on load
+document.addEventListener('DOMContentLoaded', function() {
+  const theme = getTheme();
+  applyTheme(theme);
+});
+
+themeToggleBtn.addEventListener('click', function() {
+  const isDark = document.documentElement.classList.contains('dark');
+  if (isDark) {
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
+    setThemeIcons(false);
+  } else {
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
+    setThemeIcons(true);
+  }
+});
+</script>
+{% endblock %}

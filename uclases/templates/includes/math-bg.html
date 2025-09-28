@@ -1,0 +1,45 @@
+<div id="math-bg-container" class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0"></div>
+
+{% block scripts %}
+<script>
+const symbols = ['∑', '∫', 'π', '√', '∞', '≈', 'Δ', 'θ', 'λ', 'μ', 'α', 'β', 'φ', 'ψ', 'ω', '÷', '∂', '∇', '∉', '7'];
+const container = document.getElementById('math-bg-container');
+const max_symbols = 22;
+
+function createSymbol() {
+    if (container.childElementCount >= max_symbols) return;
+    
+    const symbol = document.createElement('span');
+    symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+
+    // Random initial position
+    symbol.style.left = `${Math.random() * 100}vw`;
+    symbol.style.top = `${Math.random() * 100}vh`;
+    
+    symbol.style.transform = `translateX(${Math.random() * 80 - 40}px)`;
+
+    // Random size
+    const size = Math.random() * 32 + 10;
+    symbol.style.fontSize = `${size}px`;
+
+    // Custom Tailwind animation
+    symbol.className = 'absolute animate-float pointer-events-none select-none transition-opacity';
+
+    // Random animation duration
+    const duration = Math.random() * 6 + 4;
+    symbol.style.animationDuration = `${duration}s`;
+
+    container.appendChild(symbol);
+
+    // Fade out and remove with smooth transition
+    setTimeout(() => {
+        // Wait for the transition before removing
+        setTimeout(() => {
+            if (symbol.parentNode === container) container.removeChild(symbol);
+        }, 1000);
+    }, duration * 1000);
+}
+
+setInterval(createSymbol, 500);
+</script>
+{% endblock %}
