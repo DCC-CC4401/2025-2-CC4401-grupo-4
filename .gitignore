@@ -1,0 +1,75 @@
+# Python
+
+\*.py[cod]
+**/__pycache__/
+\*.so
+\*.egg
+\*.egg-info/
+dist/
+build/
+
+# Virtual environments
+
+venv/
+env/
+.venv/
+ENV/
+
+# Django
+
+\*.log
+\*.pot
+\*.pyc
+db.sqlite3
+db.sqlite3-journal
+uclases/media/
+uclases/staticfiles/
+uclases/static_root/
+uclases/collectstatic/
+logs/
+
+# Tailwind / frontend build
+
+uclases/static/css/src/output.css
+uclases/static/css/src/*.map
+uclases/static/css/dist/
+uclases/static/js/dist/
+tailwind.log
+.parcel-cache/
+.cache/
+
+# Node.js & package manager
+
+node_modules/
+npm-debug.log\*
+yarn-debug.log\*
+yarn-error.log\*
+pnpm-debug.log\*
+.pnp/
+.pnp.js
+
+# Environment & tooling
+
+.env
+.env.*
+.envrc
+.python-version
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+celerybeat-schedule
+celerybeat.pid
+
+# Editor
+
+.vscode/
+.idea/
+\*.sublime-project
+\*.sublime-workspace
+
+# OS files
+
+.DS_Store
+Thumbs.db
