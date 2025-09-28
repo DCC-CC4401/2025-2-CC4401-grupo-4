@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/src/output.css' %}">
+  <title>{% block title %}U-Clases{% endblock %}</title>
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+  <div id="nav">
+    {% include "includes/nav.html" %}
+  </div>
+  {% if messages %}
+    <div class="fixed right-4 bottom-4 top-auto z-999 flex flex-col items-end gap-2 min-w-[280px] max-w-md" role="region" aria-live="polite" aria-label="Notificaciones">
+        {% for message in messages %}
+        <div data-message class="hover:scale-105 animate-fade-in-delay-{{ forloop.counter }} transform transition-all duration-300 bg-card border border-border
+                    {% if message.tags == 'success' %} border-green-500 text-green-600
+                    {% elif message.tags == 'error' %} border-red-500 text-red-600
+                    {% elif message.tags == 'warning' %} border-amber-500 text-amber-600
+                    {% else %} border-blue-500 text-blue-600{% endif %}
+                    p-4 rounded-md shadow-lg">
+            <div class="flex items-center justify-between gap-3">
+                <p class="text-sm font-medium">{{ message }}</p>
+                <button type="button" class="close-message text-current opacity-60 hover:opacity-100 hover:scale-110 transition-opacity focus:outline-none" aria-label="Cerrar notificación">
+                    ✕
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+  </div>
+  {% endif %}
+  <div id="content">
+    {% block content %}{% endblock %}
+  </div>
+
+  <div id="footer">
+    {% include "includes/footer.html" %}
+  </div>
+  {% block scripts %}{% endblock %}
+  {% if messages %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Función para eliminar un mensaje con animación
+        function removeMessage(messageElement) {
+            messageElement.style.transform = 'translateX(100%)';
+            messageElement.style.opacity = '0';
+            setTimeout(() => messageElement.remove(), 300);
+        }
+
+        // Manejar botones de cierre
+        document.querySelectorAll('.close-message').forEach(button => {
+            button.addEventListener('click', () => {
+                const messageElement = button.closest('[data-message]');
+                if (messageElement) {
+                    removeMessage(messageElement);
+                }
+            });
+        });
+
+        // Auto-ocultar mensajes después de un tiempo
+        document.querySelectorAll('[data-message]').forEach((message, index) => {
+            const displayTime = 8000 + (index * 1000);
+            setTimeout(() => {
+                if (document.body.contains(message)) {
+                    removeMessage(message);
+                }
+            }, displayTime);
+        });
+    });
+</script>
+{% endif %}
+</body>
+</html>
