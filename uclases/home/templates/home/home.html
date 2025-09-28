@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% include "includes/math-bg.html" %}
+<section id="presentation" class="relative min-h-screen flex flex-col items-center justify-center px-4">
+    <div class="container max-w-4xl mx-auto text-center z-10">
+        <div class="space-y-6">
+            <h1 class="hover:scale-101 text-4xl md:text-6xl font-bold tracking-tight flex justify-center">
+                <span class="text-glow opacity-0 animate-fade-in">U</span>
+                <span class="text-glow text-primary opacity-0 animate-fade-in-delay-1">-Clases</span>
+                <span class="text-gradient ml-2 opacity-0 animate-fade-in-delay-2"></span>
+            </h1>
+            <br />
+            <div class="flex h-9 items-center gap-3 py-5 p-3 cosmic-button active:scale-100 w-full outline-hidden bg-card text-foreground rounded-md mt-10 opacity-0 animate-fade-in-delay-3">
+                <!-- Filter -->
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                    width="24" height="24" viewBox="0 0 24 24" 
+                    fill="none" stroke="currentColor" stroke-width="2" 
+                    stroke-linecap="round" stroke-linejoin="round"
+                    class="hover:scale-108 opacity-0 animate-fade-in-delay-4 transition-transform duration-200 cursor-pointer">
+                    <path d="M3 4h18l-7 8v6l-4 2v-8L3 4z"></path>
+                </svg>
+
+                <!-- Magnifying glass -->
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                    width="24" height="24" viewBox="0 0 24 24" 
+                    fill="none" stroke="currentColor" stroke-width="2" 
+                    stroke-linecap="round" stroke-linejoin="round" 
+                    class="hover:scale-108 opacity-0 animate-fade-in-delay-4 transition-transform duration-200 cursor-pointer">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                </svg>
+
+                <!-- Searchbar -->
+                <input
+                    data-slot="command-input"
+                    class="px-1 w-full text-sm outline-hidden bg-card text-foreground placeholder:text-muted-foreground opacity-0 animate-fade-in-delay-3"
+                    placeholder="Empieza a buscar..."
+                    cmdk-input="" 
+                    autocomplete="off" 
+                    autocorrect="off" 
+                    spellcheck="false" 
+                    aria-autocomplete="list" 
+                    role="combobox" 
+                    aria-expanded="true" 
+                    aria-controls="radix-«rj»" 
+                    aria-labelledby="radix-«rk»" 
+                    id="radix-«rl»" 
+                    type="text" 
+                    value="">
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
