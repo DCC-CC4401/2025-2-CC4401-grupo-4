@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
 
 #TODO: add a CSS classes to the input fields
-INPUT_CLASS = ""
+INPUT_CLASS = "w-full px-4 py-2 border border-border rounded-md bg-background text-foreground mb-2 focus:outline-none focus:ring-2 focus:ring-primary transition"
 
 class SignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):

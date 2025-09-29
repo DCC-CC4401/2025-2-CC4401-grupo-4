@@ -4,38 +4,42 @@
 
 {% block content %}
 {% include "includes/math-bg.html" %}
-<section id="register" class="pt-20">
-    <div>
-        <h2>Register</h2>
+<section id="register" class="min-h-screen items-center justify-center bg-background pt-20">
+    <div class="relative container bg-card border border-border rounded-md shadow-md p-10 max-w-md mx-auto mt-12">
+        <h2 class="text-2xl font-bold mb-6 text-primary">Register</h2>
+
         {% if form.non_field_errors %}
-        <ul>
+        <ul class="text-red-600 mb-4 text-sm list-disc pl-5">
             {% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}
         </ul>
         {% endif %}
         <form method="post" novalidate>
             {% csrf_token %}
-
-            <div>
-                <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+            <div class="mb-4">
+                <label for="{{ form.username.id_for_label }}" class="block text-left mb-2 text-foreground font-medium">
+                    {{ form.username.label }}
+                </label>
                 {{ form.username }}
-                {% for e in form.username.errors %}<div>{{ e }}</div>{% endfor %}
+                {% for e in form.username.errors %}<p class="text-red-600 text-sm mb-2">{{ e }}</p>{% endfor %}
             </div>
-            <div>
-                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            <div class="mb-4">
+                <label for="{{ form.email.id_for_label }}" class="block text-left mb-2 text-foreground font-medium">{{ form.email.label }}</label>
                 {{ form.email }}
                 {% for e in form.email.errors %}<div>{{ e }}</div>{% endfor %}
             </div>
             <div>
-                <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+                <label for="{{ form.password1.id_for_label }}" class="block text-left mb-2 text-foreground font-medium">{{ form.password1.label }}</label>
                 {{ form.password1 }}
-                {% for e in form.password1.errors %}<div>{{ e }}</div>{% endfor %}
+                {% for e in form.password1.errors %}<p class="text-red-600 text-sm mb-2">{{ e }}</p>{% endfor %}
             </div>
             <div>
-                <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+                <label for="{{ form.password2.id_for_label }}" class="block text-left mb-2 text-foreground font-medium">{{ form.password2.label }}</label>
                 {{ form.password2 }}
-                {% for e in form.password2.errors %}<div>{{ e }}</div>{% endfor %}
+                {% for e in form.password2.errors %}<p class="text-red-600 text-sm mb-2">{{ e }}</p>{% endfor %}
             </div>
-            <button type="submit">Register</button>
+            <button type="submit" class="px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium transition-all duration-300 hover:shadow-[0_0_10px_rgba(245,73,39,0.5)] hover:scale-105 active:scale-95 w-full mt-2">
+                Register
+            </button>
         </form>
     </div>
 </section>

@@ -4,44 +4,42 @@
 
 {% block content %}
 {% include "includes/math-bg.html" %}
-<section id="login" class="pt-20">
-    <div>
-        <h2>Iniciar Sesión</h2>
+<section id="login" class="min-h-screen items-center justify-center bg-background pt-20">
+    <div class="relative container bg-card border border-border rounded-md shadow-md p-10 max-w-md mx-auto mt-12">
+        <h2 class="text-2xl font-bold mb-6 text-primary">Iniciar Sesión</h2>
         
         {% if form.non_field_errors %}
-        <div>
+        <div class="mb-6 p-4 rounded-lg bg-red-50/10 border border-red-600/20">
             {% for error in form.non_field_errors %}
-                <p>Nombre de usuario o contraseña incorrectos.</p>
+                <p class="text-red-600 text-sm mb-2">Nombre de usuario o contraseña incorrectos.</p>
             {% endfor %}
         </div>
         {% endif %}
 
         <form method="post" novalidate>
             {% csrf_token %}
-            <div>
-                <label for="{{ form.username.id_for_label }}">
+            <div class="mb-4">
+                <label for="{{ form.username.id_for_label }}" class="block text-left mb-2 text-foreground font-medium">
                     {{ form.username.label }}
                 </label>
                 {{ form.username }}
-                {% if form.username.errors %}
-                    {% for error in form.username.errors %}
-                        <p>{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
+                {% for e in form.username.errors %}<p class="text-red-600 text-sm mb-2">{{ e }}</p>{% endfor %}
             </div>
-            <div>
-                <label for="{{ form.password.id_for_label }}">
+            <div class="mb-4">
+                <label for="{{ form.password.id_for_label }}" class="block text-left mb-2 text-foreground font-medium">
                     {{ form.password.label }}
                 </label>
                 {{ form.password }}
                 {% if form.password.errors %}
                     {% for error in form.password.errors %}
-                        <p>{{ error }}</p>
+                        <p class="text-sm text-red-600 mt-1">{{ error }}</p>
                     {% endfor %}
                 {% endif %}
             </div>
          
-            <button type="submit">Login</button>
+            <button type="submit" class="px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium transition-all duration-300 hover:shadow-[0_0_10px_rgba(245,73,39,0.5)] hover:scale-105 active:scale-95 w-full mt-2">
+                Login
+            </button>
         </form>
     </div>
 </section>
