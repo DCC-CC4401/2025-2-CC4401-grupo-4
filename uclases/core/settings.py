@@ -102,7 +102,6 @@ USE_TZ = True
 LANGUAGES = [("es", "Español")]
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-AUTH_USER_MODEL = 'accounts.User'
 
 
 WSGI_APPLICATION = 'core.wsgi.application'
