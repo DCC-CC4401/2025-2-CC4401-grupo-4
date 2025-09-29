@@ -4,7 +4,7 @@
 
 {% block content %}
 {% include "includes/math-bg.html" %}
-<div>
+<section id="register">
     <div>
         <h2>Register</h2>
         {% if form.non_field_errors %}
@@ -38,5 +38,5 @@
             <button type="submit">Register</button>
         </form>
     </div>
-</div>
+</section>
 {% endblock %}
