@@ -1,0 +1,41 @@
+
+{% block title %}Crear cuenta{% endblock %}
+
+{% block content %}
+{% include "includes/math-bg.html" %}
+<div>
+    <div>
+        <h2>Register</h2>
+        {% if form.non_field_errors %}
+        <ul>
+            {% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div>
+                <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                {{ form.username }}
+                {% for e in form.username.errors %}<div>{{ e }}</div>{% endfor %}
+            </div>
+            <div>
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% for e in form.email.errors %}<div>{{ e }}</div>{% endfor %}
+            </div>
+            <div>
+                <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+                {{ form.password1 }}
+                {% for e in form.password1.errors %}<div>{{ e }}</div>{% endfor %}
+            </div>
+            <div>
+                <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+                {{ form.password2 }}
+                {% for e in form.password2.errors %}<div>{{ e }}</div>{% endfor %}
+            </div>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
