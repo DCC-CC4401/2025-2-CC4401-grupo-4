@@ -1,7 +1,7 @@
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from django.urls import path
-from .views import signin_view, signup_view, logout_view
+from .views import signin_view, signup_view, logout_view, profile_view
 from .forms import CustomPasswordResetForm, CustomSetPasswordForm
 
 app_name = 'accounts'
@@ -43,4 +43,7 @@ urlpatterns = [
             template_name='accounts/password_reset_complete.html',
         ),
         name='password_reset_complete',
-    ),]
+    ),
+    
+    path('profile/', profile_view, name='profile')
+]

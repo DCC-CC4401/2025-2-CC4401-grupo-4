@@ -38,3 +38,6 @@ def signup_view(request):
     else:
         form = SignUpForm()
     return render(request, 'accounts/signup.html', {'form': form})
+
+def profile_view(request):
+	return render(request, 'profile/profile.html')
