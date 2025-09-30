@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="relative h-[480px] w-full gradient-hero">
+	<img 
+		alt="Beauchef" 
+		class="object-cover w-full h-full relative z-0" 
+		src="https://ingenieria.uchile.cl/dam/jcr:de2aacbb-85ad-474c-837b-6221246925db/imageservlet.jpeg"/>
+	<div class="z-10 flex flex-col items-center absolute top-28 left-0 right-0">
+		<span data-slot="avatar" class="relative flex shrink-0 overflow-hidden rounded-full size-32">
+			<img
+				data-slot="avatar-image"
+				class="aspect-square size-full object-cover"
+				alt="Patricio Felmer A."
+				src="https://ucampus.uchile.cl/d/r/usuario/5e/5ecd9143ecb0df35ca7ba9ac92a9c803/perfil/d937b16ea715137dbf4a26d0224e1b77.jpg"
+			/>
+		</span>
+		<h1 class="mt-6 text-4xl font-bold text-glow text-foreground">
+			Patricio Felmer A.
+		</h1>
+		<h3 class="font-medium text-foreground/90 text-lg">
+			Profesor de Matemáticas - Universidad de Chile
+		</h3>
+		<div id="stars-rating" class="flex flex-row items-center mt-3">
+			<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-6 text-yellow-400" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+				<path fill="none" d="M0 0h24v24H0z"></path>
+				<path fill="none" d="M0 0h24v24H0z"></path>
+				<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+			</svg>
+			<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-6 text-yellow-400" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+				<path fill="none" d="M0 0h24v24H0z"></path>
+				<path fill="none" d="M0 0h24v24H0z"></path>
+				<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+			</svg>
+			<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-6 text-yellow-400" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+				<path fill="none" d="M0 0h24v24H0z"></path>
+				<path fill="none" d="M0 0h24v24H0z"></path>
+				<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+			</svg>
+			<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-6 text-yellow-400" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+				<path fill="none" d="M0 0h24v24H0z"></path>
+				<path d="m22 9.24-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4V6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"></path>
+			</svg>
+			<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-6 text-gray-400" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+				<path d="m22 9.24-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"></path>
+			</svg>
+			<span class="ml-2 text-sm text-foreground/90">
+				(3.88) • 24 reseñas
+			</span>
+		</div>
+	</div>
+</div>
+<main class="grid grid-cols-1 container md:grid-cols-10 gap-3 max-w-4xl mx-auto md:mt-0 -mt-24 relative z-10 md:py-5 py-25">
+	<div class="md:col-span-4 relative">
+		<div class="sticky top-6">
+			<div data-slot="card" class="text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm bg-green-500/10 border-green-500/30 card-hover">
+				<div data-slot="card-content" class="px-6">
+					<div class="flex flex-col items-center gap-2 text-center">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-medal size-8 text-green-400 shrink-0"
+						>
+							<path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15"></path>
+							<path d="M11 12 5.12 2.2"></path>
+							<path d="m13 12 5.88-9.8"></path>
+							<path d="M8 7h8"></path>
+							<circle cx="12" cy="17" r="5"></circle>
+							<path d="M12 18v-2h-.5"></path>
+						</svg>
+						<div class="flex flex-col">
+							<h2 class="font-bold text-green-400">The GOAT 🐐</h2>
+							<small class="text-muted-foreground">Patricio Felmer A. es destacadx y recomendadx por la comunidad.</small>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm mt-3 card-hover">
+				<div data-slot="card-content" class="px-6">
+					<h3 class="text-xl text-bold">📚 Carrera y estudios</h3>
+					<p class="mt-2 text-foreground/60">
+						Ingeniería civil matematica en la Universidad de Chile. Doctorado en Matemáticas en la Universidad de Chicago. Profesor titular en la Universidad de Chile desde 1994. Ha recibido varios premios por su docencia e investigación.
+					</p>
+				</div>
+			</div>
+			<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm mt-3 card-hover">
+				<div data-slot="card-content" class="px-6">
+					<h3 class="text-xl text-bold">✍ Descripción</h3>
+					<p class="mt-2 text-foreground/60">
+						El Prof. Patricio Felmer destaca por su habilidad para explicar conceptos complejos de matemáticas de forma comprensible y rigurosa. Los Rp son valorados por fomentar el pensamiento crítico, aunque algunos
+					</p>
+				</div>
+			</div>
+			<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm mt-3 card-hover">
+				<div data-slot="card-content" class="px-6">
+					<h3 class="text-xl text-bold">📝 Cursos dictados</h3>
+					<div class="flex flex-row flex-wrap gap-2 mt-3">
+						<span class="badge badge-info">Probabilidades</span>
+						<span class="badge badge-info">Introducción al Cálculo</span>
+						<span class="badge badge-info">Cálculo diferencial</span>
+						<span class="badge badge-warning">Análisis</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="md:col-span-6 flex flex-col gap-3 mb-12 mt-6 md:mt-0">
+		<div class="flex flex-row items-center justify-between text-foreground/60 pl-3">
+			<h3>24 resultados</h3>
+			<button
+				type="button"
+				role="combobox"
+				aria-controls="radix-«r0»"
+				aria-expanded="false"
+				aria-autocomplete="none"
+				dir="ltr"
+				data-state="closed"
+				data-slot="select-trigger"
+				data-size="default"
+				class="border-border text-foreground/60 flex items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-sm outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 w-[160px]"
+			>
+				<span data-slot="select-value" style="pointer-events: none;">Más recientes</span>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="lucide lucide-chevron-down size-4 opacity-50"
+					aria-hidden="true"
+				>
+					<path d="m6 9 6 6 6-6"></path>
+				</svg>
+			</button>
+		</div>
+		<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm relative">
+			<div data-slot="card-content" class="px-6">
+				<form class="space-y-4">
+					<div data-slot="form-item" class="grid gap-2">
+						<label
+							data-slot="form-label"
+							class="flex items-center gap-2 text-sm leading-none font-medium select-none"
+							for="«r1»-form-item"
+						>
+							Calificación
+						</label>
+						<div class="flex items-center gap-1">
+							<button type="button" class="transition-colors hover:scale-110 cursor-pointer">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-star w-5 h-5 text-gray-300 hover:text-yellow-400"
+								>
+									<path
+										d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"
+									></path>
+								</svg>
+							</button>
+							<button type="button" class="transition-colors hover:scale-110 cursor-pointer">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-star w-5 h-5 text-gray-300 hover:text-yellow-400"
+								>
+									<path
+										d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"
+									></path>
+								</svg>
+							</button>
+							<button type="button" class="transition-colors hover:scale-110 cursor-pointer">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-star w-5 h-5 text-gray-300 hover:text-yellow-400"
+								>
+									<path
+										d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"
+									></path>
+								</svg>
+							</button>
+							<button type="button" class="transition-colors hover:scale-110 cursor-pointer">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-star w-5 h-5 text-gray-300 hover:text-yellow-400"
+								>
+									<path
+										d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"
+									></path>
+								</svg>
+							</button>
+							<button type="button" class="transition-colors hover:scale-110 cursor-pointer">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-star w-5 h-5 text-gray-300 hover:text-yellow-400"
+								>
+									<path
+										d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"
+									></path>
+								</svg>
+							</button>
+						</div>
+					</div>
+					<div data-slot="form-item" class="grid gap-2">
+						<label
+							data-slot="form-label"
+							class="flex items-center gap-2 text-sm leading-none font-medium select-none"
+							for="«r2»-form-item"
+						>
+							Tu reseña
+						</label>
+						<textarea
+							data-slot="form-control"
+							class="cosmic-button bg-card text-foreground placeholder:text-foreground/60 outline-none flex field-sizing-content w-full rounded-md border px-3 py-2 shadow-sm transition-[color,box-shadow] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[100px]"
+							placeholder="Escribe tu reseña..."
+							name="content"
+							id="«r2»-form-item"
+							aria-describedby="«r2»-form-item-description"
+							aria-invalid="false"
+						></textarea>
+						<p data-slot="form-description" id="«r2»-form-item-description" class="text-foreground/60 text-sm">Tu opinión es 100% anónima. Se respetuosx por favor.</p>
+					</div>
+					<button data-slot="button" class="cosmic-button w-full" type="submit" disabled>Enviar</button>
+				</form>
+			</div>
+		</div>
+		<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm">
+			<div data-slot="card-content" class="px-6">
+				<div class="flex flex-row items-center text-white mb-1 relative">
+					<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-5 text-white" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+					</svg>
+					<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-5 text-gray-500" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+					</svg>
+					<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-5 text-gray-500" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+					</svg>
+					<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-5 text-gray-500" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+					</svg>
+					<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-5 text-gray-500" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+					</svg>
+				</div>
+				<small class="text-foreground/60">Asignatura: No especificada</small>
+				<p class="mt-3">No. Simplemente no.</p>
+			</div>
+		</div>
+		<nav role="navigation" aria-label="pagination" data-slot="pagination" class="mx-auto flex w-full justify-center">
+			<ul data-slot="pagination-content" class="flex flex-row items-center gap-1">
+				<li data-slot="pagination-item">
+					<a
+						data-slot="pagination-link"
+						class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-9 py-2 has-[&gt;svg]:px-3 gap-1 px-2.5 sm:pl-2.5 pointer-events-none opacity-50"
+						aria-label="Go to previous page"
+						href="#"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-chevron-left"
+						>
+							<path d="m15 18-6-6 6-6"></path>
+						</svg>
+						<span class="hidden sm:block">Previous</span>
+					</a>
+				</li>
+				<li data-slot="pagination-item">
+					<a
+						aria-current="page"
+						data-slot="pagination-link"
+						data-active="true"
+						class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 size-9"
+						href="#"
+					>
+						1
+					</a>
+				</li>
+				<li data-slot="pagination-item">
+					<a
+						data-slot="pagination-link"
+						data-active="false"
+						class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9"
+						href="#"
+					>
+						2
+					</a>
+				</li>
+				<li data-slot="pagination-item">
+					<a
+						data-slot="pagination-link"
+						data-active="false"
+						class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9"
+						href="#"
+					>
+						3
+					</a>
+				</li>
+				<li data-slot="pagination-item">
+					<a
+						data-slot="pagination-link"
+						class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-9 py-2 has-[&gt;svg]:px-3 gap-1 px-2.5 sm:pr-2.5"
+						aria-label="Go to next page"
+						href="#"
+					>
+						<span class="hidden sm:block">Next</span>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-chevron-right"
+						>
+							<path d="m9 18 6-6-6-6"></path>
+						</svg>
+					</a>
+				</li>
+			</ul>
+		</nav>
+	</div>
+</main>
+<script></script>
+<section aria-label="Notifications alt+T" tabindex="-1" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></section>
+{% endblock %}
