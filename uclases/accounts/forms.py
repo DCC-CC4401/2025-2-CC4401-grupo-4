@@ -1,9 +1,8 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm, PasswordResetForm
 
 from .models import User
 
-#TODO: add a CSS classes to the input fields
 INPUT_CLASS = "w-full px-4 py-2 border border-border rounded-md bg-background text-foreground mb-2 focus:outline-none focus:ring-2 focus:ring-primary transition"
 
 class SignUpForm(UserCreationForm):
@@ -29,3 +28,16 @@ class CustomLoginForm(AuthenticationForm):
         super().__init__(request, *args, **kwargs)
         self.fields['username'].widget.attrs.update({'class': INPUT_CLASS, 'autofocus': True})
         self.fields['password'].widget.attrs.update({'class': INPUT_CLASS})
+
+class CustomSetPasswordForm(SetPasswordForm):
+    def __init__(self, *a, **k):
+        super().__init__(*a, **k)
+        f = self.fields
+        f['new_password1'].widget.attrs.update({'class': INPUT_CLASS, 'placeholder': 'Ingresa tu nueva contraseña'})
+        f['new_password2'].widget.attrs.update({'class': INPUT_CLASS, 'placeholder': 'Confirma tu nueva contraseña'})
+
+class CustomPasswordResetForm(PasswordResetForm):
+    def __init__(self, *a, **k):
+        super().__init__(*a, **k)
+        self.fields['email'].label = "Correo electrónico"
+        self.fields['email'].widget.attrs.update({'class': INPUT_CLASS, 'placeholder': 'tucorreo@dominio.com', 'autocomplete': 'email'})
