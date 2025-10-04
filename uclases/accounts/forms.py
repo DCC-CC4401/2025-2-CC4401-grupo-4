@@ -22,6 +22,15 @@ class SignUpForm(UserCreationForm):
         if User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError("Ese email ya está registrado.")
         return email
+    
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+        if len(username) < 4:
+            raise forms.ValidationError("El nombre de usuario debe tener al menos 4 caracteres.")
+        return username
+    
+    
+
 
 class CustomLoginForm(AuthenticationForm):
     def __init__(self, request=None, *args, **kwargs):
