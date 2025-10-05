@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator,MaxValueValidator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
 # Perfil:
 class Perfil(models.Model):
     # Relación 1:1 con User basico de Django,
@@ -29,20 +30,17 @@ def crear_o_actualizar_perfil(sender, instance, created, **kwargs):
     if created:
         Perfil.objects.create(user=instance)
     else: 
-        try:
-            instance.perfil.save()
-        except Perfil.DoesNotExist:
-            Perfil.objects.create(user=instance)
+        Perfil.objects.get_or_create(user=instance)
 
 
 #Carrera:
 class Carrera(models.Model):
     #ID_Carrera (PK) se crea automaticamente como 'id'
-    nombre = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
     class Meta: verbose_name_plural = "Carreras"
 
-    def __str__(self): return self.nombre
+    def __str__(self): return self.name
 
 #Ramo:
 class Ramo(models.Model):
@@ -72,7 +70,7 @@ class SolicitudClase(models.Model):
     #ID_Solicitud (PK) se crea atomaticamente como 'id'
     titulo = models.CharField(max_length=200)
     descripcion = models.TextField()
-    fecha_publicación = models.DateTimeField(auto_now_add=True)
+    fecha_publicacion = models.DateTimeField(auto_now_add=True)
 
     #Relación N:1 con PERFIL (Solicitante)
     #ID Usuario (Solicitante) (FK)
@@ -83,10 +81,19 @@ class SolicitudClase(models.Model):
 
     def __str__(self): return self.titulo
 
+class DiaSemana(models.IntegerChoices):
+    LUNES = 1, "Lunes"
+    MARTES = 2, "Martes"
+    MIERCOLES = 3, "Miércoles"
+    JUEVES = 4, "Jueves"
+    VIERNES = 5, "Viernes"
+    SABADO = 6, "Sábado"
+    DOMINGO = 7, "Domingo"
+
 #Horario: 
 class HorarioOfertado(models.Model):
     #ID_Horario (PK) se crea automaticamente como 'id'
-    dia = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(7)]) #Lunes a Viernes
+    dia = models.IntegerField(choices=DiaSemana.choices)
     hora_inicio = models.TimeField()
     hora_fin = models.TimeField()
     cupos_totales = models.PositiveIntegerField(default=1)
@@ -106,11 +113,11 @@ class PerfilRamo(models.Model):
 
     class Meta: 
         #PK compuesta por ambas FK
-        unique_together = ('perfil', 'ramo')
+        constraints  = [models.UniqueConstraint(fields=['perfil','ramo'], name='unique_perfil_ramo')]
         verbose_name = "Ramo Cursado"
         verbose_name_plural = "Ramos Cursados"
 
-    def __str__(self): return f"{self.perfil.user.username} cursa {self.ramo.nombre}"
+    def __str__(self): return f"{self.perfil.user.username} cursa {self.ramo.name}"
 #Añadimos a Perfil los ramos cursados.
 Perfil.ramos_cursados = models.ManyToManyField(Ramo, through='PerfilRamo', related_name='perfiles_que_cursaron')
 
@@ -126,7 +133,7 @@ class Inscripcion(models.Model):
     fecha_reserva = models.DateTimeField(auto_now_add=True)
 
     class Meta: 
-        unique_together = ('estudiante', 'horario_ofertado')
+        constraints  = [models.UniqueConstraint(fields=['estudiante', 'horario_ofertado'], name='unique_inscripcion')]
         verbose_name_plural = "Inscripciones"
 
     def __str__(self): return f"Inscripción de {self.estudiante.user.username} a {self.horario_ofertado.oferta.titulo}"
