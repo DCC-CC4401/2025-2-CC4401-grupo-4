@@ -1,10 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm, PasswordResetForm
-
-from .models import User
+from django.conf import settings
+from .models import User, Perfil
 
 INPUT_CLASS = "w-full px-4 py-2 border border-border rounded-md bg-background text-foreground mb-2 focus:outline-none focus:ring-2 focus:ring-primary transition"
-
+TEXTAREA_CLASS = ""
 class SignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
@@ -50,3 +50,152 @@ class CustomPasswordResetForm(PasswordResetForm):
         super().__init__(*a, **k)
         self.fields['email'].label = "Correo electrónico"
         self.fields['email'].widget.attrs.update({'class': INPUT_CLASS, 'placeholder': 'tucorreo@dominio.com', 'autocomplete': 'email'})
+
+
+## FORMULARIO DE EDICIÓN DE USUARIO
+class UserForm(forms.ModelForm):
+    """Formulario para editar datos del modelo User,
+    tiene username, first_name, last_name y email.
+    """
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email']
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': INPUT_CLASS, 
+                'placeholder': 'Nombre de usuario'
+            }),
+            'first_name': forms.TextInput(attrs={
+                'class': INPUT_CLASS, 
+                'placeholder': 'Nombre'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': INPUT_CLASS, 
+                'placeholder': 'Apellido'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': INPUT_CLASS, 
+                'placeholder': 'tucorreo@dominio.com'
+            }),
+        }
+        labels = {
+            'username': 'Nombre de usuario',
+            'first_name': 'Nombre',
+            'last_name': 'Apellido',
+            'email': 'Correo electrónico'
+        }
+    
+    def clean_username(self):
+        """Validar que el username no esté en uso por otro usuario"""
+        username = self.cleaned_data['username']
+        if User.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Ese nombre de usuario ya está en uso.")
+        return username
+    
+    def clean_email(self):
+        """Validar que el email no esté en uso por otro usuario"""
+        email = self.cleaned_data['email'].lower()
+        if User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Ese email ya está registrado por otro usuario.")
+        return email
+
+
+# ============================================
+# FORMULARIOS DE EDICIÓN DE PERFIL
+# ============================================
+
+class ProfileForm(forms.ModelForm):
+    """Formulario para editar datos del modelo Perfil"""
+    class Meta:
+        model = Perfil
+        fields = ['telefono', 'descripcion', 'foto_url', 'banner_url', 'carrera', 'ramos_cursados']
+        widgets = {
+            'telefono': forms.TextInput(attrs={
+                'class': INPUT_CLASS, 
+                'placeholder': '+56912345678'
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': TEXTAREA_CLASS,
+                'placeholder': 'Cuéntanos sobre ti...',
+                'rows': 4
+            }),
+            'foto_url': forms.URLInput(attrs={
+                'class': INPUT_CLASS,
+                'placeholder': 'https://ejemplo.com/foto.jpg'
+            }),
+            'banner_url': forms.URLInput(attrs={
+                'class': INPUT_CLASS,
+                'placeholder': 'https://ejemplo.com/banner.jpg'
+            }),
+            'carrera': forms.Select(attrs={
+                'class': INPUT_CLASS
+            }),
+            'ramos_cursados': forms.CheckboxSelectMultiple()
+        }
+        labels = {
+            'telefono': 'Teléfono',
+            'descripcion': 'Descripción',
+            'foto_url': 'URL de foto de perfil',
+            'banner_url': 'URL de banner',
+            'carrera': 'Carrera',
+            'ramos_cursados': 'Ramos cursados'
+        }
+
+class DescriptionForm(forms.ModelForm):
+    """Formulario para editar SOLO la descripción"""
+    class Meta:
+        model = Perfil
+        fields = ['descripcion']
+        widgets = {
+            'descripcion': forms.Textarea(attrs={
+                'class': TEXTAREA_CLASS,
+                'placeholder': 'Cuéntanos sobre ti...',
+                'rows': 5
+            })
+        }
+
+
+class ImagesForm(forms.ModelForm):
+    """Formulario para editar SOLO las imágenes"""
+    class Meta:
+        model = Perfil
+        fields = ['foto_url', 'banner_url']
+        widgets = {
+            'foto_url': forms.URLInput(attrs={
+                'class': INPUT_CLASS,
+                'placeholder': 'https://ejemplo.com/foto.jpg'
+            }),
+            'banner_url': forms.URLInput(attrs={
+                'class': INPUT_CLASS,
+                'placeholder': 'https://ejemplo.com/banner.jpg'
+            }),
+        }
+        labels = {
+            'foto_url': 'URL de foto de perfil',
+            'banner_url': 'URL de banner'
+        }
+class CareerForm(forms.ModelForm):
+    """Formulario para editar SOLO carrera y ramos"""
+    class Meta:
+        model = Perfil
+        fields = ['carrera', 'ramos_cursados']
+        widgets = {
+            'carrera': forms.Select(attrs={'class': INPUT_CLASS}),
+            'ramos_cursados': forms.CheckboxSelectMultiple()
+        }
+        labels = {
+            'carrera': 'Carrera actual',
+            'ramos_cursados': 'Ramos cursados'
+        }
+class ContactInfoForm(forms.ModelForm):
+    """Formulario para editar SOLO teléfono"""
+    class Meta:
+        model = Perfil
+        fields = ['telefono']
+        widgets = {
+            'telefono': forms.TextInput(attrs={
+                'class': INPUT_CLASS, 
+                'placeholder': '+56912345678'
+            })
+        }
+        labels = {'telefono': 'Teléfono'}

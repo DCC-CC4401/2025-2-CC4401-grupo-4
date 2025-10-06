@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Perfil - {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+
+<!-- Banner con foto de perfil -->
+<div class="relative h-[480px] w-full gradient-hero">
+	{% if perfil.banner_url %}
+	<img 
+		alt="Banner de {{ profile_user.username }}" 
+		class="object-cover w-full h-full relative z-0" 
+		src="{{ perfil.banner_url }}"/>
+	{% else %}
+	<img 
+		alt="Banner por defecto" 
+		class="object-cover w-full h-full relative z-0" 
+		src="https://ingenieria.uchile.cl/dam/jcr:de2aacbb-85ad-474c-837b-6221246925db/imageservlet.jpeg"/>
+	{% endif %}
+	
+	<div class="z-10 flex flex-col items-center absolute top-28 left-0 right-0">
+		<!-- Foto de perfil circular -->
+		<span data-slot="avatar" class="relative flex shrink-0 overflow-hidden rounded-full size-32">
+			{% if perfil.foto_url %}
+			<img
+				data-slot="avatar-image"
+				class="aspect-square size-full object-cover"
+				alt="{{ profile_user.username }}"
+				src="{{ perfil.foto_url }}"
+			/>
+			{% else %}
+			<div class="aspect-square size-full flex items-center justify-center bg-primary/10 text-4xl font-bold text-primary">
+				{{ profile_user.username|first|upper }}
+			</div>
+			{% endif %}
+		</span>
+		
+		<!-- Nombre y título -->
+		<h1 class="mt-6 text-4xl font-bold text-glow text-foreground">
+			{% if profile_user.first_name or profile_user.last_name %}
+				{{ profile_user.first_name }} {{ profile_user.last_name }}
+			{% else %}
+				{{ profile_user.username }}
+			{% endif %}
+		</h1>
+		
+		<h3 class="font-medium text-foreground/90 text-lg">
+			@{{ profile_user.username }}
+			{% if perfil.carrera %}
+				 - {{ perfil.carrera.name }}
+			{% endif %}
+		</h3>
+		
+		<!-- Rating con estrellas -->
+		<div id="stars-rating" class="flex flex-row items-center mt-3">
+			{% with rating=perfil.rating_promedio|floatformat:0|add:"0" %}
+				{% for i in "12345" %}
+					{% if forloop.counter <= rating %}
+					<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-6 text-yellow-400" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+					</svg>
+					{% else %}
+					<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-6 text-gray-400" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+						<path d="m22 9.24-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"></path>
+					</svg>
+					{% endif %}
+				{% endfor %}
+			{% endwith %}
+			<span class="ml-2 text-sm text-foreground/90">
+				({{ perfil.rating_promedio }}) • {{ perfil.total_ratings }} valoraciones
+			</span>
+		</div>
+	</div>
+</div>
+
+<!-- Contenido principal -->
+<main class="grid grid-cols-1 container md:grid-cols-10 gap-3 max-w-4xl mx-auto md:mt-0 -mt-24 relative z-10 md:py-5 py-25">
+	<!-- Columna izquierda - Información del perfil -->
+	<div class="md:col-span-4 relative">
+		<div class="sticky top-6">
+			
+			<!-- Card: Carrera y Estudios -->
+			{% if perfil.carrera or perfil.ramos_cursados.exists %}
+			<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm card-hover">
+				<div data-slot="card-content" class="px-6">
+					<h3 class="text-xl text-bold">📚 Carrera y estudios</h3>
+					
+					<!-- Carrera actual -->
+					{% if perfil.carrera %}
+					<div class="mt-3">
+						<p class="text-xs text-foreground/60 mb-2">Carrera actual</p>
+						<span class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium bg-green-500/10 text-green-600 border-green-500/30">
+							{{ perfil.carrera.name }}
+						</span>
+					</div>
+					{% endif %}
+					
+					<!-- Ramos cursados -->
+					{% if perfil.ramos_cursados.exists %}
+					<div class="mt-4">
+						<p class="text-xs text-foreground/60 mb-2">Ramos cursados</p>
+						<div class="flex flex-row flex-wrap gap-2">
+							{% for ramo in perfil.ramos_cursados.all %}
+							<span class="badge badge-info">{{ ramo.name }}</span>
+							{% endfor %}
+						</div>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+			{% endif %}
+			
+			<!-- Card: Descripción -->
+			{% if perfil.descripcion %}
+			<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm mt-3 card-hover">
+				<div data-slot="card-content" class="px-6">
+					<h3 class="text-xl text-bold">✍ Descripción</h3>
+					<p class="mt-2 text-foreground/80 whitespace-pre-line">
+						{{ perfil.descripcion }}
+					</p>
+				</div>
+			</div>
+			{% endif %}
+			
+			<!-- Card: Cursos ofertados -->
+			{% if perfil.ofertas_creadas.exists %}
+			<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm mt-3 card-hover">
+				<div data-slot="card-content" class="px-6">
+					<h3 class="text-xl text-bold">📝 Cursos dictados</h3>
+					<div class="flex flex-row flex-wrap gap-2 mt-3">
+						{% for oferta in perfil.ofertas_creadas.all %}
+							{% for ramo in oferta.ramos.all %}
+							<span class="badge badge-warning">{{ ramo.name }}</span>
+							{% endfor %}
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+	
+	<!-- Columna derecha - Reseñas y comentarios -->
+	<div class="md:col-span-6 flex flex-col gap-3 mb-12 mt-6 md:mt-0">
+		<div class="flex flex-row items-center justify-between text-foreground/60 pl-3">
+			<h3>{{ perfil.total_ratings }} reseñas</h3>
+			<button
+				type="button"
+				role="combobox"
+				aria-controls="radix-r0"
+				aria-expanded="false"
+				aria-autocomplete="none"
+				dir="ltr"
+				data-state="closed"
+				data-slot="select-trigger"
+				data-size="default"
+				class="border-border text-foreground/60 flex items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-sm outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 w-[160px]"
+			>
+				<span data-slot="select-value" style="pointer-events: none;">Más recientes</span>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="lucide lucide-chevron-down size-4 opacity-50"
+					aria-hidden="true"
+				>
+					<path d="m6 9 6 6 6-6"></path>
+				</svg>
+			</button>
+		</div>
+		
+		<!-- Card: Formulario de reseña -->
+		<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm">
+			<div data-slot="card-content" class="px-6">
+				<form class="space-y-4">
+					<div data-slot="form-item" class="grid gap-2">
+						<label
+							data-slot="form-label"
+							class="flex items-center gap-2 text-sm leading-none font-medium select-none"
+						>
+							Calificación
+						</label>
+						<div class="flex items-center gap-1">
+							{% for i in "12345" %}
+							<button type="button" class="transition-colors hover:scale-110 cursor-pointer">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-star w-5 h-5 text-gray-300 hover:text-yellow-400"
+								>
+									<path
+										d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"
+									></path>
+								</svg>
+							</button>
+							{% endfor %}
+						</div>
+					</div>
+					
+					<div data-slot="form-item" class="grid gap-2">
+						<label
+							data-slot="form-label"
+							class="flex items-center gap-2 text-sm leading-none font-medium select-none"
+						>
+							Comentario
+						</label>
+						<textarea
+							placeholder="Comparte tu experiencia..."
+							class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+						></textarea>
+					</div>
+					
+					<button
+						type="submit"
+						class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-full"
+					>
+						Enviar reseña
+					</button>
+				</form>
+			</div>
+		</div>
+		
+		<!-- Card: Lista de reseñas -->
+		<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm">
+			<div data-slot="card-content" class="px-6">
+				<div class="space-y-4">
+					{% if perfil.ratings_recibidos.exists %}
+						{% for rating in perfil.ratings_recibidos.all %}
+						<div class="border-b border-border pb-4 last:border-0">
+							<div class="flex items-start justify-between">
+								<div class="flex items-center gap-2">
+									<span class="font-semibold">{{ rating.calificador.user.username }}</span>
+									<div class="flex">
+										{% for i in "12345" %}
+											{% if forloop.counter <= rating.valoracion %}
+											<svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+												<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+											</svg>
+											{% else %}
+											<svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+												<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+											</svg>
+											{% endif %}
+										{% endfor %}
+									</div>
+								</div>
+								<span class="text-xs text-muted-foreground">{{ rating.fecha_rating|date:"d/m/Y" }}</span>
+							</div>
+							<p class="mt-2 text-sm text-foreground/80">Reseña del curso {{ rating.inscripcion.horario_ofertado.oferta.titulo }}</p>
+						</div>
+						{% endfor %}
+					{% else %}
+						<p class="text-center text-foreground/60 py-8">Aún no hay reseñas</p>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		
+		<!-- Paginación -->
+		<nav role="navigation" aria-label="pagination" data-slot="pagination" class="mx-auto flex w-full justify-center">
+			<ul data-slot="pagination-content" class="flex flex-row items-center gap-1">
+				<li data-slot="pagination-item">
+					<a href="#" aria-label="Go to previous page" data-slot="pagination-link" data-size="default" class="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 aria-disabled:pointer-events-none aria-disabled:opacity-50">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left h-4 w-4">
+							<path d="m15 18-6-6 6-6"></path>
+						</svg>
+						<span>Anterior</span>
+					</a>
+				</li>
+				<li data-slot="pagination-item">
+					<a href="#" aria-label="Go to page 1" data-slot="pagination-link" data-size="default" aria-current="page" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 w-9 aria-current:border-primary aria-current:bg-primary aria-current:text-primary-foreground">
+						1
+					</a>
+				</li>
+				<li data-slot="pagination-item">
+					<a href="#" aria-label="Go to next page" data-slot="pagination-link" data-size="default" class="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 aria-disabled:pointer-events-none aria-disabled:opacity-50">
+						<span>Siguiente</span>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right h-4 w-4">
+							<path d="m9 18 6-6-6-6"></path>
+						</svg>
+					</a>
+				</li>
+			</ul>
+		</nav>
+	</div>
+</main>
+
+{% endblock %}
