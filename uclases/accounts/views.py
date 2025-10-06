@@ -75,8 +75,6 @@ def my_profile_view(request):
 
 # only lecture
 
-
-@login_required
 def profile_detail_view(request, public_uid):
     """Vista del perfil público de un usuario usando su UUID"""
     user = get_object_or_404(User, public_uid=public_uid)
