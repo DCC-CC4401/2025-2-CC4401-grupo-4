@@ -1,8 +1,9 @@
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from django.urls import path
-from .views import signin_view, signup_view, logout_view, profile_view
+from .views import signin_view, signup_view, logout_view, felmer_view, profile_detail_view,my_profile_view
 from .forms import CustomPasswordResetForm, CustomSetPasswordForm
+from django.shortcuts import redirect
 
 app_name = 'accounts'
 
@@ -10,6 +11,9 @@ urlpatterns = [
     path('login/', signin_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('register/', signup_view, name='register'),
+    path('profile/', lambda request: redirect('accounts:my_profile'), name='profile_redirect'),
+    path('profile/me/', my_profile_view, name='my_profile'),
+    path('profile/<uuid:public_uid>/', profile_detail_view, name='profile_detail'),
     path(
         'password-reset/',
         auth_views.PasswordResetView.as_view(
@@ -45,5 +49,5 @@ urlpatterns = [
         name='password_reset_complete',
     ),
     
-    path('profile/', profile_view, name='profile')
+    path('profile/felmer', felmer_view, name='felmer')
 ]
