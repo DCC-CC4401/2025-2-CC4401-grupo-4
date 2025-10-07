@@ -52,4 +52,94 @@
         </div>
     </div>
 </section>
+
+<!-- Sección de Publicaciones Recientes -->
+<section class="container max-w-4xl mx-auto px-4 py-12">
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold mb-6 text-foreground px-2">Publicaciones Recientes</h2>
+        
+        {% if publicaciones_recientes %}
+        <div class="space-y-4">
+            {% for publicacion in publicaciones_recientes %}
+            <article class="bg-card text-foreground rounded-xl border border-border shadow-sm card-hover cursor-pointer transition-all duration-300">
+                <div class="p-6">
+                    <!-- Header: Usuario, Carrera, Ramos y Tipo -->
+                    <div class="flex items-start justify-between mb-4 gap-4">
+                        <div class="flex items-center gap-3 flex-wrap flex-1">
+                            <!-- Usuario -->
+                            {% if publicacion.profesor %}
+                                <!-- Es una Oferta -->
+                                <a href="{% url 'accounts:profile_detail' publicacion.profesor.user.public_uid %}" class="font-semibold text-foreground hover:text-primary transition-colors">
+                                    @{{ publicacion.profesor.user.username }}
+                                </a>
+                                
+                                <!-- Carrera -->
+                                {% if publicacion.profesor.carrera %}
+                                <span class="badge inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium"
+                                      style="color: #10b981; border-color: color-mix(in oklab, #10b981 30%, transparent); background-color: color-mix(in oklab, #10b981 12%, transparent);">
+                                    {{ publicacion.profesor.carrera.name }}
+                                </span>
+                                {% endif %}
+                                
+                                <!-- Ramos (múltiples) -->
+                                {% for ramo in publicacion.ramos.all %}
+                                <span class="badge inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium"
+                                      style="color: #8b5cf6; border-color: color-mix(in oklab, #8b5cf6 30%, transparent); background-color: color-mix(in oklab, #8b5cf6 12%, transparent);">
+                                    {{ ramo.name }}
+                                </span>
+                                {% endfor %}
+                            {% else %}
+                                <!-- Es una Solicitud -->
+                                <a href="{% url 'accounts:profile_detail' publicacion.solicitante.user.public_uid %}" class="font-semibold text-foreground hover:text-primary transition-colors">
+                                    @{{ publicacion.solicitante.user.username }}
+                                </a>
+                                
+                                <!-- Carrera -->
+                                {% if publicacion.solicitante.carrera %}
+                                <span class="badge inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium"
+                                      style="color: #10b981; border-color: color-mix(in oklab, #10b981 30%, transparent); background-color: color-mix(in oklab, #10b981 12%, transparent);">
+                                    {{ publicacion.solicitante.carrera.name }}
+                                </span>
+                                {% endif %}
+                                
+                                <!-- Ramo (solo uno) -->
+                                <span class="badge inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium"
+                                      style="color: #8b5cf6; border-color: color-mix(in oklab, #8b5cf6 30%, transparent); background-color: color-mix(in oklab, #8b5cf6 12%, transparent);">
+                                    {{ publicacion.ramo.name }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Tipo: Oferta o Solicitud -->
+                        {% if publicacion.profesor %}
+                        <span class="badge inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium flex-shrink-0"
+                              style="color: #ef4444; border-color: color-mix(in oklab, #ef4444 30%, transparent); background-color: color-mix(in oklab, #ef4444 12%, transparent);">
+                            Oferta
+                        </span>
+                        {% else %}
+                        <span class="badge inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium flex-shrink-0"
+                              style="color: #06b6d4; border-color: color-mix(in oklab, #06b6d4 30%, transparent); background-color: color-mix(in oklab, #06b6d4 12%, transparent);">
+                            Solicitud
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Título -->
+                    <h3 class="text-lg font-semibold text-foreground mb-2">{{ publicacion.titulo }}</h3>
+                    
+                    <!-- Descripción truncada -->
+                    <p class="text-sm text-foreground/70 truncate">
+                        {{ publicacion.descripcion }}
+                    </p>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <p class="text-foreground/60 text-lg">No hay publicaciones disponibles aún.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}
