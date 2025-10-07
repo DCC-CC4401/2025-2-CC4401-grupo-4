@@ -7,6 +7,7 @@ from .models import Perfil, User
 from courses.models import Carrera
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.urls import reverse
 # Create your views here.
 
 
@@ -81,6 +82,9 @@ def my_profile_view(request):
         'perfil': perfil,
         'ramos_dictados': sorted(ramos_dictados, key=lambda r: r.name),
         'ramos_solicitados': sorted(ramos_solicitados, key=lambda r: r.name),
+        'share_url': request.build_absolute_uri(
+            reverse('accounts:profile_detail', args=[user.public_uid])
+        ),
         #aqui se añaden los forms en caso de que se quiera editar
     }
 
@@ -91,6 +95,11 @@ def my_profile_view(request):
 def profile_detail_view(request, public_uid):
     """Vista del perfil público de un usuario usando su UUID"""
     user = get_object_or_404(User, public_uid=public_uid)
+    
+    # Redirigir a mi perfil si es el usuario autenticado
+    if request.user.is_authenticated and request.user == user:
+        return redirect('accounts:my_profile')
+    
     perfil = user.perfil
     
     # Obtener ramos únicos de ofertas (sin duplicados)
@@ -109,6 +118,9 @@ def profile_detail_view(request, public_uid):
         'perfil': perfil,
         'ramos_dictados': sorted(ramos_dictados, key=lambda r: r.name),
         'ramos_solicitados': sorted(ramos_solicitados, key=lambda r: r.name),
+        'share_url': request.build_absolute_uri(
+            reverse('accounts:profile_detail', args=[user.public_uid])
+        ),
     }
 
     return render(request, 'profile/profile_detail_view.html', context)
