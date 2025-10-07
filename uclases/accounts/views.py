@@ -64,10 +64,23 @@ def my_profile_view(request):
 
     user = request.user
     perfil = user.perfil
+    
+    # Obtener ramos únicos de ofertas (sin duplicados)
+    ramos_dictados = set()
+    for oferta in perfil.ofertas_creadas.all():
+        for ramo in oferta.ramos.all():
+            ramos_dictados.add(ramo)
+    
+    # Obtener ramos únicos de solicitudes (sin duplicados)
+    ramos_solicitados = set()
+    for solicitud in perfil.solicitudes_creadas.all():
+        ramos_solicitados.add(solicitud.ramo)
 
     context = {
         'profile_user': user,
         'perfil': perfil,
+        'ramos_dictados': sorted(ramos_dictados, key=lambda r: r.name),
+        'ramos_solicitados': sorted(ramos_solicitados, key=lambda r: r.name),
         #aqui se añaden los forms en caso de que se quiera editar
     }
 
@@ -79,10 +92,23 @@ def profile_detail_view(request, public_uid):
     """Vista del perfil público de un usuario usando su UUID"""
     user = get_object_or_404(User, public_uid=public_uid)
     perfil = user.perfil
+    
+    # Obtener ramos únicos de ofertas (sin duplicados)
+    ramos_dictados = set()
+    for oferta in perfil.ofertas_creadas.all():
+        for ramo in oferta.ramos.all():
+            ramos_dictados.add(ramo)
+    
+    # Obtener ramos únicos de solicitudes (sin duplicados)
+    ramos_solicitados = set()
+    for solicitud in perfil.solicitudes_creadas.all():
+        ramos_solicitados.add(solicitud.ramo)
 
     context = {
         'profile_user': user,
         'perfil': perfil,
+        'ramos_dictados': sorted(ramos_dictados, key=lambda r: r.name),
+        'ramos_solicitados': sorted(ramos_solicitados, key=lambda r: r.name),
     }
 
     return render(request, 'profile/profile_detail_view.html', context)
