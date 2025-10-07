@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
 	'home',
     'courses',
+    'devtools',
 ]
 
 MIDDLEWARE = [
