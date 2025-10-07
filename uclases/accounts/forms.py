@@ -19,7 +19,7 @@ class SignUpForm(UserCreationForm):
         self.fields['password2'].widget.attrs.update({'class': INPUT_CLASS})
 
     def clean_email(self):
-        email = self.cleaned_data.get("email").strip().lower()
+        email = self.cleaned_data.get("email").strip()
         if email is None:
             raise forms.ValidationError("El correo electrónico es obligatorio.")
         if User.objects.filter(email__iexact=email).exists():
@@ -27,7 +27,7 @@ class SignUpForm(UserCreationForm):
         return email
     
     def clean_username(self):
-        username = self.cleaned_data.get("username").strip().lower()
+        username = self.cleaned_data.get("username").strip()
         if username is None:
             raise forms.ValidationError("El nombre de usuario es obligatorio.")
         if len(username) < 4:
@@ -49,7 +49,7 @@ class CustomLoginForm(AuthenticationForm):
         self.fields['username'].widget.attrs.update({'class': INPUT_CLASS, 'autofocus': True})
         self.fields['password'].widget.attrs.update({'class': INPUT_CLASS})
     def clean_username(self):
-        username = self.cleaned_data.get("username").strip().lower()
+        username = self.cleaned_data.get("username").strip()
         if username is None:
             raise forms.ValidationError("El nombre de usuario o correo electrónico es obligatorio.")
         # Allowing login with email in username field
