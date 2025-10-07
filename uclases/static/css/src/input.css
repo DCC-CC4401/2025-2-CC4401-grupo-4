@@ -1,167 +1,193 @@
 @import "tailwindcss";
 
 @theme {
-  --color-border: var(--border);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+	--color-border: var(--border);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
 
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
 
-  --color-card: var(--card);
+	--color-card: var(--card);
 
-  --animate-float: float 6s ease-in-out infinite;
-  --animate-pulse-subtle: pulse-subtle 4s ease-in-out infinite;
-  --animate-fade-in: fade-in 0.7s ease-out forwards;
-  --animate-fade-in-delay-1: fade-in 0.7s ease-out 0.2s forwards;
-  --animate-fade-in-delay-2: fade-in 0.7s ease-out 0.4s forwards;
-  --animate-fade-in-delay-3: fade-in 0.7s ease-out 0.6s forwards;
-  --animate-fade-in-delay-4: fade-in 0.7s ease-out 0.8s forwards;
+	--animate-float: float 6s ease-in-out infinite;
+	--animate-pulse-subtle: pulse-subtle 4s ease-in-out infinite;
+	--animate-fade-in: fade-in 0.7s ease-out forwards;
+	--animate-fade-in-delay-1: fade-in 0.7s ease-out 0.2s forwards;
+	--animate-fade-in-delay-2: fade-in 0.7s ease-out 0.4s forwards;
+	--animate-fade-in-delay-3: fade-in 0.7s ease-out 0.6s forwards;
+	--animate-fade-in-delay-4: fade-in 0.7s ease-out 0.8s forwards;
 
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
 }
 
 @layer base {
-  :root {
-    --background: #fcf8f8;
-    --foreground: #290f0f;
+	:root {
+		--background: #fcf8f8;
+		--foreground: #290f0f;
 
-    --card: #FFFFFF;
+		--card: #FFFFFF;
 
-    --primary: #A62C2C;
-    --primary-foreground: #fcf8f8;
+		--primary: #A62C2C;
+		--primary-foreground: #fcf8f8;
 
-    --border: #efe1e1;
-  }
-  
-  .dark {
-    --background: #0f0505;
-    --foreground: #efe1e1;
-    
-    --card: #1e0b0b;
-    
-    --primary: #a21a1a;
-    --primary-foreground: #efe1e1;
+		--border: #efe1e1;
+	}
 
-    --border: #442222;
-  }
+	.dark {
+		--background: #0f0505;
+		--foreground: #efe1e1;
 
-  * {
-    @apply border-border;
-  }
+		--card: #1e0b0b;
 
-  html {
-    @apply scroll-smooth;
-  }
+		--primary: #a21a1a;
+		--primary-foreground: #efe1e1;
 
-  body {
-    @apply bg-background text-foreground transition-colors duration-300;
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
+		--border: #442222;
+	}
+
+	* {
+		@apply border-border;
+	}
+
+	html {
+		@apply scroll-smooth;
+	}
+
+	body {
+		@apply bg-background text-foreground transition-colors duration-300;
+		font-feature-settings: "rlig" 1, "calt" 1;
+	}
 }
 
 @utility container {
-  margin-inline: auto;
-  padding-inline: 2rem;
+	margin-inline: auto;
+	padding-inline: 2rem;
 
-  @media (width >= 640px) {
-    max-width: 640px;
-  }
-  @media (width >= 768px) {
-    max-width: 768px;
-  }
-  @media (width >= 1024px) {
-    max-width: 1024px;
-  }
-  @media (width >= 1280px) {
-    max-width: 1280px;
-  }
-  @media (width >= 1400px) {
-    max-width: 1400px;
-  }
+	@media (width >=640px) {
+		max-width: 640px;
+	}
+
+	@media (width >=768px) {
+		max-width: 768px;
+	}
+
+	@media (width >=1024px) {
+		max-width: 1024px;
+	}
+
+	@media (width >=1280px) {
+		max-width: 1280px;
+	}
+
+	@media (width >=1400px) {
+		max-width: 1400px;
+	}
 }
 
 @utility text-glow {
-  @apply relative;
-  text-shadow: 0 0 10px rgba(245, 73, 39, 0.5);
+	@apply relative;
+	text-shadow: 0 0 10px rgba(245,73,39,0.5);
 }
 
 @utility card-hover {
-  @apply transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg;
+	@apply transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg;
 }
 
 @utility gradient-border {
-  @apply relative rounded-md;
-  background: linear-gradient(to right, var(--card), var(--card));
-  background-clip: padding-box;
-  border: 1px solid transparent;
+	@apply relative rounded-md;
+	background: linear-gradient(to right, var(--card), var(--card));
+	background-clip: padding-box;
+	border: 1px solid transparent;
 }
 
 @utility cosmic-button {
-  @apply px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium 
-         transition-all duration-300 hover:shadow-[0_0_10px_rgba(245,73,39,0.5)]
-         hover:scale-105 active:scale-95;
+	@apply px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium transition-all duration-300 hover:shadow-[0_0_10px_rgba(245,73,39,0.5)] hover:scale-105 active:scale-95;
 }
 
 #root {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0;
-  text-align: center;
-  font-size: 18px;
+	max-width: 100%;
+	margin: 0 auto;
+	padding: 0;
+	text-align: center;
+	font-size: 18px;
 }
 
 @layer utilities {
-  @keyframes float {
-    0% { 
-      opacity: 0.4; 
-      transform: rotate(0deg) translate(0px,20px) scale(1); 
-    }
-    100% { 
-      opacity: 0; 
-      transform: rotate(30deg) translate(10px,-20px) scale(0.9); 
-    }
-  }
-  .animate-float {
-    animation: float 6s ease-in-out forwards;
-  }
+	@keyframes float {
+		0% {
+			opacity: 0.4;
+			transform: rotate(0deg) translate(0px, 20px) scale(1);
+		}
 
-  /* Badges */
-  .badge { @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs; }
-  .badge-info {
-    color: #3b82f6; /* blue-500 */
-    border-color: color-mix(in oklab, #3b82f6 30%, transparent);
-    background-color: color-mix(in oklab, #3b82f6 12%, transparent);
-  }
-  .badge-warning {
-    color: #f59e0b; /* amber-500 */
-    border-color: color-mix(in oklab, #f59e0b 30%, transparent);
-    background-color: color-mix(in oklab, #f59e0b 12%, transparent);
-  }
+		100% {
+			opacity: 0;
+			transform: rotate(30deg) translate(10px, -20px) scale(0.9);
+		}
+	}
 
-  /* Hero gradient overlay for readability */
-  .gradient-hero { position: relative; overflow: hidden; }
-  .gradient-hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    /* Funde la imagen con el color de fondo actual del tema */
-    background: linear-gradient(
-      to bottom,
-      color-mix(in oklab, var(--background) 0%, transparent) 0%,
-      color-mix(in oklab, var(--background) 35%, transparent) 55%,
-      color-mix(in oklab, var(--background) 70%, transparent) 80%,
-      var(--background) 100%
-    );
-    pointer-events: none;
-  }
+	.animate-float {
+		animation: float 6s ease-in-out forwards;
+	}
+
+	/* Badges */
+	.badge {
+		@apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs;
+	}
+
+	.badge-info {
+		color: #3b82f6; /* blue-500 */
+		border-color: color-mix(in oklab, #3b82f6 30%, transparent);
+		background-color: color-mix(in oklab, #3b82f6 12%, transparent);
+	}
+
+	.badge-warning {
+		color: #f59e0b; /* amber-500 */
+		border-color: color-mix(in oklab, #f59e0b 30%, transparent);
+		background-color: color-mix(in oklab, #f59e0b 12%, transparent);
+	}
+
+	/* Hero gradient overlay for readability */
+	.gradient-hero {
+		position: relative;
+		overflow: hidden;
+	}
+
+	.gradient-hero::before,
+	.gradient-hero::after {
+		content: "";
+		position: absolute;
+		left: 0;
+		width: 100%;
+		pointer-events: none;
+		z-index: 1;
+	}
+
+	.gradient-hero::before {
+		top: 0;
+		height: 50%;
+		background: linear-gradient(to top,
+				transparent 0%,
+				color-mix(in oklab, var(--background) 45%, transparent) 55%,
+				var(--background) 100%);
+	}
+
+	.gradient-hero::after {
+		bottom: 0;
+		height: 50%;
+		background: linear-gradient(to bottom,
+				transparent 0%,
+				color-mix(in oklab, var(--background) 45%, transparent) 55%,
+				var(--background) 100%);
+	}
 }
