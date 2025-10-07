@@ -2,12 +2,19 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import CustomLoginForm, SignUpForm, ProfileForm
+from .forms import (
+    CustomLoginForm,
+    SignUpForm,
+    ProfileForm,
+    DescriptionForm,
+    ImagesForm,
+    CareerForm,
+    ContactInfoForm,
+)
 from .models import Perfil, User
 from courses.models import Carrera
 from django.shortcuts import get_object_or_404
 from django.conf import settings
-# Create your views here.
 
 
 @login_required
@@ -65,10 +72,28 @@ def my_profile_view(request):
     user = request.user
     perfil = user.perfil
 
+    description_form = DescriptionForm(request.POST or None, instance=perfil, prefix="desc")
+    images_form = ImagesForm(request.POST or None, instance=perfil, prefix="img")
+    career_form = CareerForm(request.POST or None, instance=perfil, prefix="career")
+    contact_form = ContactInfoForm(request.POST or None, instance=perfil, prefix="contact")
+    profile_form = ProfileForm(request.POST or None, instance=perfil, prefix="main")
+
+    if request.method == "POST":
+        for form in [description_form, images_form, career_form, contact_form, profile_form]:
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Tu perfil se ha actualizado correctamente.")
+                return redirect('accounts:my_profile')
+            messages.error(request, "Reingresa la informacion y vuelve a intentarlo.")
+
     context = {
         'profile_user': user,
         'perfil': perfil,
-        #aqui se añaden los forms en caso de que se quiera editar
+        'description_form': description_form,
+        'images_form': images_form,
+        'career_form': career_form,
+        'contact_info_form': contact_form,
+        'profile_form': profile_form,
     }
 
     return render(request, 'profile/my_profile.html', context)
