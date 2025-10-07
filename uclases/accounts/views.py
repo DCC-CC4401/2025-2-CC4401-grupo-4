@@ -61,8 +61,6 @@ def felmer_view(request):
     return render(request, 'profile/felmer.html')
 
 # editable profile
-
-
 def my_profile_view(request):
     """Vista del perfil del usuario autenticado"""
     if not request.user.is_authenticated:
@@ -72,19 +70,49 @@ def my_profile_view(request):
     user = request.user
     perfil = user.perfil
 
-    description_form = DescriptionForm(request.POST or None, instance=perfil, prefix="desc")
-    images_form = ImagesForm(request.POST or None, instance=perfil, prefix="img")
-    career_form = CareerForm(request.POST or None, instance=perfil, prefix="career")
-    contact_form = ContactInfoForm(request.POST or None, instance=perfil, prefix="contact")
-    profile_form = ProfileForm(request.POST or None, instance=perfil, prefix="main")
+    target_prefix = request.POST.get("form_prefix") if request.method == "POST" else None
+
+    description_form = DescriptionForm(
+        request.POST if target_prefix == "desc" else None,
+        instance=perfil,
+        prefix="desc",
+    )
+    images_form = ImagesForm(
+        request.POST if target_prefix == "img" else None,
+        instance=perfil,
+        prefix="img",
+    )
+    career_form = CareerForm(
+        request.POST if target_prefix == "career" else None,
+        instance=perfil,
+        prefix="career",
+    )
+    contact_form = ContactInfoForm(
+        request.POST if target_prefix == "contact" else None,
+        instance=perfil,
+        prefix="contact",
+    )
+    profile_form = ProfileForm(
+        request.POST if target_prefix == "main" else None,
+        instance=perfil,
+        prefix="main",
+    )
+
+    forms_map = {
+        "desc": description_form,
+        "img": images_form,
+        "career": career_form,
+        "contact": contact_form,
+        "main": profile_form,
+    }
 
     if request.method == "POST":
-        for form in [description_form, images_form, career_form, contact_form, profile_form]:
-            if form.is_valid():
-                form.save()
-                messages.success(request, "Tu perfil se ha actualizado correctamente.")
-                return redirect('accounts:my_profile')
-            messages.error(request, "Reingresa la informacion y vuelve a intentarlo.")
+        selected_form = forms_map.get(target_prefix)
+        if selected_form and selected_form.is_valid():
+            selected_form.save()
+            messages.success(request, "Tu perfil se ha actualizado correctamente.")
+            return redirect('accounts:my_profile')
+        messages.error(request, "Reingresa la informacion y vuelve a intentarlo.")
 
     context = {
         'profile_user': user,
