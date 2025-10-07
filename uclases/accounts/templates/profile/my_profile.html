@@ -123,16 +123,28 @@
 			</div>
 			{% endif %}
 			
-			<!-- Card: Cursos ofertados -->
-			{% if perfil.ofertas_creadas.exists %}
+			<!-- Card: Cursos dictados -->
+			{% if ramos_dictados %}
 			<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm mt-3 card-hover">
 				<div data-slot="card-content" class="px-6">
 					<h3 class="text-xl text-bold">📝 Cursos dictados</h3>
 					<div class="flex flex-row flex-wrap gap-2 mt-3">
-						{% for oferta in perfil.ofertas_creadas.all %}
-							{% for ramo in oferta.ramos.all %}
-							<span class="badge badge-warning">{{ ramo.name }}</span>
-							{% endfor %}
+						{% for ramo in ramos_dictados %}
+						<span class="badge badge-warning">{{ ramo.name }}</span>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+			{% endif %}
+			
+			<!-- Card: Cursos solicitados -->
+			{% if ramos_solicitados %}
+			<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm mt-3 card-hover">
+				<div data-slot="card-content" class="px-6">
+					<h3 class="text-xl text-bold">🔍 Cursos solicitados</h3>
+					<div class="flex flex-row flex-wrap gap-2 mt-3">
+						{% for ramo in ramos_solicitados %}
+						<span class="badge badge-info">{{ ramo.name }}</span>
 						{% endfor %}
 					</div>
 				</div>
