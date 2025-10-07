@@ -199,7 +199,6 @@ class DescriptionForm(forms.ModelForm):
             })
         }
 
-
 class ImagesForm(forms.ModelForm):
     """Formulario para editar SOLO las imágenes"""
     class Meta:
@@ -219,6 +218,7 @@ class ImagesForm(forms.ModelForm):
             'foto_url': 'URL de foto de perfil',
             'banner_url': 'URL de banner'
         }
+
 class CareerForm(forms.ModelForm):
     """Formulario para editar SOLO carrera y ramos"""
     class Meta:
@@ -226,12 +226,25 @@ class CareerForm(forms.ModelForm):
         fields = ['carrera', 'ramos_cursados']
         widgets = {
             'carrera': forms.Select(attrs={'class': INPUT_CLASS}),
-            'ramos_cursados': forms.CheckboxSelectMultiple()
+            'ramos_cursados': forms.SelectMultiple(attrs={'class': INPUT_CLASS})
         }
         labels = {
             'carrera': 'Carrera actual',
             'ramos_cursados': 'Ramos cursados'
         }
+
+class PerfilRamoForm(forms.ModelForm):
+    """Formulario para editar SOLO ramos cursados"""
+    class Meta:
+        model = Perfil
+        fields = ['ramos_cursados']
+        widgets = {
+            'ramos_cursados': forms.SelectMultiple(attrs={'class': INPUT_CLASS})
+        }
+        labels = {
+            'ramos_cursados': 'Ramos cursados'
+        }
+        
 class ContactInfoForm(forms.ModelForm):
     """Formulario para editar SOLO teléfono"""
     class Meta:
