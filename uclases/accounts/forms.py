@@ -3,8 +3,9 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetP
 from django.conf import settings
 from .models import User, Perfil
 
-INPUT_CLASS = "w-full px-4 py-2 border border-border rounded-md bg-background text-foreground mb-2 focus:outline-none focus:ring-2 focus:ring-primary transition"
-TEXTAREA_CLASS = ""
+INPUT_CLASS = "appearance-none my-4 w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
+TEXTAREA_CLASS = "mt-4 w-full px-4 py-3 border border-border rounded-xl outline-hidden bg-card text-foreground placeholder:text-muted-foreground transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+
 class SignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
