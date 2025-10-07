@@ -10,7 +10,7 @@ solo_alnum_guionbajo = RegexValidator(
 
 class User(AbstractUser):
     username = models.CharField(
-        'username',
+        'Nombre de usuario',
         max_length=150,
         unique=True,
         help_text='Solo letras, números o _',
