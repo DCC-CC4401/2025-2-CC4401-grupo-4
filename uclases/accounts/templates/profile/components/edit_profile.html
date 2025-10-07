@@ -1,8 +1,8 @@
 {% comment %} 
 Componente reutilizable para abrir un modal de edición. Requiere
 variables: - form: instancia del formulario Django - title: título del modal -
-action_url: (opcional) endpoint donde se enviará el form (default: página
-actual) - button_label: (opcional) texto del botón (default: ✏️) 
+action_url: (opcional) endpoint donde se enviará el form (default: página actual) - 
+button_label: (opcional) texto del botón
 {% endcomment %}
 
 <div class="inline-block">
@@ -55,7 +55,9 @@ actual) - button_label: (opcional) texto del botón (default: ✏️)
                 action="{{ action_url|default:request.path }}"
                 class="space-y-4"
             >
-                {% csrf_token %} {{ form.as_p }}
+                {% csrf_token %}
+                <input type="hidden" name="form_prefix" value="{{ form.prefix }}" />
+                {{ form.as_p }}
 
                 <div class="flex justify-end gap-2 mt-4">
                     <button
