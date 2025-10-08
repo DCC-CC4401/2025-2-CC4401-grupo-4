@@ -78,8 +78,9 @@
         {% if publicaciones_recientes %}
         <div class="space-y-4">
             {% for publicacion in publicaciones_recientes %}
-            <article class="bg-card text-foreground rounded-xl border border-border shadow-sm card-hover cursor-pointer transition-all duration-300"
-                     onclick="window.location.href='{% if publicacion.profesor %}{% url 'courses:oferta_detail' publicacion.id %}{% else %}{% url 'courses:solicitud_detail' publicacion.id %}{% endif %}'">
+            <a href="{% if publicacion.profesor %}{% url 'courses:oferta_detail' publicacion.id %}{% else %}{% url 'courses:solicitud_detail' publicacion.id %}{% endif %}"
+               class="block bg-card text-foreground rounded-xl border border-border shadow-sm card-hover cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
+               aria-label="Ver detalles de la publicación {{ publicacion.titulo }}">
                 <div class="p-6">
                     <!-- Header: Usuario, Carrera, Ramos y Tipo -->
                     <div class="flex items-start justify-between mb-4 gap-4">
@@ -150,7 +151,7 @@
                         {{ publicacion.descripcion }}
                     </p>
                 </div>
-            </article>
+            </a>
             {% endfor %}
         </div>
         {% else %}
