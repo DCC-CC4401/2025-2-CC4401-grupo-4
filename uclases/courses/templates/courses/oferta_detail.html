@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container mx-auto px-4 py-8 max-w-4xl">
     <!-- Card Principal -->
-    <div class="bg-white border border-gray-200 rounded-lg shadow-md p-8">
+    <div class="bg-card border border-border rounded-lg shadow-md p-8">
         <!-- Encabezado -->
         <div class="border-b border-gray-200 pb-4 mb-6">
             <div class="flex items-start justify-between mb-3">
@@ -122,10 +122,42 @@
                 </svg>
                 Volver
             </a>
-            <button class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                    onclick="alert('Funcionalidad de inscripción próximamente')">
+            <button id="inscribirseBtn" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                    aria-haspopup="dialog" aria-controls="modalInscripcion">
                 Inscribirse en esta oferta
             </button>
+            <!-- Modal de Inscripción -->
+            <div id="modalInscripcion" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+                <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                    <h3 id="modalTitle" class="text-lg font-semibold mb-4">Funcionalidad de inscripción próximamente</h3>
+                    <button id="closeModalBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Cerrar modal">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+            <script>
+                const inscribirseBtn = document.getElementById('inscribirseBtn');
+                const modal = document.getElementById('modalInscripcion');
+                const closeModalBtn = document.getElementById('closeModalBtn');
+
+                inscribirseBtn.addEventListener('click', function() {
+                    modal.classList.remove('hidden');
+                    closeModalBtn.focus();
+                });
+
+                closeModalBtn.addEventListener('click', function() {
+                    modal.classList.add('hidden');
+                    inscribirseBtn.focus();
+                });
+
+                // Cerrar modal con Escape
+                document.addEventListener('keydown', function(e) {
+                    if (!modal.classList.contains('hidden') && e.key === 'Escape') {
+                        modal.classList.add('hidden');
+                        inscribirseBtn.focus();
+                    }
+                });
+            </script>
         </div>
     </div>
 </div>
