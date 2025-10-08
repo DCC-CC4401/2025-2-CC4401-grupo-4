@@ -78,7 +78,8 @@
         {% if publicaciones_recientes %}
         <div class="space-y-4">
             {% for publicacion in publicaciones_recientes %}
-            <article class="bg-card text-foreground rounded-xl border border-border shadow-sm card-hover cursor-pointer transition-all duration-300">
+            <article class="bg-card text-foreground rounded-xl border border-border shadow-sm card-hover cursor-pointer transition-all duration-300"
+                     onclick="window.location.href='{% if publicacion.profesor %}{% url 'courses:oferta_detail' publicacion.id %}{% else %}{% url 'courses:solicitud_detail' publicacion.id %}{% endif %}'">
                 <div class="p-6">
                     <!-- Header: Usuario, Carrera, Ramos y Tipo -->
                     <div class="flex items-start justify-between mb-4 gap-4">
@@ -86,9 +87,9 @@
                             <!-- Usuario -->
                             {% if publicacion.profesor %}
                                 <!-- Es una Oferta -->
-                                <a href="{% url 'accounts:profile_detail' publicacion.profesor.user.public_uid %}" class="font-semibold text-foreground hover:text-primary transition-colors">
+                                <span class="font-semibold text-foreground">
                                     @{{ publicacion.profesor.user.username }}
-                                </a>
+                                </span>
                                 
                                 <!-- Carrera -->
                                 {% if publicacion.profesor.carrera %}
@@ -107,9 +108,9 @@
                                 {% endfor %}
                             {% else %}
                                 <!-- Es una Solicitud -->
-                                <a href="{% url 'accounts:profile_detail' publicacion.solicitante.user.public_uid %}" class="font-semibold text-foreground hover:text-primary transition-colors">
+                                <span class="font-semibold text-foreground">
                                     @{{ publicacion.solicitante.user.username }}
-                                </a>
+                                </span>
                                 
                                 <!-- Carrera -->
                                 {% if publicacion.solicitante.carrera %}
