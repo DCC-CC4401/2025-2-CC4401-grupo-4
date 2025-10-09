@@ -20,7 +20,7 @@ class SignUpForm(UserCreationForm):
         self.fields['password2'].widget.attrs.update({'class': INPUT_CLASS})
 
     def clean_email(self):
-        email = self.cleaned_data.get("email").strip().lower()
+        email = self.cleaned_data.get("email").strip()
         if email is None:
             raise forms.ValidationError("El correo electrónico es obligatorio.")
         if User.objects.filter(email__iexact=email).exists():
@@ -28,7 +28,7 @@ class SignUpForm(UserCreationForm):
         return email
     
     def clean_username(self):
-        username = self.cleaned_data.get("username").strip().lower()
+        username = self.cleaned_data.get("username").strip()
         if username is None:
             raise forms.ValidationError("El nombre de usuario es obligatorio.")
         if len(username) < 4:
@@ -50,7 +50,7 @@ class CustomLoginForm(AuthenticationForm):
         self.fields['username'].widget.attrs.update({'class': INPUT_CLASS, 'autofocus': True})
         self.fields['password'].widget.attrs.update({'class': INPUT_CLASS})
     def clean_username(self):
-        username = self.cleaned_data.get("username").strip().lower()
+        username = self.cleaned_data.get("username").strip()
         if username is None:
             raise forms.ValidationError("El nombre de usuario o correo electrónico es obligatorio.")
         # Allowing login with email in username field
@@ -65,21 +65,13 @@ class CustomLoginForm(AuthenticationForm):
                 raise forms.ValidationError("Ingresa un correo electrónico válido.")
         # Non email username validation
         else:
-            if len(username) < 4:
-                raise forms.ValidationError("El nombre de usuario debe tener al menos 4 caracteres.")
-            if len(username) > 20:
-                raise forms.ValidationError("El nombre de usuario no puede tener más de 20 caracteres.")
-            if not all(c.isalnum() or c == "_" for c in username):
-                raise forms.ValidationError("El nombre de usuario solo puede contener letras, números y guiones bajos.")
             if not User.objects.filter(username__iexact=username).exists():
                 raise forms.ValidationError("No existe una cuenta con ese nombre de usuario.")
-        return username
+        return User.objects.filter(username__iexact=username).first()
     def clean_password(self):
         password = self.cleaned_data.get("password").strip()
         if password is None:
             raise forms.ValidationError("La contraseña es obligatoria.")
-        if len(password) < 8:
-            raise forms.ValidationError("La contraseña debe tener al menos 8 caracteres.")
         return password
 
 class CustomSetPasswordForm(SetPasswordForm):

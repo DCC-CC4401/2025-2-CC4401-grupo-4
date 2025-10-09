@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
 	'home',
     'courses',
+    'devtools',
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# Media files (User uploaded files)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

@@ -44,12 +44,35 @@
 			{% endif %}
 		</h1>
 		
+		{% if share_url %}
+		<div class="flex items-center gap-2 group relative">
+			<h3 
+				class="font-medium text-foreground/90 text-lg cursor-pointer select-none hover:text-primary transition-colors"
+				onclick="navigator.clipboard.writeText('{{ share_url }}').then(() => { const msg = document.getElementById('copy-msg-{{ profile_user.id }}'); msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2400); })"
+				title="Clic para copiar link del perfil"
+			>
+				@{{ profile_user.username }}
+			</h3>
+			<svg 
+				xmlns="http://www.w3.org/2000/svg" 
+				viewBox="0 0 24 24" 
+				fill="none" 
+				stroke="currentColor" 
+				stroke-width="2" 
+				stroke-linecap="round" 
+				stroke-linejoin="round" 
+				class="size-4 opacity-0 group-hover:opacity-100 transition-opacity text-foreground/60"
+			>
+				<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+				<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+			</svg>
+			<span id="copy-msg-{{ profile_user.id }}" class="absolute left-full ml-2 text-xs font-medium text-green-600 whitespace-nowrap hidden">¡Copiado!</span>
+		</div>
+		{% else %}
 		<h3 class="font-medium text-foreground/90 text-lg">
 			@{{ profile_user.username }}
-			{% if perfil.carrera %}
-				 - {{ perfil.carrera.name }}
-			{% endif %}
 		</h3>
+		{% endif %}
 		
 		<!-- Rating con estrellas -->
 		<div id="stars-rating" class="flex flex-row items-center mt-3">
@@ -123,16 +146,28 @@
 			</div>
 			{% endif %}
 			
-			<!-- Card: Cursos ofertados -->
-			{% if perfil.ofertas_creadas.exists %}
+			<!-- Card: Cursos dictados -->
+			{% if ramos_dictados %}
 			<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm mt-3 card-hover">
 				<div data-slot="card-content" class="px-6">
 					<h3 class="text-xl text-bold">📝 Cursos dictados</h3>
 					<div class="flex flex-row flex-wrap gap-2 mt-3">
-						{% for oferta in perfil.ofertas_creadas.all %}
-							{% for ramo in oferta.ramos.all %}
-							<span class="badge badge-warning">{{ ramo.name }}</span>
-							{% endfor %}
+						{% for ramo in ramos_dictados %}
+						<span class="badge badge-warning">{{ ramo.name }}</span>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+			{% endif %}
+			
+			<!-- Card: Cursos solicitados -->
+			{% if ramos_solicitados %}
+			<div data-slot="card" class="bg-card text-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm mt-3 card-hover">
+				<div data-slot="card-content" class="px-6">
+					<h3 class="text-xl text-bold">🔍 Cursos solicitados</h3>
+					<div class="flex flex-row flex-wrap gap-2 mt-3">
+						{% for ramo in ramos_solicitados %}
+						<span class="badge badge-info">{{ ramo.name }}</span>
 						{% endfor %}
 					</div>
 				</div>
