@@ -86,6 +86,13 @@ button_label: (opcional) texto del botón
         if (!modal.dataset.portalized) {
             document.body.appendChild(modal);
             modal.dataset.portalized = "true";
+            
+            // Agregar event listener para cerrar al hacer click fuera
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    toggleModal(prefix, false);
+                }
+            });
         }
 
         modal.classList.toggle("hidden", !show);
