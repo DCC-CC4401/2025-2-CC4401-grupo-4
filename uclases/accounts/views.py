@@ -15,6 +15,8 @@ from .models import Perfil, User
 from courses.models import Carrera
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.urls import reverse
+# Create your views here.
 
 
 @login_required
@@ -70,6 +72,17 @@ def my_profile_view(request):
     user = request.user
     perfil = user.perfil
 
+     # Obtener ramos únicos de ofertas (sin duplicados)
+    ramos_dictados = set()
+    for oferta in perfil.ofertas_creadas.all():
+        for ramo in oferta.ramos.all():
+            ramos_dictados.add(ramo)
+    
+    # Obtener ramos únicos de solicitudes (sin duplicados)
+    ramos_solicitados = set()
+    for solicitud in perfil.solicitudes_creadas.all():
+        ramos_solicitados.add(solicitud.ramo)
+
     target_prefix = request.POST.get("form_prefix") if request.method == "POST" else None
 
     description_form = DescriptionForm(
@@ -115,13 +128,19 @@ def my_profile_view(request):
         messages.error(request, "Reingresa la informacion y vuelve a intentarlo.")
 
     context = {
-        'profile_user': user,
+         'profile_user': user,
         'perfil': perfil,
         'description_form': description_form,
         'images_form': images_form,
         'career_form': career_form,
         'contact_info_form': contact_form,
         'profile_form': profile_form,
+        'ramos_dictados': sorted(ramos_dictados, key=lambda r: r.name),
+        'ramos_solicitados': sorted(ramos_solicitados, key=lambda r: r.name),
+        'share_url': request.build_absolute_uri(
+            reverse('accounts:profile_detail', args=[user.public_uid])
+        ),
+        #aqui se añaden los forms en caso de que se quiera editar
     }
 
     return render(request, 'profile/my_profile.html', context)
