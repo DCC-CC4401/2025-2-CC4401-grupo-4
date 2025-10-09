@@ -222,8 +222,32 @@ class CareerForm(forms.ModelForm):
         }
         labels = {
             'carrera': 'Carrera actual',
-            'ramos_cursados': 'Ramos cursados'
+            'ramos_cursados': 'Agregar ramos cursados'
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Si hay una instancia (perfil existente), filtrar los ramos ya cursados
+        if self.instance and self.instance.pk:
+            from courses.models import Ramo
+            ramos_ya_cursados = self.instance.ramos_cursados.all()
+            # Mostrar solo los ramos que NO están ya seleccionados
+            self.fields['ramos_cursados'].queryset = Ramo.objects.exclude(
+                id__in=ramos_ya_cursados.values_list('id', flat=True)
+            )
+            # Cambiar a required=False para permitir no seleccionar nada
+            self.fields['ramos_cursados'].required = False
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            # AÑADIR los nuevos ramos seleccionados a los existentes
+            nuevos_ramos = self.cleaned_data.get('ramos_cursados')
+            if nuevos_ramos:
+                for ramo in nuevos_ramos:
+                    instance.ramos_cursados.add(ramo)
+        return instance
 
 class PerfilRamoForm(forms.ModelForm):
     """Formulario para editar SOLO ramos cursados"""
