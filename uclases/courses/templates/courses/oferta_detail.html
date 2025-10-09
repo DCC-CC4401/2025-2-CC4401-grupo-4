@@ -157,6 +157,14 @@
                         inscribirseBtn.focus();
                     }
                 });
+
+                // Cerrar modal al hacer click fuera del contenido
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                        inscribirseBtn.focus();
+                    }
+                });
             </script>
         </div>
     </div>

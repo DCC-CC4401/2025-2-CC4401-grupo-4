@@ -113,8 +113,16 @@
                     proponerClaseModal.classList.add('hidden');
                     proponerClaseBtn.focus();
                 });
+                // Cerrar modal al presionar Escape
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape' && !proponerClaseModal.classList.contains('hidden')) {
+                        proponerClaseModal.classList.add('hidden');
+                        proponerClaseBtn.focus();
+                    }
+                });
+                // Cerrar modal al hacer click fuera del contenido
+                proponerClaseModal.addEventListener('click', (e) => {
+                    if (e.target === proponerClaseModal) {
                         proponerClaseModal.classList.add('hidden');
                         proponerClaseBtn.focus();
                     }
