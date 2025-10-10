@@ -37,7 +37,7 @@ def crear_oferta(request):
             if formset.is_valid():
                 formset.save()
                 messages.success(request, "Oferta y horarios creados correctamente.")
-                return redirect('oferta_detail', pk=oferta.pk)
+                return redirect('/', pk=oferta.pk)
         else:
             formset = HorarioFormSet(prefix="horarios")
     else:
