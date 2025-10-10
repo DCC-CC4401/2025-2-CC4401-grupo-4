@@ -3,6 +3,7 @@ from django.contrib import messages
 from .models import OfertaClase, SolicitudClase
 from .enums import DiaSemana
 from .forms import OfertaForm, HorarioFormSet
+from .forms import SolicitudClaseForm
 
 def oferta_detail(request, pk):
     """Vista detallada de una oferta de clase"""
@@ -45,3 +46,15 @@ def crear_oferta(request):
         formset = HorarioFormSet(prefix="horarios")
 
     return render(request, "courses/crear_oferta.html", {"form": form, "formset": formset})
+
+def crear_solicitud(request):
+    if request.method == "POST":
+        form = SolicitudClaseForm(request.POST)
+        if form.is_valid():
+            solicitud = form.save()
+            messages.success(request, "Solicitud creada correctamente.")
+            return redirect('solicitud_detail', pk=solicitud.pk)
+    else:
+        form = SolicitudClaseForm()
+
+    return render(request, "courses/crear_solicitud.html", {"form": form})
