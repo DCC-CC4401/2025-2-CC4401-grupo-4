@@ -16,9 +16,20 @@
 
     {{ formset.management_form }}
 
+    {% if formset.non_form_errors %}
+      <div class="mb-4 rounded-md border border-red-300 bg-red-50 text-red-700 text-sm p-3">
+        {{ formset.non_form_errors }}
+      </div>
+    {% endif %}
+
     <div id="horarios-container">
       {% for hf in formset %}
         <div class="horario-form border border-border rounded-lg p-4 mb-4 bg-background/70">
+          {% if hf.non_field_errors %}
+            <div class="mb-2 text-red-600 text-sm">
+              {{ hf.non_field_errors }}
+            </div>
+          {% endif %}
           {{ hf.as_p }}
         </div>
       {% endfor %}
