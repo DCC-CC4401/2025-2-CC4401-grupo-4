@@ -6,4 +6,5 @@ app_name = 'courses'
 urlpatterns = [
     path('oferta/<int:pk>/', views.oferta_detail, name='oferta_detail'),
     path('solicitud/<int:pk>/', views.solicitud_detail, name='solicitud_detail'),
+    path('oferta/nueva/', views.crear_oferta, name='crear_oferta'),
 ]

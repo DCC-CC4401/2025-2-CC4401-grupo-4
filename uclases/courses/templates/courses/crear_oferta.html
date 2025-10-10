@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-card p-8 rounded-xl shadow-md">
+  <h1 class="text-2xl font-semibold mb-6">Nueva Oferta de Clase</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    
+    <h2 class="text-lg font-medium mb-2">Información de la oferta</h2>
+    {{ form.as_p }}
+
+    <hr class="my-6">
+
+    <h2 class="text-lg font-medium mb-2">Horarios ofertados</h2>
+    {{ formset.management_form }}
+    {% for horario_form in formset %}
+      <div class="border border-border rounded-lg p-4 mb-4 bg-background/70">
+        {{ horario_form.as_p }}
+      </div>
+    {% endfor %}
+
+    <button type="submit"
+            class="bg-primary text-white px-4 py-2 rounded-md hover:opacity-90">
+      Crear Oferta
+    </button>
+  </form>
+</div>
+{% endblock %}
