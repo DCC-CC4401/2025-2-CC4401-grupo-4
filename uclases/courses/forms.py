@@ -36,14 +36,28 @@ class OfertaForm(forms.ModelForm):
             # 2) o casillas (quedan más lindas):
             "ramos": forms.CheckboxSelectMultiple(),
         }
-        help_texts = {
+        #help_texts = {
             #"ramos": "Mantén presionada Ctrl/⌘ para seleccionar varios (si usas multiselect).",
-        }
+        #}
+
+class HorarioOfertadoForm(forms.ModelForm):
+    hora_inicio = forms.TimeField(
+        widget=forms.TimeInput(attrs={"type": "time", "class": INPUT}, format="%H:%M"),
+        input_formats=["%H:%M"]
+    )
+    hora_fin = forms.TimeField(
+        widget=forms.TimeInput(attrs={"type": "time", "class": INPUT}, format="%H:%M"),
+        input_formats=["%H:%M"]
+    )
+    class Meta:
+        model = HorarioOfertado
+        fields = ["dia", "hora_inicio", "hora_fin", "cupos_totales"]
 
 HorarioFormSet = inlineformset_factory(
-    parent_model=OfertaClase,
-    model=HorarioOfertado,
+    OfertaClase,
+    HorarioOfertado,
+    form=HorarioOfertadoForm,
     fields=["dia", "hora_inicio", "hora_fin", "cupos_totales"],
-    extra=1,             # cuántos formularios vacíos mostrar por defecto
-    can_delete=True,     # permite eliminar horarios
+    extra=1,
+    can_delete=True,
 )

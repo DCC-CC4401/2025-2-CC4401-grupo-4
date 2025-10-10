@@ -29,23 +29,19 @@ def solicitud_detail(request, pk):
     return render(request, 'courses/solicitud_detail.html', context)
 
 def crear_oferta(request):
-    """Vista para crear una nueva oferta de clase"""
     if request.method == "POST":
         form = OfertaForm(request.POST)
-        formset = HorarioFormSet(request.POST)
-
-        if form.is_valid() and formset.is_valid():
-            oferta = form.save()
-            horarios = formset.save(commit=False)
-            for h in horarios:
-                h.oferta = oferta  # vincula el horario con la oferta
-                h.save()
-            messages.success(request, "Oferta y horarios creados correctamente.")
-            return redirect('oferta_detail', pk=oferta.pk)
+        if form.is_valid():
+            oferta = form.save()  # guarda el padre
+            formset = HorarioFormSet(request.POST, instance=oferta, prefix="horarios")
+            if formset.is_valid():
+                formset.save()
+                messages.success(request, "Oferta y horarios creados correctamente.")
+                return redirect('oferta_detail', pk=oferta.pk)
+        else:
+            formset = HorarioFormSet(prefix="horarios")
     else:
         form = OfertaForm()
-        formset = HorarioFormSet()
-        
+        formset = HorarioFormSet(prefix="horarios")
 
-    context = {"form": form, "formset": formset}
-    return render(request, "courses/crear_oferta.html", context)
+    return render(request, "courses/crear_oferta.html", {"form": form, "formset": formset})
