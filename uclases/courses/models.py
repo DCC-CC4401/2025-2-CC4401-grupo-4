@@ -41,6 +41,7 @@ class Carrera(models.Model):
 #Solicitud Clase: 
 class SolicitudClase(models.Model):
     #ID_Solicitud (PK) se crea atomaticamente como 'id'
+    MODALIDADES= [('presencial', 'Presencial'), ('online','Online'),]
     titulo = models.CharField(max_length=200)
     descripcion = models.TextField()
     fecha_publicacion = models.DateTimeField(auto_now_add=True)
@@ -51,7 +52,7 @@ class SolicitudClase(models.Model):
 
     #Relación N:1 con RAMO (Pertenece a)
     ramo = models.ForeignKey(Ramo, on_delete=models.CASCADE, related_name='solicitudes')
-
+    modalidad= models.CharField(max_length=20, choices=MODALIDADES, default = 'presencial')
     def __str__(self): return self.titulo
 
 

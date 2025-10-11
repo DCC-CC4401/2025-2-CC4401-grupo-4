@@ -53,7 +53,7 @@ def crear_solicitud(request):
         if form.is_valid():
             solicitud = form.save()
             messages.success(request, "Solicitud creada correctamente.")
-            return redirect('solicitud_detail', pk=solicitud.pk)
+            return redirect('/', pk=solicitud.pk)
     else:
         form = SolicitudClaseForm()
 

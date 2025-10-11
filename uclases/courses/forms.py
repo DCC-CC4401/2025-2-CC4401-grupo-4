@@ -73,7 +73,7 @@ class SolicitudClaseForm(forms.ModelForm):
 
     class Meta:
         model = SolicitudClase
-        fields = ['titulo','descripcion','solicitante','ramo']
+        fields = ['titulo','descripcion','solicitante','ramo','modalidad']
         labels = {
             "descripcion": "Descripción",
             "solicitante": "Solicitante",
@@ -88,4 +88,5 @@ class SolicitudClaseForm(forms.ModelForm):
             }),
             "solicitante": forms.Select(attrs={"class": INPUT}),
             "ramo": forms.Select(attrs={"class": INPUT}),
+            "modalidad": forms.Select(attrs={"class": INPUT}),
         }
