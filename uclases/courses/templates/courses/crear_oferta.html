@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-card p-8 rounded-xl shadow-md">
+  <h1 class="text-2xl font-semibold mb-6">Nueva Oferta de Clase</h1>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <h2 class="text-lg font-medium mb-2">Información de la oferta</h2>
+    {{ form.as_p }}
+
+    <hr class="my-6">
+
+    <h2 class="text-lg font-medium mb-2">Horarios ofertados</h2>
+
+    {{ formset.management_form }}
+
+    {% if formset.non_form_errors %}
+      <div class="mb-4 rounded-md border border-red-300 bg-red-50 text-red-700 text-sm p-3">
+        {{ formset.non_form_errors }}
+      </div>
+    {% endif %}
+
+    <div id="horarios-container">
+      {% for hf in formset %}
+        <div class="horario-form border border-border rounded-lg p-4 mb-4 bg-background/70">
+          {% if hf.non_field_errors %}
+            <div class="mb-2 text-red-600 text-sm">
+              {{ hf.non_field_errors }}
+            </div>
+          {% endif %}
+          {{ hf.as_p }}
+        </div>
+      {% endfor %}
+    </div>
+
+    <button type="button" id="addHorario" class="mb-4 px-3 py-2 border rounded">+ Agregar horario</button>
+
+    <!-- 👇 OJO: NO uses |escapejs aquí -->
+    <template id="empty-form-template">
+      <div class="horario-form border border-border rounded-lg p-4 mb-4 bg-background/70">
+        {{ formset.empty_form.as_p }}
+      </div>
+    </template>
+
+    <button type="submit"
+            class="bg-primary text-white px-4 py-2 rounded-md hover:opacity-90">
+      Crear Oferta
+    </button>
+  </form>
+</div>
+
+<script>
+  (function () {
+    const prefix = "horarios"; // usa el mismo prefix que en la vista
+    const totalInput = document.getElementById(`id_${prefix}-TOTAL_FORMS`);
+    const container = document.getElementById("horarios-container");
+    const tpl = document.getElementById("empty-form-template");
+    const addBtn = document.getElementById("addHorario");
+
+    addBtn.addEventListener("click", () => {
+      const index = parseInt(totalInput.value, 10);
+
+      // Toma el HTML del template y reemplaza __prefix__ por el índice nuevo
+      const html = tpl.innerHTML.replace(/__prefix__/g, index);
+      container.insertAdjacentHTML("beforeend", html);
+
+      totalInput.value = index + 1;
+    });
+  })();
+</script>
+{% endblock %}
