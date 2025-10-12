@@ -98,7 +98,7 @@ class Inscripcion(models.Model):
     #ID Horario (FK) - Relación N:1 con HORARIO OFERTADO
     horario_ofertado = models.ForeignKey(HorarioOfertado, on_delete=models.CASCADE, related_name='inscripciones')
 
-    estado = models.IntegerField(estados = ESTADOS, default = ESTADO_PENDIENTE, verbose_name='Estado de la Inscripción')
+    estado = models.IntegerField(choices=ESTADOS, default=ESTADO_PENDIENTE, verbose_name='Estado de la Inscripción')
 
     #Atributo
     fecha_reserva = models.DateTimeField(auto_now_add=True)
@@ -118,7 +118,7 @@ class Inscripcion(models.Model):
         verbose_name_plural = "Inscripciones"
 
     def __str__(self): 
-        estado_display = dict(self.ESTADO).get(self.estado, 'Desconocido')
+        estado_display = dict(self.ESTADOS).get(self.estado, 'Desconocido')
         return f"Inscripción de {self.estudiante.user.username} a {self.horario_ofertado.oferta.titulo} ({estado_display})"
 
 
