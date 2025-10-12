@@ -1,7 +1,17 @@
 from django.db import models
 from accounts.models import Perfil
-from .enums import DiaSemana
+from .enums import DiaSemana, EstadoInscripcion
 from django.core.validators import MinValueValidator, MaxValueValidator
+
+
+#Carrera:
+class Carrera(models.Model):
+    #ID_Carrera (PK) se crea automaticamente como 'id'
+    name = models.CharField(max_length=100)
+
+    class Meta: verbose_name_plural = "Carreras"
+
+    def __str__(self): return self.name
 
 #Ramo:
 class Ramo(models.Model):
@@ -25,17 +35,6 @@ class OfertaClase(models.Model):
     ramos = models.ManyToManyField(Ramo, related_name='ofertas')
 
     def __str__(self): return self.titulo
-
-
-#Carrera:
-class Carrera(models.Model):
-    #ID_Carrera (PK) se crea automaticamente como 'id'
-    name = models.CharField(max_length=100)
-
-    class Meta: verbose_name_plural = "Carreras"
-
-    def __str__(self): return self.name
-
 
 
 #Solicitud Clase: 
@@ -94,14 +93,32 @@ class Inscripcion(models.Model):
     #ID Horario (FK) - Relación N:1 con HORARIO OFERTADO
     horario_ofertado = models.ForeignKey(HorarioOfertado, on_delete=models.CASCADE, related_name='inscripciones')
 
+    estado = models.IntegerField(
+        choices=EstadoInscripcion.choices,
+        default=EstadoInscripcion.PENDIENTE,
+        verbose_name='Estado de la Inscripción'
+    )
+
     #Atributo
     fecha_reserva = models.DateTimeField(auto_now_add=True)
+
+    def aceptar(self):
+        if self.estado != EstadoInscripcion.ACEPTADO:
+            self.estado = EstadoInscripcion.ACEPTADO
+            self.save()
+
+    def rechazar(self):
+        if self.estado != EstadoInscripcion.RECHAZADO:
+            self.estado = EstadoInscripcion.RECHAZADO
+            self.save()
 
     class Meta: 
         constraints  = [models.UniqueConstraint(fields=['estudiante', 'horario_ofertado'], name='unique_inscripcion')]
         verbose_name_plural = "Inscripciones"
 
-    def __str__(self): return f"Inscripción de {self.estudiante.user.username} a {self.horario_ofertado.oferta.titulo}"
+    def __str__(self): 
+        estado_display = EstadoInscripcion(self.estado).label
+        return f"Inscripción de {self.estudiante.user.username} a {self.horario_ofertado.oferta.titulo} ({estado_display})"
 
 
 #Rating:

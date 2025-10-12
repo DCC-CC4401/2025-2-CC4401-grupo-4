@@ -152,6 +152,7 @@
 	}
 
 	.badge-warning {
+		/* @apply text-amber-500 border border-amber-500/30 bg-amber-500/10; */
 		color: #f59e0b; /* amber-500 */
 		border-color: color-mix(in oklab, #f59e0b 30%, transparent);
 		background-color: color-mix(in oklab, #f59e0b 12%, transparent);
