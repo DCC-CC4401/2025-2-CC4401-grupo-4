@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto bg-card p-8 rounded-xl shadow-md">
+  <h1 class="text-2xl font-semibold mb-6">Nueva Solicitud de Clase</h1>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <h2 class="text-lg font-medium mb-2">Información de la solicitud</h2>
+    {{ form.as_p }}
+
+    <button type="submit"
+            class="bg-primary text-white px-4 py-2 rounded-md hover:opacity-90">
+      Crear Solicitud
+    </button>
+  </form>
+
+</div>
+{% endblock %}

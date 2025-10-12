@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
-from .models import HorarioOfertado, OfertaClase
+from .models import HorarioOfertado, OfertaClase, SolicitudClase
 from django.core.exceptions import ValidationError
 
 
@@ -120,3 +120,32 @@ HorarioFormSet = inlineformset_factory(
     extra=1,
     can_delete=True,
 )
+
+class SolicitudClaseForm(forms.ModelForm):
+    titulo = forms.CharField(
+        label="Título de la solicitud",
+        widget=forms.TextInput(attrs={
+            "placeholder": "Ej: Ayuda con Cálculo I",
+            "class": INPUT
+        })
+    )
+
+    class Meta:
+        model = SolicitudClase
+        fields = ['titulo','descripcion','solicitante','ramo']
+        labels = {
+            "descripcion": "Descripción",
+            "solicitante": "Solicitante",
+            "ramo": "Ramo asociado",
+        }
+
+        widgets = {
+            "descripcion": forms.Textarea(attrs={
+                "rows": 4,
+                "placeholder": "Cuenta brevemente qué necesitas, tu disponibilidad, etc.",
+                "class": INPUT
+            }),
+            "solicitante": forms.Select(attrs={"class": INPUT}),
+            "ramo": forms.Select(attrs={"class": INPUT}),
+            #"modalidad": forms.Select(attrs={"class": INPUT}),
+        }
