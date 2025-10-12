@@ -20,7 +20,7 @@
 	
 	<div class="z-10 flex flex-col items-center absolute top-28 left-0 right-0">
 		<!-- Foto de perfil circular -->
-		<span data-slot="avatar" class="relative flex shrink-0 overflow-hidden rounded-full size-32">
+		<span data-slot="avatar" class="relative flex shrink-0 overflow-hidden rounded-full size-32 group">
 			{% if perfil.foto_url %}
 			<img
 				data-slot="avatar-image"
@@ -33,6 +33,14 @@
 				{{ profile_user.username|first|upper }}
 			</div>
 			{% endif %}
+			
+			{% if request.user == profile_user %}
+			<!-- full-size overlay button shown on hover -->
+			<div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
+		        {% include "profile/components/edit_avatar.html" with form=images_form title="Cambiar foto de perfil" btn_class="w-full h-full p-0 rounded-full flex items-center justify-center text-foreground/60" svg_class="w-1/3 h-1/3" %}
+		    </div>
+    		{% endif %}
+
 		</span>
 		
 		<!-- Nombre y título -->
