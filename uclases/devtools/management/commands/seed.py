@@ -230,6 +230,28 @@ class Command(BaseCommand):
         # ============================================
         # 7. CREAR OFERTAS DE CLASES
         # ============================================
+        # Limpieza adicional: eliminar ofertas sin profesor y ofertas con más de 1 ramo
+        self.stdout.write("\n💼 Limpiando ofertas inválidas...")
+
+        # Ofertas sin profesor
+        ofertas_sin_profesor = OfertaClase.objects.filter(profesor__isnull=True)
+        if ofertas_sin_profesor.exists():
+            for o in ofertas_sin_profesor:
+                self.stdout.write(self.style.WARNING(f"  🗑 Eliminando oferta sin profesor: {o.titulo[:60]} (id={o.id})"))
+            ofertas_sin_profesor.delete()
+        else:
+            self.stdout.write("  ✅ No se encontraron ofertas sin profesor")
+
+        # Ofertas con más de un ramo
+        ofertas_multi_ramo = OfertaClase.objects.annotate(num_ramos=Count('ramos')).filter(num_ramos__gt=1)
+        if ofertas_multi_ramo.exists():
+            for o in ofertas_multi_ramo:
+                self.stdout.write(self.style.WARNING(f"  🗑 Eliminando oferta con >1 ramo: {o.titulo[:60]} (id={o.id}, ramos={o.num_ramos})"))
+            # Eliminarlas
+            ofertas_multi_ramo.delete()
+        else:
+            self.stdout.write("  ✅ No se encontraron ofertas con más de 1 ramo")
+
         self.stdout.write("\n💼 Creando ofertas de clases...")
         
         # Primero, limpiar duplicados existentes
@@ -266,7 +288,7 @@ class Command(BaseCommand):
                 "profesor": profesores[1],
                 "titulo": "Física I y II - Mecánica y Electricidad",
                 "descripcion": "Clases particulares de Física para ingeniería. Énfasis en comprensión conceptual y resolución de problemas. Disponibilidad fines de semana.",
-                "ramos": [ramos[8], ramos[9]],
+                "ramos": [ramos[8]],
             },
             {
                 "profesor": profesores[2],
@@ -308,7 +330,7 @@ class Command(BaseCommand):
                 "profesor": profesores[0],
                 "titulo": "Matemáticas para Ingeniería - Paquete completo",
                 "descripcion": "Clases de Cálculo I, II, III y Ecuaciones Diferenciales. Ideal para estudiantes que necesitan reforzar toda la línea de cálculo. Descuento por paquete.",
-                "ramos": [ramos[1], ramos[2], ramos[3], ramos[4]],
+                "ramos": [ ramos[3]],
             },
         ]
 
@@ -519,7 +541,7 @@ class Command(BaseCommand):
                 "profesor": estudiantes[3],
                 "titulo": "Algoritmos y Estructuras de Datos - Competitiva",
                 "descripcion": "Tengo experiencia en competencias de programación (ACM-ICPC). Te ayudo con algoritmos complejos y estructuras de datos avanzadas.",
-                "ramos": [ramos[13], ramos[14]],
+                "ramos": [ramos[13]],
             },
             {
                 "profesor": estudiantes[5],
@@ -531,7 +553,7 @@ class Command(BaseCommand):
                 "profesor": estudiantes[8],
                 "titulo": "Cálculo y Álgebra - Estudiante avanzado",
                 "descripcion": "Curso 4to año de Ingeniería Matemática. Ofrezco clases de Cálculo I, II y Álgebra Lineal con enfoque en teoría y ejercicios.",
-                "ramos": [ramos[0], ramos[1], ramos[2]],
+                "ramos": [ramos[0]],
             },
         ]
 
