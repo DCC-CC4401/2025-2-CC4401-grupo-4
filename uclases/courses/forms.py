@@ -18,10 +18,9 @@ class OfertaForm(forms.ModelForm):
 
     class Meta:
         model = OfertaClase
-        fields = ['titulo','descripcion','profesor','ramos']
+        fields = ['titulo','descripcion','ramos']
         labels = {
             "descripcion": "Descripción",
-            "profesor": "Profesor",
             "ramos": "Ramos asociados",
         }
 
@@ -31,35 +30,21 @@ class OfertaForm(forms.ModelForm):
                 "placeholder": "Cuenta brevemente el enfoque, requisitos, horarios tentativos…",
                 "class": INPUT
             }),
-            "profesor": forms.Select(attrs={"class": INPUT}),
             # Opciones:
             # 1) multiselect
-            #"ramos": forms.SelectMultiple(attrs={"class": INPUT + " h-40"}),
+            "ramos": forms.SelectMultiple(),
             # 2) o casillas (quedan más lindas):
-            "ramos": forms.CheckboxSelectMultiple(),
+            #"ramos": forms.CheckboxSelectMultiple(),
         }
-        #help_texts = {
-            #"ramos": "Mantén presionada Ctrl/⌘ para seleccionar varios (si usas multiselect).",
-        #}
 
-    def clean(self):
-        cleaned = super().clean()
-        inicio = cleaned.get("hora_inicio")
-        fin = cleaned.get("hora_fin")
-        cupos = cleaned.get("cupos_totales")
-
-        # Si algún campo requerido viene vacío, deja que el validador base lo marque.
-        if inicio and fin:
-            if inicio >= fin:
-                # Puedes marcar ambos campos o solo el "fin"
-                self.add_error("hora_inicio", "La hora de inicio debe ser menor a la hora de término.")
-                self.add_error("hora_fin", "La hora de término debe ser mayor a la hora de inicio.")
-                raise ValidationError("Rango de horas inválido.")
-
-        if cupos is not None and cupos < 1:
-            self.add_error("cupos_totales", "Debe ser al menos 1.")
-
-        return cleaned
+    def clean_ramos(self):
+        ramos = self.cleaned_data["ramos"]
+        if len(ramos) > 1:
+            raise forms.ValidationError("Solo puedes ofertar un ramo")
+        if len(ramos) == 0:
+            raise forms.ValidationError("Debes elegir un ramo para ofertar")
+        return ramos
+            
 
 class HorarioOfertadoForm(forms.ModelForm):
     hora_inicio = forms.TimeField(
