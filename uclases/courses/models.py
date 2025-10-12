@@ -3,6 +3,16 @@ from accounts.models import Perfil
 from .enums import DiaSemana
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+
+#Carrera:
+class Carrera(models.Model):
+    #ID_Carrera (PK) se crea automaticamente como 'id'
+    name = models.CharField(max_length=100)
+
+    class Meta: verbose_name_plural = "Carreras"
+
+    def __str__(self): return self.name
+
 #Ramo:
 class Ramo(models.Model):
     #ID_Ramo (PK) se crea automaticamente como 'id'
@@ -25,17 +35,6 @@ class OfertaClase(models.Model):
     ramos = models.ManyToManyField(Ramo, related_name='ofertas')
 
     def __str__(self): return self.titulo
-
-
-#Carrera:
-class Carrera(models.Model):
-    #ID_Carrera (PK) se crea automaticamente como 'id'
-    name = models.CharField(max_length=100)
-
-    class Meta: verbose_name_plural = "Carreras"
-
-    def __str__(self): return self.name
-
 
 
 #Solicitud Clase: 
@@ -87,6 +86,11 @@ class PerfilRamo(models.Model):
     def __str__(self): return f"{self.perfil.user.username} cursa {self.ramo.name}"
 
 class Inscripcion(models.Model):
+    ESTADO_PENDIENTE = 0
+    ESTADO_ACEPTADO = 1
+    ESTADO_RECHAZADO = 2
+
+    ESTADOS = [(ESTADO_PENDIENTE, 'Pendiente'), (ESTADO_ACEPTADO, 'Aceptado'), (ESTADO_RECHAZADO, 'Rechazado')]
     #ID Inscripción (PK) se crea automaticamente como 'id'
     #ID Usuario (Estudiante) (FK) - Relación N:1 con PERFIL
     estudiante = models.ForeignKey(Perfil, on_delete=models.CASCADE, related_name='inscripciones')
@@ -94,14 +98,28 @@ class Inscripcion(models.Model):
     #ID Horario (FK) - Relación N:1 con HORARIO OFERTADO
     horario_ofertado = models.ForeignKey(HorarioOfertado, on_delete=models.CASCADE, related_name='inscripciones')
 
+    estado = models.IntegerField(estados = ESTADOS, default = ESTADO_PENDIENTE, verbose_name='Estado de la Inscripción')
+
     #Atributo
     fecha_reserva = models.DateTimeField(auto_now_add=True)
+
+    def aceptar(self):
+        if self.estado != self.ESTADO_ACEPTADO:
+            self.estado = self.ESTADO_ACEPTADO
+            self.save()
+
+    def rechazar(self):
+        if self.estado != self.ESTADO_RECHAZADO:
+            self.estado = self.ESTADO_RECHAZADO
+            self.save()
 
     class Meta: 
         constraints  = [models.UniqueConstraint(fields=['estudiante', 'horario_ofertado'], name='unique_inscripcion')]
         verbose_name_plural = "Inscripciones"
 
-    def __str__(self): return f"Inscripción de {self.estudiante.user.username} a {self.horario_ofertado.oferta.titulo}"
+    def __str__(self): 
+        estado_display = dict(self.ESTADO).get(self.estado, 'Desconocido')
+        return f"Inscripción de {self.estudiante.user.username} a {self.horario_ofertado.oferta.titulo} ({estado_display})"
 
 
 #Rating:
