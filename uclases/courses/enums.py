@@ -8,3 +8,8 @@ class DiaSemana(models.IntegerChoices):
     VIERNES = 5, "Viernes"
     SABADO = 6, "Sábado"
     DOMINGO = 7, "Domingo"
+
+class EstadoInscripcion(models.IntegerChoices):
+    PENDIENTE = 0, "Pendiente"
+    ACEPTADO = 1, "Aceptado"
+    RECHAZADO = 2, "Rechazado"

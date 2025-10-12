@@ -1,6 +1,6 @@
 from django.db import models
 from accounts.models import Perfil
-from .enums import DiaSemana
+from .enums import DiaSemana, EstadoInscripcion
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
@@ -86,11 +86,6 @@ class PerfilRamo(models.Model):
     def __str__(self): return f"{self.perfil.user.username} cursa {self.ramo.name}"
 
 class Inscripcion(models.Model):
-    ESTADO_PENDIENTE = 0
-    ESTADO_ACEPTADO = 1
-    ESTADO_RECHAZADO = 2
-
-    ESTADOS = [(ESTADO_PENDIENTE, 'Pendiente'), (ESTADO_ACEPTADO, 'Aceptado'), (ESTADO_RECHAZADO, 'Rechazado')]
     #ID Inscripción (PK) se crea automaticamente como 'id'
     #ID Usuario (Estudiante) (FK) - Relación N:1 con PERFIL
     estudiante = models.ForeignKey(Perfil, on_delete=models.CASCADE, related_name='inscripciones')
@@ -98,19 +93,23 @@ class Inscripcion(models.Model):
     #ID Horario (FK) - Relación N:1 con HORARIO OFERTADO
     horario_ofertado = models.ForeignKey(HorarioOfertado, on_delete=models.CASCADE, related_name='inscripciones')
 
-    estado = models.IntegerField(choices=ESTADOS, default=ESTADO_PENDIENTE, verbose_name='Estado de la Inscripción')
+    estado = models.IntegerField(
+        choices=EstadoInscripcion.choices,
+        default=EstadoInscripcion.PENDIENTE,
+        verbose_name='Estado de la Inscripción'
+    )
 
     #Atributo
     fecha_reserva = models.DateTimeField(auto_now_add=True)
 
     def aceptar(self):
-        if self.estado != self.ESTADO_ACEPTADO:
-            self.estado = self.ESTADO_ACEPTADO
+        if self.estado != EstadoInscripcion.ACEPTADO:
+            self.estado = EstadoInscripcion.ACEPTADO
             self.save()
 
     def rechazar(self):
-        if self.estado != self.ESTADO_RECHAZADO:
-            self.estado = self.ESTADO_RECHAZADO
+        if self.estado != EstadoInscripcion.RECHAZADO:
+            self.estado = EstadoInscripcion.RECHAZADO
             self.save()
 
     class Meta: 
@@ -118,7 +117,7 @@ class Inscripcion(models.Model):
         verbose_name_plural = "Inscripciones"
 
     def __str__(self): 
-        estado_display = dict(self.ESTADOS).get(self.estado, 'Desconocido')
+        estado_display = EstadoInscripcion(self.estado).label
         return f"Inscripción de {self.estudiante.user.username} a {self.horario_ofertado.oferta.titulo} ({estado_display})"
 
 
