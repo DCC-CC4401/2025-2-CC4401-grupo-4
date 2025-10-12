@@ -29,6 +29,8 @@ class Perfil(models.Model):
     telefono = models.CharField(max_length=13, blank=True, null=True)
     descripcion = models.TextField(max_length=500, blank=True)
     foto_url = models.URLField(max_length=200, blank=True, null=True)
+    foto_file = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    banner_file = models.ImageField(upload_to='banners/', blank=True, null=True)
     banner_url = models.URLField(max_length=200, blank=True, null=True)
     rating_promedio = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     total_ratings = models.IntegerField(default=0)

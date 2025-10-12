@@ -6,7 +6,12 @@
 
 <!-- Banner con foto de perfil -->
 <div class="relative h-[480px] w-full gradient-hero">
-	{% if perfil.banner_url %}
+	{% if perfil.banner_file %}
+	<img 
+		alt="Banner de {{ profile_user.username }}" 
+		class="object-cover w-full h-full relative z-0" 
+		src="{{ perfil.banner_file.url }}?t={% now 'U' %}"/>
+	{% elif perfil.banner_url %}
 	<img 
 		alt="Banner de {{ profile_user.username }}" 
 		class="object-cover w-full h-full relative z-0" 
@@ -21,7 +26,14 @@
 	<div class="z-10 flex flex-col items-center absolute top-28 left-0 right-0">
 		<!-- Foto de perfil circular -->
 		<span data-slot="avatar" class="relative flex shrink-0 overflow-hidden rounded-full size-32 group">
-			{% if perfil.foto_url %}
+			{% if perfil.foto_file %}
+			<img
+				data-slot="avatar-image"
+				class="aspect-square size-full object-cover"
+				alt="{{ profile_user.username }}"
+				src="{{ perfil.foto_file.url }}?t={% now 'U' %}"
+			/>
+			{% elif perfil.foto_url %}
 			<img
 				data-slot="avatar-image"
 				class="aspect-square size-full object-cover"

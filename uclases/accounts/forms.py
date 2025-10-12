@@ -195,7 +195,7 @@ class ImagesForm(forms.ModelForm):
     """Formulario para editar SOLO las imágenes"""
     class Meta:
         model = Perfil
-        fields = ['foto_url', 'banner_url']
+        fields = ['foto_url', 'banner_url', 'foto_file', 'banner_file']
         widgets = {
             'foto_url': forms.URLInput(attrs={
                 'class': INPUT_CLASS,
@@ -205,10 +205,18 @@ class ImagesForm(forms.ModelForm):
                 'class': INPUT_CLASS,
                 'placeholder': 'https://ejemplo.com/banner.jpg'
             }),
+            'foto_file': forms.ClearableFileInput(attrs={
+                'class': INPUT_CLASS, 'accept': 'image/*'
+            }),
+            'banner_file': forms.ClearableFileInput(attrs={
+                'class': INPUT_CLASS, 'accept': 'image/*'
+            }),
         }
         labels = {
             'foto_url': 'URL de foto de perfil',
-            'banner_url': 'URL de banner'
+            'banner_url': 'URL de banner',
+            'foto_file': 'Subir foto de perfil',
+            'banner_file': 'Subir banner'
         }
 
 class CareerForm(forms.ModelForm):

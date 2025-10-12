@@ -54,6 +54,7 @@ button_label: (opcional) texto del botón
             <form
                 method="post"
                 action="{{ action_url|default:request.path }}"
+                enctype="multipart/form-data"
                 class="space-y-4"
             >
                 {% csrf_token %}

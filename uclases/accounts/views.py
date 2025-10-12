@@ -103,6 +103,7 @@ def my_profile_view(request):
     )
     images_form = ImagesForm(
         request.POST if target_prefix == "img" else None,
+        request.FILES if target_prefix == "img" else None,
         instance=perfil,
         prefix="img",
     )
