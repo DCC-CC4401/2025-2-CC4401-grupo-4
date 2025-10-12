@@ -54,7 +54,7 @@ def crear_solicitud(request):
     if request.method == "POST":
         form = SolicitudClaseForm(request.POST)
         if form.is_valid():
-            solicitud = form.save()
+            solicitud = form.save(commit=False)
             solicitud.solicitante = request.user.perfil
             solicitud.save()
             messages.success(request, "Solicitud creada correctamente.")
