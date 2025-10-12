@@ -14,8 +14,8 @@
 	{% else %}
 	<img 
 		alt="Banner por defecto" 
-		class="object-cover w-full h-full relative z-0" 
-		src="https://ingenieria.uchile.cl/dam/jcr:de2aacbb-85ad-474c-837b-6221246925db/imageservlet.jpeg"/>
+		class="object-cover w-full h-full relative z-0 brightness-70 dark:brightness-90 opacity-50" 
+		src="https://ingenieria.uchile.cl/.imaging/default/dam/imagenes/Ingenieria/subportadas/subportada-sobre-la-fcfm/sobre-la-fcfm-header.jpg/jcr:content.jpg"/>
 	{% endif %}
 	
 	<div class="z-10 flex flex-col items-center absolute top-28 left-0 right-0">
@@ -36,7 +36,7 @@
 		</span>
 		
 		<!-- Nombre y título -->
-		<h1 class="mt-6 text-4xl font-bold text-glow text-foreground">
+		<h1 class="mt-6 text-4xl font-bold text-foreground">
 			{% if profile_user.first_name or profile_user.last_name %}
 				{{ profile_user.first_name }} {{ profile_user.last_name }}
 			{% else %}
@@ -61,12 +61,12 @@
 				stroke-width="2" 
 				stroke-linecap="round" 
 				stroke-linejoin="round" 
-				class="size-4 opacity-0 group-hover:opacity-100 transition-opacity text-foreground/60"
+				class="size-4 opacity-40 group-hover:opacity-100 transition-opacity text-foreground/60"
 			>
 				<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
 				<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
 			</svg>
-			<span id="copy-msg-{{ profile_user.id }}" class="absolute left-full ml-2 text-xs font-medium text-green-600 whitespace-nowrap hidden">¡Copiado!</span>
+			<span id="copy-msg-{{ profile_user.id }}" class="absolute left-full ml-2 text-xs font-medium text-green-600 font-bold whitespace-nowrap hidden">¡Copiado!</span>
 		</div>
 		{% else %}
 		<h3 class="font-medium text-foreground/90 text-lg">
@@ -84,7 +84,7 @@
 						<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
 					</svg>
 					{% else %}
-					<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-6 text-gray-400" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+					<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="size-6 text-foreground" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
 						<path d="m22 9.24-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"></path>
 					</svg>
 					{% endif %}
