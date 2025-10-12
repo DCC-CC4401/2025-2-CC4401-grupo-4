@@ -32,7 +32,10 @@ def crear_oferta(request):
     if request.method == "POST":
         form = OfertaForm(request.POST)
         if form.is_valid():
-            oferta = form.save()  # guarda el padre
+            oferta = form.save(commit=False)  # guarda el padre
+            oferta.profesor = request.user.perfil
+            oferta.save()
+            form.save_m2m()
             formset = HorarioFormSet(request.POST, instance=oferta, prefix="horarios")
             if formset.is_valid():
                 formset.save()
