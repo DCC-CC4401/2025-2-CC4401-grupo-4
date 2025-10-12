@@ -13,3 +13,5 @@ class EstadoInscripcion(models.IntegerChoices):
     PENDIENTE = 0, "Pendiente"
     ACEPTADO = 1, "Aceptado"
     RECHAZADO = 2, "Rechazado"
+    CANCELADO = 3, "Cancelado"
+    COMPLETADO = 4, "Completado"
