@@ -52,37 +52,11 @@
                         {% endfor %}
                     </div>
 
-                    <div
-                        class="space-y-2"
-                        data-autocomplete
-                        data-autocomplete-url="{% url 'courses:ramo-autocomplete-api' %}"
-                        data-autocomplete-min-length="1"
-                    >
-                        <label class="text-sm font-medium text-foreground/80" for="autocomplete-{{ form.ramo.id_for_label }}">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-foreground/80" for="{{ form.ramo.id_for_label }}">
                             {{ form.ramo.label }}
                         </label>
                         {{ form.ramo }}
-                        <div class="relative">
-                            <input
-                                id="autocomplete-{{ form.ramo.id_for_label }}"
-                                type="text"
-                                class="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
-                                placeholder="Busca y selecciona el ramo asociado"
-                                autocomplete="off"
-                                data-autocomplete-input
-                            />
-                            <button
-                                type="button"
-                                class="absolute inset-y-0 right-0 px-3 text-sm text-foreground/60 hover:text-foreground"
-                                data-autocomplete-clear
-                            >
-                                Limpiar
-                            </button>
-                            <div
-                                class="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-card shadow-lg hidden"
-                                data-autocomplete-results
-                            ></div>
-                        </div>
                         {% if form.ramo.help_text %}
                         <p class="text-xs text-foreground/60">{{ form.ramo.help_text }}</p>
                         {% endif %}
