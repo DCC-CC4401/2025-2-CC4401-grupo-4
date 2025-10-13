@@ -49,17 +49,17 @@
                     </div>
                 </section>
 
-                <!-- Ramos -->
+                <!-- Ramo -->
                 <section class="rounded-xl border border-border bg-background/60 p-6">
-                    <h2 class="text-lg font-semibold text-foreground mb-3">Ramos</h2>
+                    <h2 class="text-lg font-semibold text-foreground mb-3">Ramo</h2>
                     <div class="flex flex-wrap gap-2">
-                        {% for ramo in oferta.ramos.all %}
+                        {% if oferta.ramo %}
                         <span class="badge badge-warning text-sm">
-                            {{ ramo.name }}
+                            {{ oferta.ramo.name }}
                         </span>
-                        {% empty %}
-                        <p class="text-foreground/60 text-sm">No se han especificado ramos</p>
-                        {% endfor %}
+                        {% else %}
+                        <p class="text-foreground/60 text-sm">No se ha especificado ramo</p>
+                        {% endif %}
                     </div>
                 </section>
 
