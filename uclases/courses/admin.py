@@ -40,15 +40,14 @@ class HorarioOfertadoInline(admin.TabularInline):
 @admin.register(OfertaClase)
 class OfertaClaseAdmin(admin.ModelAdmin):
     """Admin para el modelo OfertaClase"""
-    list_display = ("id", "titulo", "profesor", "fecha_publicacion", "total_horarios", "total_comentarios")
-    search_fields = ("titulo", "descripcion", "profesor__user__username")
-    list_filter = ("fecha_publicacion",)
+    list_display = ("id", "titulo", "profesor", "ramo", "fecha_publicacion", "total_horarios", "total_comentarios")
+    search_fields = ("titulo", "descripcion", "profesor__user__username", "ramo__name")
+    list_filter = ("fecha_publicacion", "ramo")
     ordering = ("-fecha_publicacion",)
-    filter_horizontal = ("ramos",)
     
     fieldsets = (
         ("Información Básica", {"fields": ("titulo", "descripcion", "profesor")}),
-        ("Ramos", {"fields": ("ramos",)}),
+        ("Ramo", {"fields": ("ramo",)}),
         ("Fechas", {"fields": ("fecha_publicacion",)}),
     )
     

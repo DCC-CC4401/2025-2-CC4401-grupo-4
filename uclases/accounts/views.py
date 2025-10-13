@@ -1,7 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.conf import settings
+from django.urls import reverse
+
 from .forms import (
     CustomLoginForm,
     SignUpForm,
@@ -13,9 +16,6 @@ from .forms import (
 )
 from .models import Perfil, User
 from courses.models import Carrera
-from django.shortcuts import get_object_or_404
-from django.conf import settings
-from django.urls import reverse
 # Create your views here.
 
 
@@ -75,24 +75,14 @@ def my_profile_view(request):
     # Obtener ramos únicos de ofertas (sin duplicados)
     ramos_dictados = set()
     for oferta in perfil.ofertas_creadas.all():
-        for ramo in oferta.ramos.all():
-            ramos_dictados.add(ramo)
+        if oferta.ramo:  # Ahora ramo es ForeignKey (un solo ramo)
+            ramos_dictados.add(oferta.ramo)
     
     # Obtener ramos únicos de solicitudes (sin duplicados)
     ramos_solicitados = set()
     for solicitud in perfil.solicitudes_creadas.all():
-        ramos_solicitados.add(solicitud.ramo)
-
-     # Obtener ramos únicos de ofertas (sin duplicados)
-    ramos_dictados = set()
-    for oferta in perfil.ofertas_creadas.all():
-        for ramo in oferta.ramos.all():
-            ramos_dictados.add(ramo)
-    
-    # Obtener ramos únicos de solicitudes (sin duplicados)
-    ramos_solicitados = set()
-    for solicitud in perfil.solicitudes_creadas.all():
-        ramos_solicitados.add(solicitud.ramo)
+        if solicitud.ramo:
+            ramos_solicitados.add(solicitud.ramo)
 
     target_prefix = request.POST.get("form_prefix") if request.method == "POST" else None
 
@@ -140,7 +130,7 @@ def my_profile_view(request):
         messages.error(request, "Reingresa la informacion y vuelve a intentarlo.")
 
     context = {
-         'profile_user': user,
+        'profile_user': user,
         'perfil': perfil,
         'description_form': description_form,
         'images_form': images_form,
@@ -172,13 +162,14 @@ def profile_detail_view(request, public_uid):
     # Obtener ramos únicos de ofertas (sin duplicados)
     ramos_dictados = set()
     for oferta in perfil.ofertas_creadas.all():
-        for ramo in oferta.ramos.all():
-            ramos_dictados.add(ramo)
+        if oferta.ramo:  # Ahora ramo es ForeignKey (un solo ramo)
+            ramos_dictados.add(oferta.ramo)
     
     # Obtener ramos únicos de solicitudes (sin duplicados)
     ramos_solicitados = set()
     for solicitud in perfil.solicitudes_creadas.all():
-        ramos_solicitados.add(solicitud.ramo)
+        if solicitud.ramo:
+            ramos_solicitados.add(solicitud.ramo)
 
     context = {
         'profile_user': user,

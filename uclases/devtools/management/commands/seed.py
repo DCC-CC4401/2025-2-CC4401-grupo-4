@@ -242,15 +242,8 @@ class Command(BaseCommand):
         else:
             self.stdout.write("  ✅ No se encontraron ofertas sin profesor")
 
-        # Ofertas con más de un ramo
-        ofertas_multi_ramo = OfertaClase.objects.annotate(num_ramos=Count('ramos')).filter(num_ramos__gt=1)
-        if ofertas_multi_ramo.exists():
-            for o in ofertas_multi_ramo:
-                self.stdout.write(self.style.WARNING(f"  🗑 Eliminando oferta con >1 ramo: {o.titulo[:60]} (id={o.id}, ramos={o.num_ramos})"))
-            # Eliminarlas
-            ofertas_multi_ramo.delete()
-        else:
-            self.stdout.write("  ✅ No se encontraron ofertas con más de 1 ramo")
+        # Ya no necesitamos verificar múltiples ramos porque ahora es ForeignKey
+        self.stdout.write("  ✅ Modelo actualizado a un solo ramo por oferta")
 
         self.stdout.write("\n💼 Creando ofertas de clases...")
         
@@ -276,73 +269,74 @@ class Command(BaseCommand):
                 "profesor": profesores[0],
                 "titulo": "Clases de Cálculo I - Preparación para certámenes",
                 "descripcion": f"Ofrezco clases de {ramos[1].name} con enfoque en preparación para certámenes. Incluye resolución de ejercicios tipo prueba, revisión de materia y tips para optimizar el tiempo en evaluaciones. 3 años de experiencia ayudando estudiantes.",
-                "ramos": [ramos[1]],
+                "ramo": ramos[1],
             },
             {
                 "profesor": profesores[0],
                 "titulo": "Álgebra Lineal - Desde cero hasta avanzado",
                 "descripcion": f"¿Problemas con {ramos[0].name}? Te ayudo con una metodología clara y ejemplos prácticos. Incluyo material complementario y ejercicios resueltos.",
-                "ramos": [ramos[0]],
+                "ramo": ramos[0],
             },
             {
                 "profesor": profesores[1],
                 "titulo": f"{ramos[8].name} - Mecánica y Electricidad",
                 "descripcion": f"Clases particulares de {ramos[8].name} para ingeniería. Énfasis en comprensión conceptual y resolución de problemas. Disponibilidad fines de semana.",
-                "ramos": [ramos[8]],
+                "ramo": ramos[8],
             },
             {
                 "profesor": profesores[2],
                 "titulo": f"{ramos[12].name} - Nivel básico a intermedio",
                 "descripcion": f"Aprende {ramos[12].name} desde cero: variables, estructuras de control, funciones, POO, y más. Incluye proyectos prácticos y código comentado. Ideal para estudiantes que cursan {ramos[12].name}.",
-                "ramos": [ramos[12]],
+                "ramo": ramos[12],
             },
             {
                 "profesor": profesores[2],
                 "titulo": "Estructuras de Datos - Listas, árboles, grafos",
                 "descripcion": f"Domina {ramos[13].name}: listas, árboles y grafos. Implementación en Python/Java, análisis de complejidad y aplicaciones prácticas. Material de apoyo incluido.",
-                "ramos": [ramos[13]],
+                "ramo": ramos[13],
             },
             {
                 "profesor": profesores[3],
                 "titulo": "Algoritmos - Preparación intensiva",
                 "descripcion": f"Curso completo de {ramos[14].name}: ordenamiento, búsqueda, recursión, programación dinámica y greedy. Incluye ejercicios tipo competencias y práctica dirigida.",
-                "ramos": [ramos[14]],
+                "ramo": ramos[14],
             },
             {
                 "profesor": profesores[4],
                 "titulo": "Bases de Datos - SQL y diseño",
                 "descripcion": f"Aprende {ramos[15].name} desde consultas básicas hasta queries complejas. Cubrimos normalización, diseño ER y optimización de consultas. PostgreSQL y MySQL.",
-                "ramos": [ramos[15]],
+                "ramo": ramos[15],
             },
             {
                 "profesor": profesores[5],
                 "titulo": "Introducción a Machine Learning con Python",
                 "titulo": f"{ramos[20].name} - Introducción con Python",
                 "descripcion": f"Aprende los fundamentos de {ramos[20].name}: regresión, clasificación y clustering. Usamos scikit-learn, pandas y numpy. Proyectos con datasets reales.",
-                "ramos": [ramos[20]],
+                "ramo": ramos[20],
             },
             {
                 "profesor": profesores[6],
                 "titulo": "Desarrollo Web Full-Stack - Django + React",
                 "descripcion": f"Crea aplicaciones web completas con {ramos[21].name}: backend con Django REST Framework y frontend con React. Incluye despliegue en producción.",
-                "ramos": [ramos[21]],
+                "ramo": ramos[21],
             },
             {
                 "profesor": profesores[0],
                 "titulo": "Cálculo III - Matemáticas para Ingeniería",
                 "descripcion": "Clases avanzadas de Cálculo III: series, integrales múltiples y ecuaciones diferenciales aplicadas. Orientadas a estudiantes de ingeniería con ejercicios y exámenes tipo certamen.",
-                "ramos": [ramos[3]],
+                "ramo": ramos[3],
             },
         ]
 
         ofertas_creadas = []
         for data in ofertas_data:
+            # Ahora ramo es ForeignKey (un solo ramo)
+            ramo = data["ramo"]
             oferta, created = OfertaClase.objects.update_or_create(
                 profesor=data["profesor"],
                 titulo=data["titulo"],
-                defaults={"descripcion": data["descripcion"]}
+                defaults={"descripcion": data["descripcion"], "ramo": ramo}
             )
-            oferta.ramos.set(data["ramos"])
             ofertas_creadas.append(oferta)
             status = "✅ Creada" if created else "♻️  Actualizada"
             self.stdout.write(f"  {status}: {data['titulo'][:50]}... por {data['profesor'].user.username}")
@@ -536,36 +530,37 @@ class Command(BaseCommand):
                 "profesor": estudiantes[0],
                 "titulo": "Clases de Programación básica - Ayudante certificado",
                 "descripcion": "Soy ayudante del curso de Programación. Ofrezco clases de reforzamiento en Python, ideal para principiantes. Métodos didácticos y paciencia.",
-                "ramos": [ramos[12]],
+                "ramo": ramos[12],
             },
             {
                 "profesor": estudiantes[3],
                 "titulo": "Algoritmos y Estructuras de Datos - Competitiva",
                 "descripcion": "Tengo experiencia en competencias de programación (ACM-ICPC). Te ayudo con algoritmos complejos y estructuras de datos avanzadas.",
-                "ramos": [ramos[13]],
+                "ramo": ramos[13],
             },
             {
                 "profesor": estudiantes[5],
                 "titulo": "Física básica - Estudiante de Ingeniería",
                 "descripcion": "Estudio Ingeniería Civil en Computación y tengo buen manejo de Física I. Puedo ayudarte con mecánica clásica y cinemática.",
-                "ramos": [ramos[8]],
+                "ramo": ramos[8],
             },
             {
                 "profesor": estudiantes[8],
                 "titulo": "Cálculo y Álgebra - Estudiante avanzado",
                 "descripcion": "Curso 4to año de Ingeniería Matemática. Ofrezco clases de Cálculo I, II y Álgebra Lineal con enfoque en teoría y ejercicios.",
-                "ramos": [ramos[0]],
+                "ramo": ramos[0],
             },
         ]
 
         ofertas_estudiantes_creadas = []
         for data in ofertas_estudiantes:
+            # Ahora ramo es ForeignKey (un solo ramo)
+            ramo = data["ramo"]
             oferta, created = OfertaClase.objects.update_or_create(
                 profesor=data["profesor"],
                 titulo=data["titulo"],
-                defaults={"descripcion": data["descripcion"]}
+                defaults={"descripcion": data["descripcion"], "ramo": ramo}
             )
-            oferta.ramos.set(data["ramos"])
             ofertas_estudiantes_creadas.append(oferta)
             status = "✅ Creada" if created else "♻️  Actualizada"
             self.stdout.write(f"  {status}: Estudiante ofrece - {data['titulo'][:40]}... por {data['profesor'].user.username}")

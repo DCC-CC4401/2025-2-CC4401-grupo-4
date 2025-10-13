@@ -3,19 +3,17 @@ from operator import attrgetter
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
 from django.contrib import messages
 
 from accounts.models import Perfil
 from .models import OfertaClase, SolicitudClase, Ramo
 from .enums import DiaSemana
 from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
-from .models import OfertaClase, SolicitudClase
 
 
 def publications_view(request):
     """Listar todas las publicaciones (ofertas y solicitudes) ordenadas por fecha."""
-    ofertas_qs = OfertaClase.objects.select_related('profesor__user', 'profesor__carrera').prefetch_related('ramos')
+    ofertas_qs = OfertaClase.objects.select_related('profesor__user', 'profesor__carrera', 'ramo')
     solicitudes_qs = SolicitudClase.objects.select_related('solicitante__user', 'solicitante__carrera', 'ramo')
     
     publicaciones = sorted(
@@ -29,25 +27,6 @@ def publications_view(request):
     }
     return render(request, 'courses/publications_list.html', context)
 
-
-def ramo_autocomplete_api(request):
-    """Retorna coincidencias de ramos en formato JSON."""
-
-    term = (request.GET.get("q", "") or "").strip()
-    perfil = request.user.perfil
-    ramos = perfil.ramos_cursados.all().order_by("name")
-
-    if term:
-        ramos = ramos.filter(name__icontains=term)
-
-    results = [
-        {
-            "id": ramo.id,
-            "label": ramo.name,
-        }
-        for ramo in ramos[:15]
-    ]
-    return JsonResponse(results, safe=False)
 
 def oferta_detail(request, pk):
     """Vista detallada de una oferta de clase"""
@@ -73,28 +52,34 @@ def solicitud_detail(request, pk):
     }
     return render(request, 'courses/solicitud_detail.html', context)
 
+@login_required
 def crear_oferta(request):
     if request.method == "POST":
-        form = OfertaForm(request.POST)
-        if form.is_valid():
-            oferta = form.save(commit=False)  # guarda el padre
+        form = OfertaForm(request.POST, user=request.user)
+        formset = HorarioFormSet(request.POST, prefix="horarios")
+        
+        if form.is_valid() and formset.is_valid():
+            oferta = form.save(commit=False)
             oferta.profesor = request.user.perfil
             oferta.save()
             form.save_m2m()
-            formset = HorarioFormSet(request.POST, instance=oferta, prefix="horarios")
-            if formset.is_valid():
-                formset.save()
-                messages.success(request, "Oferta y horarios creados correctamente.")
-                return redirect('/', pk=oferta.pk)
+            
+            # Asociar el formset con la oferta creada
+            formset.instance = oferta
+            formset.save()
+            
+            messages.success(request, "Oferta y horarios creados correctamente.")
+            return redirect('courses:oferta_detail', pk=oferta.pk)
         else:
-            formset = HorarioFormSet(prefix="horarios")
+            messages.error(request, "Por favor corrige los errores en el formulario.")
     else:
-        form = OfertaForm()
+        form = OfertaForm(user=request.user)
         formset = HorarioFormSet(prefix="horarios")
 
     return render(request, "courses/crear_oferta.html", {"form": form, "formset": formset})
 
 
+@login_required
 def crear_solicitud(request):
     if request.method == "POST":
         form = SolicitudClaseForm(request.POST)
@@ -103,7 +88,9 @@ def crear_solicitud(request):
             solicitud.solicitante = request.user.perfil
             solicitud.save()
             messages.success(request, "Solicitud creada correctamente.")
-            return redirect('/', pk=solicitud.pk)
+            return redirect('courses:solicitud_detail', pk=solicitud.pk)
+        else:
+            messages.error(request, "Por favor corrige los errores en el formulario.")
     else:
         form = SolicitudClaseForm()
 
@@ -118,15 +105,17 @@ def editar_oferta(request, pk):
         return redirect('courses:oferta_detail', pk=pk)
 
     if request.method == "POST":
-        form = OfertaForm(request.POST, instance=oferta)
+        form = OfertaForm(request.POST, instance=oferta, user=request.user)
         formset = HorarioFormSet(request.POST, instance=oferta, prefix="horarios")
         if form.is_valid() and formset.is_valid():
             form.save()
             formset.save()
             messages.success(request, "Oferta actualizada correctamente.")
             return redirect('courses:oferta_detail', pk=oferta.pk)
+        else:
+            messages.error(request, "Por favor corrige los errores en el formulario.")
     else:
-        form = OfertaForm(instance=oferta)
+        form = OfertaForm(instance=oferta, user=request.user)
         formset = HorarioFormSet(instance=oferta, prefix="horarios")
 
     return render(request, "courses/editar_oferta.html", {"form": form, "formset": formset, "oferta": oferta})
@@ -144,6 +133,8 @@ def editar_solicitud(request, pk):
             form.save()
             messages.success(request, "Solicitud actualizada correctamente.")
             return redirect('courses:solicitud_detail', pk=solicitud.pk)
+        else:
+            messages.error(request, "Por favor corrige los errores en el formulario.")
     else:
         form = SolicitudClaseForm(instance=solicitud)
 
