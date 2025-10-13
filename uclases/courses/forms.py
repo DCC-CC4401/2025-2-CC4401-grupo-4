@@ -3,9 +3,7 @@ from django.forms import inlineformset_factory, BaseInlineFormSet
 from .models import HorarioOfertado, OfertaClase, SolicitudClase
 from django.core.exceptions import ValidationError
 
-
-INPUT = "w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
-
+INPUT = "appearance-none w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
 
 class OfertaForm(forms.ModelForm):
     titulo = forms.CharField(
@@ -27,14 +25,13 @@ class OfertaForm(forms.ModelForm):
         widgets = {
             "descripcion": forms.Textarea(attrs={
                 "rows": 4,
-                "placeholder": "Cuenta brevemente el enfoque, requisitos, horarios tentativos…",
+                "placeholder": "Cuenta brevemente el enfoque, requisitos, horarios tentativos...",
                 "class": INPUT
             }),
-            # Opciones:
-            # 1) multiselect
-            "ramos": forms.SelectMultiple(),
-            # 2) o casillas (quedan más lindas):
-            #"ramos": forms.CheckboxSelectMultiple(),
+            "ramos": forms.Select(attrs={
+                "class": INPUT,
+                "data-autocomplete-select": "true",
+            }),
         }
 
     def clean_ramos(self):
@@ -58,6 +55,10 @@ class HorarioOfertadoForm(forms.ModelForm):
     class Meta:
         model = HorarioOfertado
         fields = ["dia", "hora_inicio", "hora_fin", "cupos_totales"]
+        widgets = {
+            "dia": forms.Select(attrs={"class": INPUT}),
+            "cupos_totales": forms.NumberInput(attrs={"class": INPUT}),
+        }
 
     def clean(self):
         cleaned = super().clean()
@@ -131,6 +132,9 @@ class SolicitudClaseForm(forms.ModelForm):
                 "class": INPUT
             }),
             "solicitante": forms.Select(attrs={"class": INPUT}),
-            "ramo": forms.Select(attrs={"class": INPUT}),
+            "ramo": forms.Select(attrs={
+                "class": INPUT,
+                "data-autocomplete-select": "true",
+            }),
             #"modalidad": forms.Select(attrs={"class": INPUT}),
         }
