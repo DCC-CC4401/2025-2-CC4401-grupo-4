@@ -47,8 +47,8 @@ class InscripcionTests(TestCase):
             titulo="Álgebra 101",
             descripcion="Bases",
             profesor=self.perfil_p,
+            ramo=self.ramo  # Ahora ramo es ForeignKey (un solo ramo)
         )
-        self.oferta.ramos.add(self.ramo)
 
         self.horario = HorarioOfertado.objects.create(
             dia=1, hora_inicio="10:00", hora_fin="11:00", cupos_totales=5, oferta=self.oferta

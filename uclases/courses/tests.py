@@ -35,14 +35,13 @@ class FormFactoriesMixin:
 
     def make_oferta(self, titulo="Oferta X"):
         perfil = self.make_perfil()  # crea user+perfil únicos
+        ramo = self.make_ramo()
         oferta = OfertaClase.objects.create(
             titulo=titulo,
             descripcion="desc",
             profesor=perfil,
+            ramo=ramo,
         )
-        # si tu modelo exige ramos, agrega al menos uno:
-        ramo = self.make_ramo()
-        oferta.ramos.add(ramo)
         return oferta
 
     def build_formset_post(self, prefix, forms):
@@ -132,30 +131,31 @@ class OfertaFormRamosTests(FormFactoriesMixin, TestCase):
         form = OfertaForm(data={
             "titulo": "X",
             "descripcion": "Y",
-            # "ramos": []  # sin ramos
+            # "ramo": None  # sin ramo
         })
         self.assertFalse(form.is_valid())
-        self.assertIn("ramos", form.errors)
+        self.assertIn("ramo", form.errors)
 
     def test_valid_with_one_ramo(self):
         ramo = self.make_ramo("Cálculo")
         form = OfertaForm(data={
             "titulo": "X",
             "descripcion": "Y",
-            "ramos": [ramo.pk],
+            "ramo": ramo.pk,
         })
         self.assertTrue(form.is_valid())
 
     def test_invalid_with_multiple_ramos(self):
+        # Ya no aplica porque ramo es ForeignKey (solo acepta un ramo)
+        # Este test ya no es necesario con el nuevo modelo
         ramo1 = self.make_ramo("Cálculo")
-        ramo2 = self.make_ramo("Álgebra")
         form = OfertaForm(data={
             "titulo": "X",
             "descripcion": "Y",
-            "ramos": [ramo1.pk, ramo2.pk],
+            "ramo": ramo1.pk,
         })
-        self.assertFalse(form.is_valid())
-        self.assertIn("ramos", form.errors)
+        # Ahora debería ser válido porque solo acepta un ramo
+        self.assertTrue(form.is_valid())
 
 
 class SolicitudClaseFormTests(FormFactoriesMixin, TestCase):
