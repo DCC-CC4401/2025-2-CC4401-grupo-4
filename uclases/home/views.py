@@ -29,7 +29,10 @@ def perfil_autocomplete_api(request):
     return JsonResponse(results, safe=False)
 
 def home(request):
-   
+    perfil_uid = request.GET.get("perfil")
+    if perfil_uid:
+        return redirect("accounts:profile_detail", public_uid=perfil_uid)
+
     ofertas_qs = OfertaClase.objects.order_by('-fecha_publicacion')
     solicitudes_qs = SolicitudClase.objects.order_by('-fecha_publicacion')
 
