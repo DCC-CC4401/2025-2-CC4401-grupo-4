@@ -36,8 +36,6 @@
     </div>
 
     <button type="button" id="addHorario" class="mb-4 px-3 py-2 border rounded">+ Agregar horario</button>
-
-    <!-- 👇 OJO: NO uses |escapejs aquí -->
     <template id="empty-form-template">
       <div class="horario-form border border-border rounded-lg p-4 mb-4 bg-background/70">
         {{ formset.empty_form.as_p }}
@@ -53,7 +51,7 @@
 
 <script>
   (function () {
-    const prefix = "horarios"; // usa el mismo prefix que en la vista
+    const prefix = "horarios"; 
     const totalInput = document.getElementById(`id_${prefix}-TOTAL_FORMS`);
     const container = document.getElementById("horarios-container");
     const tpl = document.getElementById("empty-form-template");
@@ -62,7 +60,6 @@
     addBtn.addEventListener("click", () => {
       const index = parseInt(totalInput.value, 10);
 
-      // Toma el HTML del template y reemplaza __prefix__ por el índice nuevo
       const html = tpl.innerHTML.replace(/__prefix__/g, index);
       container.insertAdjacentHTML("beforeend", html);
 

@@ -103,15 +103,22 @@ class Inscripcion(models.Model):
     fecha_reserva = models.DateTimeField(auto_now_add=True)
 
     def aceptar(self):
-        if self.estado != EstadoInscripcion.ACEPTADO:
+        if self.estado == EstadoInscripcion.PENDIENTE:
             self.estado = EstadoInscripcion.ACEPTADO
             self.save()
 
     def rechazar(self):
-        if self.estado != EstadoInscripcion.RECHAZADO:
+        if self.estado == EstadoInscripcion.PENDIENTE:
             self.estado = EstadoInscripcion.RECHAZADO
             self.save()
-
+    def cancelar(self):
+        if ((self.estado == EstadoInscripcion.PENDIENTE) or (self.estado == EstadoInscripcion.ACEPTADO)):
+            self.estado = EstadoInscripcion.CANCELADO
+            self.save()
+    def completar(self):
+        if self.estado == EstadoInscripcion.ACEPTADO:
+            self.estado = EstadoInscripcion.COMPLETADO
+            self.save()         
     class Meta: 
         constraints  = [models.UniqueConstraint(fields=['estudiante', 'horario_ofertado'], name='unique_inscripcion')]
         verbose_name_plural = "Inscripciones"
