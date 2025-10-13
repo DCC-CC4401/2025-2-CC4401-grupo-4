@@ -3,9 +3,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from home.views import home as home_view
+
 urlpatterns = [
-	path('admin/', admin.site.urls),
-	path('', include('home.urls')),
+    path('admin/', admin.site.urls),
+    path('', include(('home.urls', 'home'), namespace='home')),
+    path('', home_view, name='home'),
     path('accounts/', include('accounts.urls')),
     path('courses/', include('courses.urls')),
 ]

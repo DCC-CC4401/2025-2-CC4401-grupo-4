@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Crear Solicitud - U-Clases{% endblock %}
+{% block title %}Editar Solicitud - U-Clases{% endblock %}
 
 {% block content %}
 {% include "includes/math-bg.html" %}
@@ -14,14 +14,14 @@
             <header class="relative border-b border-border pb-6 mb-8">
                 <div class="flex flex-wrap items-start gap-3 justify-between">
                     <span class="badge !text-lg text-cyan-500 border-cyan-500/30 bg-cyan-500/10">
-                        Nueva solicitud
+                        Editar solicitud
                     </span>
                     <span class="text-sm text-foreground/60">
-                        Comparte lo que necesitas para recibir apoyo
+                        Ajusta la informacion publicada en tu solicitud
                     </span>
                 </div>
                 <h1 class="mt-6 text-3xl font-bold text-foreground">
-                    Crear solicitud de clase
+                    Editar solicitud de clase
                 </h1>
             </header>
 
@@ -37,7 +37,7 @@
                 {% endif %}
 
                 <section class="rounded-xl border border-border bg-background/60 p-6 space-y-5">
-                    <h2 class="text-lg font-semibold text-foreground">Información principal</h2>
+                    <h2 class="text-lg font-semibold text-foreground">Informacion principal</h2>
 
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-foreground/80" for="{{ form.titulo.id_for_label }}">
@@ -126,23 +126,28 @@
 
                 <footer class="flex flex-col md:flex-row gap-3 border-t border-border pt-6">
                     <a
-                        href="{% url 'home' %}"
+                        href="{% url 'courses:solicitud_detail' solicitud.pk %}"
                         class="cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
                             <path
                                 fill-rule="evenodd"
                                 d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
                                 clip-rule="evenodd"
                             />
                         </svg>
-                        Cancelar
+                        Volver a la solicitud
                     </a>
                     <button
                         type="submit"
                         class="cosmic-button flex-1 justify-center text-foreground border border-green-600/30 bg-green-600/50 hover:bg-green-600/90"
                     >
-                        Publicar solicitud
+                        Guardar cambios
                     </button>
                 </footer>
             </form>

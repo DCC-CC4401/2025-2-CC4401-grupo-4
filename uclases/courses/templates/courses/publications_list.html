@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Publicaciones - U-Clases{% endblock %}
+
+{% block content %}
+{% include "includes/math-bg.html" %}
+<section id="publications" class="relative min-h-screen pt-28 pb-16">
+    <div class="container max-w-5xl mx-auto px-4">
+        <header class="mb-10 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-foreground mb-2">Todas las publicaciones</h1>
+            <p class="text-foreground/70">Ofertas y solicitudes más recientes publicadas en la comunidad.</p>
+        </header>
+
+        {% if publicaciones %}
+        <div class="space-y-4">
+            {% for publicacion in publicaciones %}
+            <a href="{% if publicacion.profesor %}{% url 'courses:oferta_detail' publicacion.id %}{% else %}{% url 'courses:solicitud_detail' publicacion.id %}{% endif %}"
+               class="block bg-card text-foreground rounded-xl border border-border shadow-sm card-hover cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
+               aria-label="Ver detalles de la publicación {{ publicacion.titulo }}">
+                <div class="p-6">
+                    <!-- Header: Usuario, Carrera, Ramos y Tipo -->
+                    <div class="flex items-start justify-between mb-4 gap-4">
+                        <div class="flex items-center gap-3 flex-wrap flex-1">
+                            <!-- Usuario -->
+                            {% if publicacion.profesor %}
+                                <!-- Es una Oferta -->
+                                <span class="font-semibold text-foreground">
+                                    @{{ publicacion.profesor.user.username }}
+                                </span>
+                                
+                                <!-- Carrera -->
+                                {% if publicacion.profesor.carrera %}
+                                <span class="badge font-medium text-green-500 border-green-500/30 bg-green-500/10">
+                                    {{ publicacion.profesor.carrera.name }}
+                                </span>
+                                {% endif %}
+                                
+                                <!-- Ramos (múltiples) -->
+                                {% for ramo in publicacion.ramos.all %}
+                                <span class="badge font-medium text-violet-500 border-violet-500/30 bg-violet-500/10">
+                                    {{ ramo.name }}
+                                </span>
+                                {% endfor %}
+                            {% else %}
+                                <!-- Es una Solicitud -->
+                                <span class="font-semibold text-foreground">
+                                    @{{ publicacion.solicitante.user.username }}
+                                </span>
+                                
+                                <!-- Carrera -->
+                                {% if publicacion.solicitante.carrera %}
+                                <span class="badge font-medium text-green-500 border-green-500/30 bg-green-500/10">
+                                    {{ publicacion.solicitante.carrera.name }}
+                                </span>
+                                {% endif %}
+                                
+                                <!-- Ramo (solo uno) -->
+                                <span class="badge font-medium text-violet-500 border-violet-500/30 bg-violet-500/10">
+                                    {{ publicacion.ramo.name }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Tipo: Oferta o Solicitud -->
+                        {% if publicacion.profesor %}
+                        <span class="badge font-medium flex-shrink-0 text-red-500 border-red-500/30 bg-red-500/10">
+                            Oferta
+                        </span>
+                        {% else %}
+                        <span class="badge font-medium flex-shrink-0 text-cyan-500 border-cyan-500/30 bg-cyan-500/10">
+                            Solicitud
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Título -->
+                    <h3 class="text-lg font-semibold text-foreground mb-2">{{ publicacion.titulo }}</h3>
+                    
+                    <!-- Descripción truncada -->
+                    <p class="text-sm text-foreground/70 truncate">
+                        {{ publicacion.descripcion }}
+                    </p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-card border border-border rounded-xl p-10 text-center text-foreground/70">
+            <p>No hay publicaciones disponibles todavía. ¡Sé el primero en crear una oferta o una solicitud!</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

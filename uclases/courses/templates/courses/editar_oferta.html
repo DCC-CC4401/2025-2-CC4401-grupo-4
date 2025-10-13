@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Crear Oferta - U-Clases{% endblock %}
+{% block title %}Editar Oferta - U-Clases{% endblock %}
 
 {% block content %}
 {% include "includes/math-bg.html" %}
@@ -10,23 +10,24 @@
     <div class="container max-w-4xl mx-auto px-4 mt-6">
         <div class="relative bg-card border border-border rounded-2xl shadow-xl p-10 overflow-hidden">
             <div class="absolute inset-0 pointer-events-none opacity-20 bg-gradient-to-br from-primary/20 via-transparent to-primary/10"></div>
+
             <header class="relative border-b border-border pb-6 mb-8">
                 <div class="flex flex-wrap items-start gap-3 justify-between">
                     <span class="badge !text-lg text-red-500 border-red-500/30 bg-red-500/10">
-                        Nueva oferta
+                        Editar oferta
                     </span>
                     <span class="text-sm text-foreground/60">
-                        Comparte tu disponibilidad y cursos dictados
+                        Actualiza la información y horarios publicados
                     </span>
                 </div>
                 <h1 class="mt-6 text-3xl font-bold text-foreground">
-                    Crear oferta de clase
+                    Editar oferta de clase
                 </h1>
             </header>
 
-            <!-- Offer creation form -->
             <form method="post" class="relative space-y-8">
                 {% csrf_token %}
+
                 {% if form.non_field_errors %}
                 <div class="rounded-lg border border-red-500/40 bg-red-500/10 text-red-500 px-4 py-3 text-sm">
                     {% for error in form.non_field_errors %}
@@ -35,77 +36,75 @@
                 </div>
                 {% endif %}
 
-                <!-- General offer info -->
                 <section class="rounded-xl border border-border bg-background/60 p-6 space-y-5">
                     <h2 class="text-lg font-semibold text-foreground">
                         Información de la oferta
                     </h2>
                     {% for field in form.visible_fields %}
-                    {% if field.name == "ramos" %}
-                        <div
-                            class="space-y-2"
-                            data-autocomplete
-                            data-autocomplete-url="{% url 'courses:ramo-autocomplete-api' %}"
-                            data-autocomplete-min-length="1"
-                        >
-                            <label
-                                class="text-sm font-medium text-foreground/80"
-                                for="autocomplete-{{ field.id_for_label }}"
+                        {% if field.name == "ramos" %}
+                            <div
+                                class="space-y-2"
+                                data-autocomplete
+                                data-autocomplete-url="{% url 'courses:ramo-autocomplete-api' %}"
+                                data-autocomplete-min-length="1"
                             >
-                                {{ field.label }}
-                            </label>
-                            {{ field }}
-                            <div class="relative">
-                                <input
-                                    id="autocomplete-{{ field.id_for_label }}"
-                                    type="text"
-                                    class="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
-                                    placeholder="Busca y selecciona el ramo asociado"
-                                    autocomplete="off"
-                                    data-autocomplete-input
-                                />
-                                <button
-                                    type="button"
-                                    class="absolute inset-y-0 right-0 px-3 text-sm text-foreground/60 hover:text-foreground"
-                                    data-autocomplete-clear
+                                <label
+                                    class="text-sm font-medium text-foreground/80"
+                                    for="autocomplete-{{ field.id_for_label }}"
                                 >
-                                    Limpiar
-                                </button>
-                                <div
-                                    class="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-card shadow-lg hidden"
-                                    data-autocomplete-results
-                                ></div>
+                                    {{ field.label }}
+                                </label>
+                                {{ field }}
+                                <div class="relative">
+                                    <input
+                                        id="autocomplete-{{ field.id_for_label }}"
+                                        type="text"
+                                        class="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
+                                        placeholder="Busca y selecciona el ramo asociado"
+                                        autocomplete="off"
+                                        data-autocomplete-input
+                                    />
+                                    <button
+                                        type="button"
+                                        class="absolute inset-y-0 right-0 px-3 text-sm text-foreground/60 hover:text-foreground"
+                                        data-autocomplete-clear
+                                    >
+                                        Limpiar
+                                    </button>
+                                    <div
+                                        class="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-card shadow-lg hidden"
+                                        data-autocomplete-results
+                                    ></div>
+                                </div>
+                                {% if field.help_text %}
+                                    <p class="text-xs text-foreground/60">
+                                        {{ field.help_text }}
+                                    </p>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <p class="text-xs text-red-500">{{ error }}</p>
+                                {% endfor %}
                             </div>
-                            {% if field.help_text %}
-                                <p class="text-xs text-foreground/60">
-                                    {{ field.help_text }}
-                                </p>
-                            {% endif %}
-                            {% for error in field.errors %}
-                                <p class="text-xs text-red-500">{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="space-y-2">
-                            <label
-                                class="text-sm font-medium text-foreground/80"
-                                for="{{ field.id_for_label }}"
-                            >{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.help_text %}
-                                <p class="text-xs text-foreground/60">
-                                    {{ field.help_text }}
-                                </p>
-                            {% endif %}
-                            {% for error in field.errors %}
-                                <p class="text-xs text-red-500">{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+                        {% else %}
+                            <div class="space-y-2">
+                                <label
+                                    class="text-sm font-medium text-foreground/80"
+                                    for="{{ field.id_for_label }}"
+                                >{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <p class="text-xs text-foreground/60">
+                                        {{ field.help_text }}
+                                    </p>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <p class="text-xs text-red-500">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </section>
 
-                <!-- Offered schedules -->
                 <section class="rounded-xl border border-border bg-background/60 p-6 space-y-5">
                     <div class="flex items-start justify-between gap-4 flex-wrap">
                         <div>
@@ -113,8 +112,7 @@
                                 Horarios ofertados
                             </h2>
                             <p class="text-sm text-foreground/60 mt-1">
-                                Agrega tanta disponibilidad como necesites. Cada
-                                bloque incluye día, horario y cupos.
+                                Ajusta los bloques disponibles o agrega nuevos horarios.
                             </p>
                         </div>
                         <button
@@ -136,7 +134,6 @@
                     </div>
                     {% endif %}
 
-                    <!-- Existing schedule rows -->
                     <div id="horarios-container" class="space-y-4">
                         {% for horario_form in formset %}
                         <div class="horario-form rounded-xl border border-border bg-card/80 p-5 shadow-sm" data-horario-form>
@@ -164,38 +161,36 @@
                             </div>
                             {% endif %}
 
-                            <!-- Schedule fields -->
                             <div class="flex flex-wrap items-justify justify-between gap-4">
-							{% for field in horario_form.visible_fields %}
-								{% if field.name != 'DELETE' %}
-									<div class="flex flex-col gap-1 w-28">
-										<label
-											class="text-sm font-medium text-foreground/80"
-											for="{{ field.id_for_label }}"
-										>
-											{{ field.label }}
-										</label>
-										{{ field }}
-										{% if field.help_text %}
-											<span class="text-xs text-foreground/60">
-												{{ field.help_text }}
-											</span>
-										{% endif %}
-										{% for error in field.errors %}
-											<span class="text-xs text-red-500">
-												{{ error }}
-											</span>
-										{% endfor %}
-									</div>
-								{% endif %}
-							{% endfor %}
+                                {% for field in horario_form.visible_fields %}
+                                    {% if field.name != 'DELETE' %}
+                                        <div class="flex flex-col gap-1 w-28">
+                                            <label
+                                                class="text-sm font-medium text-foreground/80"
+                                                for="{{ field.id_for_label }}"
+                                            >
+                                                {{ field.label }}
+                                            </label>
+                                            {{ field }}
+                                            {% if field.help_text %}
+                                                <span class="text-xs text-foreground/60">
+                                                    {{ field.help_text }}
+                                                </span>
+                                            {% endif %}
+                                            {% for error in field.errors %}
+                                                <span class="text-xs text-red-500">
+                                                    {{ error }}
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
                             </div>
 
                         </div>
                         {% endfor %}
                     </div>
 
-                    <!-- Prototype for JS-added schedules -->
                     <template id="empty-form-template">
                         <div class="horario-form rounded-xl border border-border bg-card/80 p-5 pt-2 shadow-sm" data-horario-form>
                             {% if formset.can_delete %}
@@ -244,10 +239,9 @@
                     </template>
                 </section>
 
-                <!-- Form actions -->
                 <footer class="flex flex-col md:flex-row gap-3 border-t border-border pt-6">
                     <a
-                        href="{% url 'home' %}"
+                        href="{% url 'courses:oferta_detail' oferta.pk %}"
                         class="cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2"
                     >
                         <svg
@@ -262,13 +256,13 @@
                                 clip-rule="evenodd"
                             />
                         </svg>
-                        Cancelar
+                        Volver a la oferta
                     </a>
                     <button
                         type="submit"
                         class="cosmic-button flex-1 justify-center text-foreground border border-green-600/30 bg-green-600/50 hover:bg-green-600/90"
                     >
-                        Publicar oferta
+                        Guardar cambios
                     </button>
                 </footer>
             </form>
