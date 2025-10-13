@@ -11,50 +11,64 @@
                 <span class="text-gradient ml-2 opacity-0 animate-fade-in-delay-2"></span>
             </h1>
             <br />
-            <div class="flex h-9 items-center gap-3 py-5 p-3 cosmic-button active:scale-100 w-full outline-hidden bg-card text-foreground rounded-md mt-10 opacity-0 animate-fade-in-delay-3">
-                <!-- Filter -->
-                <svg xmlns="http://www.w3.org/2000/svg" 
-                    width="24" height="24" viewBox="0 0 24 24" 
-                    fill="none" stroke="currentColor" stroke-width="2" 
+            <form
+                method="get"
+                action="{% url 'home' %}"
+                class="relative flex h-9 items-center gap-3 py-5 p-3 cosmic-button active:scale-100 w-full outline-hidden bg-card text-foreground rounded-md mt-10 opacity-0 animate-fade-in-delay-3"
+                data-autocomplete
+                data-autocomplete-url="{% url 'home:perfil-autocomplete-api' %}"
+                data-autocomplete-auto-submit="true"
+                data-autocomplete-min-length="1"
+            >
+                <input type="hidden" name="perfil" data-autocomplete-value>
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    width="24" height="24" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round"
-                    class="hover:scale-108 opacity-0 animate-fade-in-delay-4 transition-transform duration-200 cursor-pointer">
+                    class="hover:scale-108 opacity-0 animate-fade-in-delay-4 transition-transform duration-200 cursor-pointer"
+                >
                     <path d="M3 4h18l-7 8v6l-4 2v-8L3 4z"></path>
                 </svg>
 
-                <!-- Magnifying glass -->
-                <svg xmlns="http://www.w3.org/2000/svg" 
-                    width="24" height="24" viewBox="0 0 24 24" 
-                    fill="none" stroke="currentColor" stroke-width="2" 
-                    stroke-linecap="round" stroke-linejoin="round" 
-                    class="hover:scale-108 opacity-0 animate-fade-in-delay-4 transition-transform duration-200 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    width="24" height="24" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"
+                    class="hover:scale-108 opacity-0 animate-fade-in-delay-4 transition-transform duration-200 cursor-pointer"
+                >
                     <circle cx="11" cy="11" r="8"></circle>
                     <path d="m21 21-4.3-4.3"></path>
                 </svg>
 
-                <!-- Searchbar -->
-                <input
-                    data-slot="command-input"
-                    class="px-1 w-full text-sm outline-hidden bg-card text-foreground placeholder:text-muted-foreground opacity-0 animate-fade-in-delay-3"
-                    placeholder="Empieza a buscar..."
-                    cmdk-input="" 
-                    autocomplete="off" 
-                    autocorrect="off" 
-                    spellcheck="false" 
-                    aria-autocomplete="list" 
-                    role="combobox" 
-                    aria-expanded="true" 
-                    aria-controls="radix-«rj»" 
-                    aria-labelledby="radix-«rk»" 
-                    id="radix-«rl»" 
-                    type="text" 
-                    value="">
-            </div>
+                <div class="flex-1">
+                    <input
+                        type="text"
+                        class="px-1 w-full text-sm outline-hidden bg-card text-foreground placeholder:text-muted-foreground"
+                        placeholder="Busca perfiles por usuario"
+                        autocomplete="off"
+                        data-autocomplete-input
+                    >
+                    <div
+                        class="absolute left-12 right-3 top-[calc(100%+0.5rem)] z-20 max-h-56 overflow-y-auto rounded-lg border border-border bg-card shadow-lg hidden"
+                        data-autocomplete-results
+                    ></div>
+                </div>
+
+                <button
+                    type="button"
+                    class="opacity-0 animate-fade-in-delay-4 text-sm text-foreground/60 hover:text-foreground"
+                    data-autocomplete-clear
+                >
+                    Limpiar
+                </button>
+            </form>
         </div>
     </div>
     
     <!-- Flecha animada hacia abajo -->
     <a href="#publicaciones" 
-       class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 opacity-0 animate-fade-in-delay-4 transition-all duration-300 hover:scale-110 active:scale-95">
+       class="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0 animate-fade-in-delay-4 transition-all duration-300 hover:scale-110 active:scale-95">
         <div class="flex flex-col items-center gap-2 cursor-pointer">
             <span class="text-foreground/70 hover:text-primary transition-colors text-xs font-medium">Ver publicaciones</span>
             <div class="mt-2 w-6 h-6 rounded-full border-2 border-foreground/20 hover:border-primary/50 flex items-center justify-center animate-bounce">
