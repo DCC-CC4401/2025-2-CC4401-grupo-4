@@ -16,10 +16,10 @@ class OfertaForm(forms.ModelForm):
 
     class Meta:
         model = OfertaClase
-        fields = ['titulo','descripcion','ramos']
+        fields = ['titulo','descripcion','ramo']
         labels = {
             "descripcion": "Descripción",
-            "ramos": "Ramos asociados",
+            "ramo": "Ramo",
         }
 
         widgets = {
@@ -28,19 +28,23 @@ class OfertaForm(forms.ModelForm):
                 "placeholder": "Cuenta brevemente el enfoque, requisitos, horarios tentativos...",
                 "class": INPUT
             }),
-            "ramos": forms.Select(attrs={
+            "ramo": forms.Select(attrs={
                 "class": INPUT,
-                "data-autocomplete-select": "true",
             }),
         }
 
-    def clean_ramos(self):
-        ramos = self.cleaned_data["ramos"]
-        if len(ramos) > 1:
-            raise forms.ValidationError("Solo puedes ofertar un ramo")
-        if len(ramos) == 0:
-            raise forms.ValidationError("Debes elegir un ramo para ofertar")
-        return ramos
+    def __init__(self, *args, **kwargs):
+        # Extraer el usuario del kwargs
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        # Filtrar ramos solo a los que el usuario ha cursado
+        if user and hasattr(user, 'perfil'):
+            self.fields['ramo'].queryset = user.perfil.ramos_cursados.all().order_by('name')
+        
+        # Mensaje cuando no hay ramos disponibles
+        if not self.fields['ramo'].queryset.exists():
+            self.fields['ramo'].empty_label = "No tienes ramos cursados registrados"
             
 
 class HorarioOfertadoForm(forms.ModelForm):
@@ -133,7 +137,6 @@ class SolicitudClaseForm(forms.ModelForm):
             "solicitante": forms.Select(attrs={"class": INPUT}),
             "ramo": forms.Select(attrs={
                 "class": INPUT,
-                "data-autocomplete-select": "true",
             }),
             #"modalidad": forms.Select(attrs={"class": INPUT}),
         }
