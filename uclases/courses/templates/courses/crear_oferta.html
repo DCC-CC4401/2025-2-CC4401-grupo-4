@@ -139,16 +139,18 @@
                     <!-- Existing schedule rows -->
                     <div id="horarios-container" class="space-y-4">
                         {% for horario_form in formset %}
-                        <div class="horario-form relative rounded-xl border border-border bg-card/80 p-5 shadow-sm" data-horario-form>
+                        <div class="horario-form rounded-xl border border-border bg-card/80 p-5 shadow-sm" data-horario-form>
                             {% if horario_form.can_delete %}
-                            <button
-                                type="button"
-                                class="absolute top-3 right-3 text-lg font-semibold text-foreground/60 hover:text-red-500"
-                                data-delete-toggle
-                                aria-label="Eliminar horario"
-                            >
-                                x
-                            </button>
+                            <div class="flex justify-end mb-3">
+                                <button
+                                    type="button"
+                                    class="px-3 py-1 text-sm font-semibold text-foreground/70 hover:text-red-500 hover:bg-red-500/10 rounded-md"
+                                    data-delete-toggle
+                                    aria-label="Eliminar horario"
+                                >
+                                    x
+                                </button>
+                            </div>
                             <span class="hidden">{{ horario_form.DELETE }}</span>
                             {% endif %}
                             {% for hidden in horario_form.hidden_fields %}
@@ -164,29 +166,29 @@
 
                             <!-- Schedule fields -->
                             <div class="flex flex-wrap items-justify justify-between gap-4">
-                                    {% for field in horario_form.visible_fields %}
-                                        {% if field.name != 'DELETE' %}
-                                            <div class="flex flex-col gap-1 w-28">
-                                                <label
-                                                    class="text-sm font-medium text-foreground/80"
-                                                    for="{{ field.id_for_label }}"
-                                                >
-                                                    {{ field.label }}
-                                                </label>
-                                                {{ field }}
-                                                {% if field.help_text %}
-                                                    <span class="text-xs text-foreground/60">
-                                                        {{ field.help_text }}
-                                                    </span>
-                                                {% endif %}
-                                                {% for error in field.errors %}
-                                                    <span class="text-xs text-red-500">
-                                                        {{ error }}
-                                                    </span>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
+							{% for field in horario_form.visible_fields %}
+								{% if field.name != 'DELETE' %}
+									<div class="flex flex-col gap-1 w-28">
+										<label
+											class="text-sm font-medium text-foreground/80"
+											for="{{ field.id_for_label }}"
+										>
+											{{ field.label }}
+										</label>
+										{{ field }}
+										{% if field.help_text %}
+											<span class="text-xs text-foreground/60">
+												{{ field.help_text }}
+											</span>
+										{% endif %}
+										{% for error in field.errors %}
+											<span class="text-xs text-red-500">
+												{{ error }}
+											</span>
+										{% endfor %}
+									</div>
+								{% endif %}
+							{% endfor %}
                             </div>
 
                         </div>
@@ -195,16 +197,18 @@
 
                     <!-- Prototype for JS-added schedules -->
                     <template id="empty-form-template">
-                        <div class="horario-form relative rounded-xl border border-border bg-card/80 p-5 shadow-sm" data-horario-form>
+                        <div class="horario-form rounded-xl border border-border bg-card/80 p-5 pt-2 shadow-sm" data-horario-form>
                             {% if formset.can_delete %}
-                            <button
-                                type="button"
-                                class="absolute top-3 right-3 text-lg font-semibold text-primary hover:scale-120"
-                                data-delete-toggle
-                                aria-label="Eliminar horario"
-                            >
-                                x
-                            </button>
+                            <div class="flex justify-end mb-3">
+                                <button
+                                    type="button"
+                                    class="px-3 py-1 font-bold text-primary hover:text-red-500 hover:bg-red-500/10 rounded-md"
+                                    data-delete-toggle
+                                    aria-label="Eliminar horario"
+                                >
+                                    x
+                                </button>
+                            </div>
                             <span class="hidden">{{ formset.empty_form.DELETE }}</span>
                             {% endif %}
                             {% for hidden in formset.empty_form.hidden_fields %}
@@ -316,22 +320,5 @@
             wireDeleteButtons();
         });
     })();
-  
-  (function () {
-    const prefix = "horarios"; 
-    const totalInput = document.getElementById(`id_${prefix}-TOTAL_FORMS`);
-    const container = document.getElementById("horarios-container");
-    const tpl = document.getElementById("empty-form-template");
-    const addBtn = document.getElementById("addHorario");
-
-    addBtn.addEventListener("click", () => {
-      const index = parseInt(totalInput.value, 10);
-
-      const html = tpl.innerHTML.replace(/__prefix__/g, index);
-      container.insertAdjacentHTML("beforeend", html);
-
-      totalInput.value = index + 1;
-    });
-  })();
 </script>
 {% endblock %}
