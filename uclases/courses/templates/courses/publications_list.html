@@ -62,7 +62,7 @@
                aria-label="Ver detalles de la publicación {{ publicacion.titulo }}"
                data-publication
                data-username="{% if publicacion.profesor %}{{ publicacion.profesor.user.username }}{% else %}{{ publicacion.solicitante.user.username }}{% endif %}"
-               data-tags="{% if publicacion.profesor %}{% for ramo in publicacion.ramos.all %}{% if not forloop.first %},{% endif %}{{ ramo.name }}{% endfor %}{% else %}{{ publicacion.ramo.name }}{% endif %}"
+               data-tags="{% if publicacion.profesor %}{{ publicacion.ramo.name }}{% else %}{{ publicacion.ramo.name }}{% endif %}"
             >
                 <div class="p-6">
                     <!-- Header: Usuario, Carrera, Ramos y Tipo -->
