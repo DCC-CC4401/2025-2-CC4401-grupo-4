@@ -1,8 +1,31 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
 from django.contrib import messages
-from .models import OfertaClase, SolicitudClase
+
+from accounts.models import Perfil
+from .models import OfertaClase, SolicitudClase, Ramo
 from .enums import DiaSemana
 from .forms import OfertaForm, HorarioFormSet, SolicitudClaseForm
+
+
+def ramo_autocomplete_api(request):
+    """Retorna coincidencias de ramos en formato JSON."""
+
+    term = (request.GET.get("q", "") or "").strip()
+    perfil = request.user.perfil
+    ramos = perfil.ramos_cursados.all().order_by("name")
+
+    if term:
+        ramos = ramos.filter(name__icontains=term)
+
+    results = [
+        {
+            "id": ramo.id,
+            "label": ramo.name,
+        }
+        for ramo in ramos[:15]
+    ]
+    return JsonResponse(results, safe=False)
 
 def oferta_detail(request, pk):
     """Vista detallada de una oferta de clase"""
