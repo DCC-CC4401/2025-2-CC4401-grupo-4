@@ -1,9 +1,31 @@
+from itertools import chain
+from operator import attrgetter
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from .models import OfertaClase, SolicitudClase
+from django.shortcuts import get_object_or_404, redirect, render
+
 from .enums import DiaSemana
-from .forms import OfertaForm, HorarioFormSet, SolicitudClaseForm
+from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
+from .models import OfertaClase, SolicitudClase
+
+
+def publications_view(request):
+    """Listar todas las publicaciones (ofertas y solicitudes) ordenadas por fecha."""
+    ofertas_qs = OfertaClase.objects.select_related('profesor__user', 'profesor__carrera').prefetch_related('ramos')
+    solicitudes_qs = SolicitudClase.objects.select_related('solicitante__user', 'solicitante__carrera', 'ramo')
+    
+    publicaciones = sorted(
+        chain(ofertas_qs, solicitudes_qs),
+        key=attrgetter('fecha_publicacion'),
+        reverse=True,
+    )
+    
+    context = {
+        'publicaciones': publicaciones,
+    }
+    return render(request, 'courses/publications_list.html', context)
 
 def oferta_detail(request, pk):
     """Vista detallada de una oferta de clase"""
