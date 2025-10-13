@@ -8,4 +8,5 @@ urlpatterns = [
     path('solicitud/<int:pk>/', views.solicitud_detail, name='solicitud_detail'),
     path('oferta/nueva/', views.crear_oferta, name='crear_oferta'),
     path('solicitud/nueva/', views.crear_solicitud, name='crear_solicitud'),
+    path('api/ramo-autocomplete/', views.ramo_autocomplete_api, name='ramo-autocomplete-api'),
 ]
