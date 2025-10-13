@@ -10,13 +10,60 @@
             <h1 class="text-3xl md:text-4xl font-bold text-foreground mb-2">Todas las publicaciones</h1>
             <p class="text-foreground/70">Ofertas y solicitudes más recientes publicadas en la comunidad.</p>
         </header>
+        
+        <!-- Aqui van los tags dados por el cliente-->
+        <div 
+            id="tags-filter" 
+            class="flex flex-wrap gap-2 mt-4 opacity-0 animate-fade-in-delay-2" aria-label="Filtrar por etiquetas">
+        </div>
 
+        <!-- Filtro por usuario -->
+        <form
+            id="publications-filter-form"
+            class="relative flex h-9 items-center gap-3 py-5 p-3 cosmic-button active:scale-100 w-full outline-hidden bg-card text-foreground rounded-md mt-6 opacity-0 animate-fade-in-delay-3"
+            onsubmit="return false;"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg"
+                width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"
+                class="hover:scale-108 opacity-0 animate-fade-in-delay-4 transition-transform duration-200 cursor-pointer"
+            >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+            </svg>
+
+            <div class="flex-1 relative">
+                <input
+                    id="publications-filter-input"
+                    type="search"
+                    class="px-1 w-full text-sm outline-hidden bg-card text-foreground placeholder:text-muted-foreground"
+                    placeholder="Busca publicaciones por usuario"
+                    autocomplete="off"
+                >
+            </div>
+
+            <button
+                type="button"
+                id="publications-filter-clear"
+                class="opacity-0 animate-fade-in-delay-4 text-sm text-foreground/60 hover:text-foreground"
+            >
+                Limpiar
+            </button>
+        </form>
+
+        <br />
+        
         {% if publicaciones %}
-        <div class="space-y-4">
+        <div class="space-y-4" id="publications-list">
             {% for publicacion in publicaciones %}
             <a href="{% if publicacion.profesor %}{% url 'courses:oferta_detail' publicacion.id %}{% else %}{% url 'courses:solicitud_detail' publicacion.id %}{% endif %}"
                class="block bg-card text-foreground rounded-xl border border-border shadow-sm card-hover cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
-               aria-label="Ver detalles de la publicación {{ publicacion.titulo }}">
+               aria-label="Ver detalles de la publicación {{ publicacion.titulo }}"
+               data-publication
+               data-username="{% if publicacion.profesor %}{{ publicacion.profesor.user.username }}{% else %}{{ publicacion.solicitante.user.username }}{% endif %}"
+               data-tags="{% if publicacion.profesor %}{% for ramo in publicacion.ramos.all %}{% if not forloop.first %},{% endif %}{{ ramo.name }}{% endfor %}{% else %}{{ publicacion.ramo.name }}{% endif %}"
+            >
                 <div class="p-6">
                     <!-- Header: Usuario, Carrera, Ramos y Tipo -->
                     <div class="flex items-start justify-between mb-4 gap-4">
@@ -84,6 +131,115 @@
             </a>
             {% endfor %}
         </div>
+
+        <script>
+        (function () {
+            const input = document.getElementById('publications-filter-input');
+            const clearBtn = document.getElementById('publications-filter-clear');
+            const list = document.getElementById('publications-list');
+            const tagsContainer = document.getElementById('tags-filter');
+            if (!input || !list || !tagsContainer) return;
+
+            const normalize = s => (s || '').toString().trim().toLowerCase().replace(/^@/, '');
+
+            // botones de tags
+            function buildTagButtons() {
+                const items = list.querySelectorAll('[data-publication]');
+                const tagSet = new Set();
+                items.forEach(it => {
+                    const raw = it.getAttribute('data-tags') || '';
+                    raw.split(',').map(t => t.trim()).filter(Boolean).forEach(t => tagSet.add(t));
+                });
+
+                // container limpio
+                tagsContainer.innerHTML = '';
+
+                if (tagSet.size === 0) return;
+
+                // botón para limpiar selección
+                const clearTagsBtn = document.createElement('button');
+                clearTagsBtn.type = 'button';
+                clearTagsBtn.textContent = 'Borrar etiquetas';
+                clearTagsBtn.className = 'text-sm text-foreground/60 hover:text-foreground mr-2';
+                clearTagsBtn.addEventListener('click', () => {
+                    tagsContainer.querySelectorAll('.tag-btn.selected').forEach(btn => {
+                        btn.classList.remove('selected', 'bg-primary', 'text-white');
+                        btn.setAttribute('aria-pressed', 'false');
+                    });
+                    filter();
+                });
+                tagsContainer.appendChild(clearTagsBtn);
+
+                tagSet.forEach(tag => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'tag-btn badge text-foreground/80 border-border bg-card/80 hover:bg-card/90';
+                    btn.textContent = tag;
+                    btn.setAttribute('data-tag', tag);
+                    btn.setAttribute('aria-pressed', 'false');
+                    btn.addEventListener('click', () => {
+                        const isSelected = btn.classList.toggle('selected');
+                        if (isSelected) {
+                            // minimal visual selected classes (project uses utility classes)
+                            btn.classList.add('bg-primary', 'text-white');
+                            btn.setAttribute('aria-pressed', 'true');
+                        } else {
+                            btn.classList.remove('bg-primary', 'text-white');
+                            btn.setAttribute('aria-pressed', 'false');
+                        }
+                        filter();
+                    });
+                    tagsContainer.appendChild(btn);
+                });
+            }
+
+            function getSelectedTags() {
+                const selected = Array.from(tagsContainer.querySelectorAll('.tag-btn.selected')).map(b => normalize(b.getAttribute('data-tag')));
+                return new Set(selected);
+            }
+
+            function filter() {
+                const q = normalize(input.value);
+                const selectedTags = getSelectedTags();
+                const items = list.querySelectorAll('[data-publication]');
+                items.forEach(it => {
+                    const username = normalize(it.getAttribute('data-username'));
+                    const rawTags = (it.getAttribute('data-tags') || '').split(',').map(t => normalize(t.trim())).filter(Boolean);
+                    const hasTagMatch = selectedTags.size === 0 || rawTags.some(t => selectedTags.has(t));
+                    const usernameMatches = !q || username.includes(q);
+                    if (usernameMatches && hasTagMatch) {
+                        it.classList.remove('hidden');
+                    } else {
+                        it.classList.add('hidden');
+                    }
+                });
+            }
+
+            input.addEventListener('input', filter);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    input.value = '';
+                    filter();
+                }
+            });
+
+            clearBtn.addEventListener('click', () => {
+                input.value = '';
+                filter();
+                input.focus();
+            });
+
+            // Inicialización de tags
+            window.addEventListener('load', () => {
+                buildTagButtons();
+                // revelar controles si están ocultos por clases de animación inicial
+                input.classList.remove('opacity-0');
+                clearBtn.classList.remove('opacity-0');
+                tagsContainer.classList.remove('opacity-0');
+            });
+        })();
+        </script>
+
         {% else %}
         <div class="bg-card border border-border rounded-xl p-10 text-center text-foreground/70">
             <p>No hay publicaciones disponibles todavía. ¡Sé el primero en crear una oferta o una solicitud!</p>

@@ -22,14 +22,20 @@
             >
                 <input type="hidden" name="perfil" data-autocomplete-value>
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    width="24" height="24" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round"
-                    class="hover:scale-108 opacity-0 animate-fade-in-delay-4 transition-transform duration-200 cursor-pointer"
-                >
-                    <path d="M3 4h18l-7 8v6l-4 2v-8L3 4z"></path>
-                </svg>
+                <a 
+                    href="{% url 'courses:publications' %}"
+                    class="inline-flex items-center justify-center"
+                    aria-label="Ir a busqueda avanzada de publicaciones"
+                    >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"
+                        class="hover:scale-108 opacity-0 animate-fade-in-delay-4 transition-transform duration-200 cursor-pointer"
+                    >
+                        <path d="M3 4h18l-7 8v6l-4 2v-8L3 4z"></path>
+                    </svg>
+                </a>
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     width="24" height="24" viewBox="0 0 24 24"
