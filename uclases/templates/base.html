@@ -48,7 +48,8 @@
             {% include "includes/footer.html" %}
         </div>
 
-        {% block scripts %}{% endblock %}
+    <script src="{% static 'js/autocomplete.js' %}" defer></script>
+    {% block scripts %}{% endblock %}
 
         {% if messages %}
         <script>

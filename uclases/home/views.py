@@ -1,8 +1,32 @@
-from django.shortcuts import render
-from courses.models import OfertaClase, SolicitudClase
 from itertools import chain
 from operator import attrgetter
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
+from accounts.models import Perfil
+from courses.models import OfertaClase, SolicitudClase
+
+def perfil_autocomplete_api(request):
+    term = (request.GET.get("q", "") or "").strip()
+    queryset = (
+        Perfil.objects.select_related("user", "carrera")
+        .order_by("user__username")
+    )
+
+    if term:
+        queryset = queryset.filter(user__username__icontains=term)
+
+    results = [
+        {
+            "id": str(perfil.user.public_uid),
+            "label": f"{perfil.user.username}",
+            "description": perfil.carrera.name if perfil.carrera else "Sin carrera",
+        }
+        for perfil in queryset[:10]
+    ]
+
+    return JsonResponse(results, safe=False)
 
 def home(request):
    
