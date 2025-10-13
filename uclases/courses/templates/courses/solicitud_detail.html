@@ -93,23 +93,27 @@
 
             <!-- Botones de Acción -->
             <footer class="flex gap-3 border-t border-border pt-6 md:flex-row">
-                     <a href="{% url 'home' %}"
-                         class="cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
+                <a href="{% url 'home' %}"
+                   class="cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                     </svg>
                     Volver
                 </a>
-                <button id="proponerClaseBtn"
-                        class="cosmic-button flex-1 justify-center text-foreground border border-green-600/30 bg-green-600/50 hover:bg-green-600/90"
-                        aria-haspopup="dialog" aria-controls="proponerClaseModal">
-                    Proponer clase
-                </button>
+                
                 {% if user.is_authenticated and solicitud.solicitante.user == user %}
-                <a href="{% url 'courses:editar_solicitud' solicitud.pk %}"
-                   class="cosmic-button flex-1 flex items-center justify-center text-foreground border border-yellow-500/30 bg-yellow-500/50 hover:bg-yellow-500/90">
-                    Editar Solicitud
-                </a>
+                    <!-- Botón de Editar si eres el dueño -->
+                    <a href="{% url 'courses:editar_solicitud' solicitud.pk %}"
+                       class="cosmic-button flex-1 flex items-center justify-center text-foreground border border-yellow-500/30 bg-yellow-500/50 hover:bg-yellow-500/90">
+                        Editar Solicitud
+                    </a>
+                {% else %}
+                    <!-- Botón de Proponer clase si NO eres el dueño -->
+                    <button id="proponerClaseBtn"
+                            class="cosmic-button flex-1 justify-center text-foreground border border-green-600/30 bg-green-600/50 hover:bg-green-600/90"
+                            aria-haspopup="dialog" aria-controls="proponerClaseModal">
+                        Proponer clase
+                    </button>
                 {% endif %}
             </footer>
         </div>
