@@ -1,3 +1,7 @@
+from itertools import chain
+from operator import attrgetter
+
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib import messages
@@ -5,7 +9,25 @@ from django.contrib import messages
 from accounts.models import Perfil
 from .models import OfertaClase, SolicitudClase, Ramo
 from .enums import DiaSemana
-from .forms import OfertaForm, HorarioFormSet, SolicitudClaseForm
+from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
+from .models import OfertaClase, SolicitudClase
+
+
+def publications_view(request):
+    """Listar todas las publicaciones (ofertas y solicitudes) ordenadas por fecha."""
+    ofertas_qs = OfertaClase.objects.select_related('profesor__user', 'profesor__carrera').prefetch_related('ramos')
+    solicitudes_qs = SolicitudClase.objects.select_related('solicitante__user', 'solicitante__carrera', 'ramo')
+    
+    publicaciones = sorted(
+        chain(ofertas_qs, solicitudes_qs),
+        key=attrgetter('fecha_publicacion'),
+        reverse=True,
+    )
+    
+    context = {
+        'publicaciones': publicaciones,
+    }
+    return render(request, 'courses/publications_list.html', context)
 
 
 def ramo_autocomplete_api(request):
@@ -77,7 +99,7 @@ def crear_solicitud(request):
     if request.method == "POST":
         form = SolicitudClaseForm(request.POST)
         if form.is_valid():
-            solicitud = form.save()
+            solicitud = form.save(commit=False)
             solicitud.solicitante = request.user.perfil
             solicitud.save()
             messages.success(request, "Solicitud creada correctamente.")
@@ -86,3 +108,43 @@ def crear_solicitud(request):
         form = SolicitudClaseForm()
 
     return render(request, "courses/crear_solicitud.html", {"form": form})
+
+
+@login_required
+def editar_oferta(request, pk):
+    oferta = get_object_or_404(OfertaClase, pk=pk)
+    if oferta.profesor != request.user.perfil:
+        messages.error(request, "No tienes permiso para editar esta oferta.")
+        return redirect('courses:oferta_detail', pk=pk)
+
+    if request.method == "POST":
+        form = OfertaForm(request.POST, instance=oferta)
+        formset = HorarioFormSet(request.POST, instance=oferta, prefix="horarios")
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            messages.success(request, "Oferta actualizada correctamente.")
+            return redirect('courses:oferta_detail', pk=oferta.pk)
+    else:
+        form = OfertaForm(instance=oferta)
+        formset = HorarioFormSet(instance=oferta, prefix="horarios")
+
+    return render(request, "courses/editar_oferta.html", {"form": form, "formset": formset, "oferta": oferta})
+
+@login_required
+def editar_solicitud(request, pk):
+    solicitud = get_object_or_404(SolicitudClase, pk=pk)
+    if solicitud.solicitante != request.user.perfil:
+        messages.error(request, "No tienes permiso para editar esta solicitud.")
+        return redirect('courses:solicitud_detail', pk=pk)
+
+    if request.method == "POST":
+        form = SolicitudClaseForm(request.POST, instance=solicitud)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Solicitud actualizada correctamente.")
+            return redirect('courses:solicitud_detail', pk=solicitud.pk)
+    else:
+        form = SolicitudClaseForm(instance=solicitud)
+
+    return render(request, "courses/editar_solicitud.html", {"form": form, "solicitud": solicitud})

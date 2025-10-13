@@ -5,7 +5,7 @@ from django.forms import ValidationError
 from django.utils import timezone
 from django.urls import reverse
 
-from courses.forms import HorarioOfertadoForm, HorarioFormSet, OfertaForm
+from courses.forms import HorarioOfertadoForm, HorarioFormSet, OfertaForm, SolicitudClaseForm
 from courses.models import OfertaClase, HorarioOfertado, Ramo, Perfil  # ajusta si la ruta cambia
 from courses.enums import DiaSemana
 
@@ -128,28 +128,61 @@ class BaseHorarioFormSetTests(FormFactoriesMixin, TestCase):
         self.assertEqual(HorarioOfertado.objects.filter(oferta=oferta).count(), 1)
 
 class OfertaFormRamosTests(FormFactoriesMixin, TestCase):
-    """
-    SOLO si agregas en OfertaForm.clean() la validación de 'al menos un ramo'.
-    Si no la agregas, puedes borrar esta clase.
-    """
     def test_requires_at_least_one_ramo(self):
-        perfil = self.make_perfil("profe_ramos")
         form = OfertaForm(data={
             "titulo": "X",
             "descripcion": "Y",
-            "profesor": perfil.pk,
             # "ramos": []  # sin ramos
         })
         self.assertFalse(form.is_valid())
         self.assertIn("ramos", form.errors)
 
     def test_valid_with_one_ramo(self):
-        perfil = self.make_perfil("profe_ok")
         ramo = self.make_ramo("Cálculo")
         form = OfertaForm(data={
             "titulo": "X",
             "descripcion": "Y",
-            "profesor": perfil.pk,
             "ramos": [ramo.pk],
         })
         self.assertTrue(form.is_valid())
+
+    def test_invalid_with_multiple_ramos(self):
+        ramo1 = self.make_ramo("Cálculo")
+        ramo2 = self.make_ramo("Álgebra")
+        form = OfertaForm(data={
+            "titulo": "X",
+            "descripcion": "Y",
+            "ramos": [ramo1.pk, ramo2.pk],
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn("ramos", form.errors)
+
+
+class SolicitudClaseFormTests(FormFactoriesMixin, TestCase):
+    def test_requires_ramo(self):
+        form = SolicitudClaseForm(data={
+            "titulo": "Solicitud X",
+            "descripcion": "Necesito ayuda",
+            # Falta ramo
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn("ramo", form.errors)
+
+    def test_valid_with_ramo(self):
+        ramo = self.make_ramo("Física")
+        form = SolicitudClaseForm(data={
+            "titulo": "Solicitud X",
+            "descripcion": "Necesito ayuda",
+            "ramo": ramo.pk,
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_titulo_required(self):
+        ramo = self.make_ramo("Química")
+        form = SolicitudClaseForm(data={
+            # Falta título
+            "descripcion": "desc",
+            "ramo": ramo.pk,
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn("titulo", form.errors)

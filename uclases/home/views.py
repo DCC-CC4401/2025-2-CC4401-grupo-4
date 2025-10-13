@@ -28,25 +28,21 @@ def perfil_autocomplete_api(request):
 
     return JsonResponse(results, safe=False)
 
-
 def home(request):
-    perfil_uid = (request.GET.get("perfil") or "").strip()
-    if perfil_uid:
-        perfil = get_object_or_404(Perfil, user__public_uid=perfil_uid)
-        return redirect("accounts:profile_detail", public_uid=perfil.user.public_uid)
+   
+    ofertas_qs = OfertaClase.objects.order_by('-fecha_publicacion')
+    solicitudes_qs = SolicitudClase.objects.order_by('-fecha_publicacion')
 
-    # Obtener todas las ofertas y solicitudes
-    ofertas = OfertaClase.objects.all()
-    solicitudes = SolicitudClase.objects.all()
-    
-    # Combinar ambas listas y ordenar por fecha de publicación (más recientes primero)
-    publicaciones_recientes = sorted(
-        chain(ofertas, solicitudes),
+    publicaciones_recientes_all = sorted(
+        chain(ofertas_qs, solicitudes_qs),
         key=attrgetter('fecha_publicacion'),
-        reverse=True
+        reverse=True,
     )
-    
+
+    publicaciones_recientes = publicaciones_recientes_all[:5]
+
     context = {
         'publicaciones_recientes': publicaciones_recientes,
+        'mostrar_ver_todas': len(publicaciones_recientes_all) > len(publicaciones_recientes),
     }
     return render(request, 'home/home.html', context)

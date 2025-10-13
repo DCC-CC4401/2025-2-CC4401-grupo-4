@@ -118,10 +118,9 @@ class SolicitudClaseForm(forms.ModelForm):
 
     class Meta:
         model = SolicitudClase
-        fields = ['titulo','descripcion','solicitante','ramo']
+        fields = ['titulo','descripcion','ramo']
         labels = {
             "descripcion": "Descripción",
-            "solicitante": "Solicitante",
             "ramo": "Ramo asociado",
         }
 
