@@ -12,6 +12,7 @@
         <!-- Desktop navigation: inline links for medium+ screens -->
         <div class="hidden md:flex space-x-8">
             <a href="/" class="text-foreground/80 hover:text-primary transition-colors duration-300">Inicio</a>
+            <a href="{% url 'courses:publications' %}" class="text-foreground/80 hover:text-primary transition-colors duration-300">Ver publicaciones</a>
 
             {% if user.is_authenticated %}
             <!-- Dropdown con avatar -->
@@ -67,6 +68,7 @@
         >
             <div class="flex flex-col space-y-8 text-xl">
                 <a href="/" class="text-foreground hover:text-primary transition-colors duration-300">Inicio</a>
+                <a href="{% url 'courses:publications' %}" class="text-foreground hover:text-primary transition-colors duration-300">Ver publicaciones</a>
 
                 {% if user.is_authenticated %}
                 <a href="{% url 'accounts:my_profile' %}" class="text-foreground hover:text-primary transition-colors duration-300">Mi perfil</a>
