@@ -7,143 +7,146 @@
 {% include "includes/math-bg.html" %}
 
 <section class="min-h-screen flex items-center justify-center bg-background pt-20 pb-16">
-  <div class="container max-w-4xl mx-auto px-4 mt-6">
-    <div class="relative bg-card border border-border rounded-2xl shadow-xl p-10 overflow-hidden">
-      <div class="absolute inset-0 pointer-events-none opacity-20 bg-gradient-to-br from-primary/20 via-transparent to-primary/10"></div>
+    <div class="container max-w-4xl mx-auto px-4 mt-6">
+        <div class="relative bg-card border border-border rounded-2xl shadow-xl p-10 overflow-hidden">
+            <div class="absolute inset-0 pointer-events-none opacity-20 bg-gradient-to-br from-primary/20 via-transparent to-primary/10"></div>
 
-      <header class="relative border-b border-border pb-6 mb-8">
-        <div class="flex flex-wrap items-start gap-3 justify-between">
-          <span class="badge !text-lg text-cyan-500 border-cyan-500/30 bg-cyan-500/10">
-            Nueva solicitud
-          </span>
-          <span class="text-sm text-foreground/60">
-            Comparte lo que necesitas para recibir apoyo
-          </span>
+            <header class="relative border-b border-border pb-6 mb-8">
+                <div class="flex flex-wrap items-start gap-3 justify-between">
+                    <span class="badge !text-lg text-cyan-500 border-cyan-500/30 bg-cyan-500/10">
+                        Nueva solicitud
+                    </span>
+                    <span class="text-sm text-foreground/60">
+                        Comparte lo que necesitas para recibir apoyo
+                    </span>
+                </div>
+                <h1 class="mt-6 text-3xl font-bold text-foreground">
+                    Crear solicitud de clase
+                </h1>
+            </header>
+
+            <form method="post" class="relative space-y-6">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="rounded-lg border border-red-500/40 bg-red-500/10 text-red-500 px-4 py-3 text-sm">
+                    {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <section class="rounded-xl border border-border bg-background/60 p-6 space-y-5">
+                    <h2 class="text-lg font-semibold text-foreground">Información principal</h2>
+
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-foreground/80" for="{{ form.titulo.id_for_label }}">
+                            {{ form.titulo.label }}
+                        </label>
+                        {{ form.titulo }}
+                        {% if form.titulo.help_text %}
+                        <p class="text-xs text-foreground/60">{{ form.titulo.help_text }}</p>
+                        {% endif %}
+                        {% for error in form.titulo.errors %}
+                        <p class="text-xs text-red-500">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div
+                        class="space-y-2"
+                        data-autocomplete
+                        data-autocomplete-url="{% url 'courses:ramo-autocomplete-api' %}"
+                        data-autocomplete-min-length="1"
+                    >
+                        <label class="text-sm font-medium text-foreground/80" for="autocomplete-{{ form.ramo.id_for_label }}">
+                            {{ form.ramo.label }}
+                        </label>
+                        {{ form.ramo }}
+                        <div class="relative">
+                            <input
+                                id="autocomplete-{{ form.ramo.id_for_label }}"
+                                type="text"
+                                class="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
+                                placeholder="Busca y selecciona el ramo asociado"
+                                autocomplete="off"
+                                data-autocomplete-input
+                            />
+                            <button
+                                type="button"
+                                class="absolute inset-y-0 right-0 px-3 text-sm text-foreground/60 hover:text-foreground"
+                                data-autocomplete-clear
+                            >
+                                Limpiar
+                            </button>
+                            <div
+                                class="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-card shadow-lg hidden"
+                                data-autocomplete-results
+                            ></div>
+                        </div>
+                        {% if form.ramo.help_text %}
+                        <p class="text-xs text-foreground/60">{{ form.ramo.help_text }}</p>
+                        {% endif %}
+                        {% for error in form.ramo.errors %}
+                        <p class="text-xs text-red-500">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="rounded-xl border border-border bg-background/60 p-6 space-y-5">
+                    <h2 class="text-lg font-semibold text-foreground">Detalles adicionales</h2>
+
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-foreground/80" for="{{ form.descripcion.id_for_label }}">
+                            {{ form.descripcion.label }}
+                        </label>
+                        {{ form.descripcion }}
+                        {% if form.descripcion.help_text %}
+                        <p class="text-xs text-foreground/60">{{ form.descripcion.help_text }}</p>
+                        {% endif %}
+                        {% for error in form.descripcion.errors %}
+                        <p class="text-xs text-red-500">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    {% if form.fields.solicitante %}
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-foreground/80" for="{{ form.solicitante.id_for_label }}">
+                            {{ form.solicitante.label }}
+                        </label>
+                        {{ form.solicitante }}
+                        {% if form.solicitante.help_text %}
+                        <p class="text-xs text-foreground/60">{{ form.solicitante.help_text }}</p>
+                        {% endif %}
+                        {% for error in form.solicitante.errors %}
+                        <p class="text-xs text-red-500">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </section>
+
+                <footer class="flex flex-col md:flex-row gap-3 border-t border-border pt-6">
+                    <a
+                        href="{% url 'home' %}"
+                        class="cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path
+                                fill-rule="evenodd"
+                                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                                clip-rule="evenodd"
+                            />
+                        </svg>
+                        Cancelar
+                    </a>
+                    <button
+                        type="submit"
+                        class="cosmic-button flex-1 justify-center text-foreground border border-green-600/30 bg-green-600/50 hover:bg-green-600/90"
+                    >
+                        Publicar solicitud
+                    </button>
+                </footer>
+            </form>
         </div>
-        <h1 class="mt-6 text-3xl font-bold text-foreground">
-          Crear solicitud de clase
-        </h1>
-      </header>
-
-      <form method="post" class="relative space-y-6">
-        {% csrf_token %}
-
-        {% if form.non_field_errors %}
-        <div class="rounded-lg border border-red-500/40 bg-red-500/10 text-red-500 px-4 py-3 text-sm">
-          {% for error in form.non_field_errors %}
-            <p>{{ error }}</p>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        <section class="rounded-xl border border-border bg-background/60 p-6 space-y-5">
-          <h2 class="text-lg font-semibold text-foreground">Información principal</h2>
-
-          <div class="space-y-2">
-            <label class="text-sm font-medium text-foreground/80" for="{{ form.titulo.id_for_label }}">
-              {{ form.titulo.label }}
-            </label>
-            {{ form.titulo }}
-            {% if form.titulo.help_text %}
-            <p class="text-xs text-foreground/60">{{ form.titulo.help_text }}</p>
-            {% endif %}
-            {% for error in form.titulo.errors %}
-            <p class="text-xs text-red-500">{{ error }}</p>
-            {% endfor %}
-          </div>
-
-          <div
-            class="space-y-2"
-            data-autocomplete
-            data-autocomplete-url="{% url 'courses:ramo-autocomplete-api' %}"
-            data-autocomplete-min-length="1"
-          >
-            <label class="text-sm font-medium text-foreground/80" for="autocomplete-{{ form.ramo.id_for_label }}">
-              {{ form.ramo.label }}
-            </label>
-            {{ form.ramo }}
-            <div class="relative">
-              <input
-                id="autocomplete-{{ form.ramo.id_for_label }}"
-                type="text"
-                class="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
-                placeholder="Busca y selecciona el ramo asociado"
-                autocomplete="off"
-                data-autocomplete-input
-              />
-              <button
-                type="button"
-                class="absolute inset-y-0 right-0 px-3 text-sm text-foreground/60 hover:text-foreground"
-                data-autocomplete-clear
-              >
-                Limpiar
-              </button>
-              <div
-                class="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-card shadow-lg hidden"
-                data-autocomplete-results
-              ></div>
-            </div>
-            {% if form.ramo.help_text %}
-            <p class="text-xs text-foreground/60">{{ form.ramo.help_text }}</p>
-            {% endif %}
-            {% for error in form.ramo.errors %}
-            <p class="text-xs text-red-500">{{ error }}</p>
-            {% endfor %}
-          </div>
-        </section>
-
-        <section class="rounded-xl border border-border bg-background/60 p-6 space-y-5">
-          <h2 class="text-lg font-semibold text-foreground">Detalles adicionales</h2>
-
-          <div class="space-y-2">
-            <label class="text-sm font-medium text-foreground/80" for="{{ form.descripcion.id_for_label }}">
-              {{ form.descripcion.label }}
-            </label>
-            {{ form.descripcion }}
-            {% if form.descripcion.help_text %}
-            <p class="text-xs text-foreground/60">{{ form.descripcion.help_text }}</p>
-            {% endif %}
-            {% for error in form.descripcion.errors %}
-            <p class="text-xs text-red-500">{{ error }}</p>
-            {% endfor %}
-          </div>
-
-          {% if form.fields.solicitante %}
-          <div class="space-y-2">
-            <label class="text-sm font-medium text-foreground/80" for="{{ form.solicitante.id_for_label }}">
-              {{ form.solicitante.label }}
-            </label>
-            {{ form.solicitante }}
-            {% if form.solicitante.help_text %}
-            <p class="text-xs text-foreground/60">{{ form.solicitante.help_text }}</p>
-            {% endif %}
-            {% for error in form.solicitante.errors %}
-            <p class="text-xs text-red-500">{{ error }}</p>
-            {% endfor %}
-          </div>
-          {% endif %}
-        </section>
-
-        <footer class="flex flex-col md:flex-row gap-3 border-t border-border pt-6">
-          <a href="{% url 'home' %}"
-             class="cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-            </svg>
-            Cancelar
-          </a>
-          <button type="submit"
-              class="cosmic-button flex-1 justify-center text-foreground border border-green-600/30 bg-green-600/50 hover:bg-green-600/90">
-            Publicar solicitud
-          </button>
-        </footer>
-      </form>
     </div>
-  </div>
 </section>
-{% endblock %}
-
-{% block scripts %}
-{{ block.super }}
-<script src="{% static 'js/ramo-autocomplete.js' %}"></script>
 {% endblock %}
