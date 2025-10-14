@@ -14,7 +14,7 @@
         <!-- Aqui van los tags dados por el cliente-->
         <div 
             id="tags-filter" 
-            class="flex flex-wrap gap-2 mt-4 opacity-0 animate-fade-in-delay-2" aria-label="Filtrar por etiquetas">
+            class="flex flex-wrap gap-2 mt-4 p-4 border border-border rounded-md bg-card opacity-0 animate-fade-in-delay-2" aria-label="Filtrar por etiquetas">
         </div>
 
         <!-- Filtro por usuario -->
@@ -151,6 +151,8 @@
                     raw.split(',').map(t => t.trim()).filter(Boolean).forEach(t => tagSet.add(t));
                 });
 
+                const sortedTags = Array.from(tagSet).sort((a, b) => a.localeCompare(b));
+
                 // container limpio
                 tagsContainer.innerHTML = '';
 
@@ -170,10 +172,10 @@
                 });
                 tagsContainer.appendChild(clearTagsBtn);
 
-                tagSet.forEach(tag => {
+                sortedTags.forEach(tag => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = 'tag-btn badge text-foreground/80 border-border bg-card/80 hover:bg-card/90';
+                    btn.className = 'tag-btn badge text-foreground/80 border-border bg-card/80 cursor:bg-card/90 cursor-pointer transform transition-transform duration-200 hover:scale-105';
                     btn.textContent = tag;
                     btn.setAttribute('data-tag', tag);
                     btn.setAttribute('aria-pressed', 'false');
