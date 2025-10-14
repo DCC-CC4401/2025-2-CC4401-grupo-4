@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.conf import settings
 from django.urls import reverse
 
 from .forms import (
@@ -14,19 +13,46 @@ from .forms import (
     CareerForm,
     ContactInfoForm,
 )
-from .models import Perfil, User
-from courses.models import Carrera
-# Create your views here.
-
+from .models import User
 
 @login_required
 def logout_view(request):
+    """
+    Cierra la sesión del usuario autenticado y redirige a la página principal.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP con el usuario autenticado.
+    
+    Returns:
+        HttpResponseRedirect: Redirige a la vista 'home' después de cerrar sesión.
+    
+    Dependencies:
+        - django.contrib.auth.logout
+        - django.contrib.auth.decorators.login_required
+    """
     logout(request)
     messages.success(request, 'Sesion cerrada correctamente.')
     return redirect('home')
 
 
 def signin_view(request):
+    """
+    Maneja el inicio de sesión de usuarios mediante formulario personalizado.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP con credenciales de usuario en POST.
+    
+    Returns:
+        HttpResponse: Renderiza el formulario de login en GET.
+        HttpResponseRedirect: Redirige a 'home' si las credenciales son válidas.
+    
+    Template:
+        'accounts/login.html'
+    
+    Dependencies:
+        - accounts.forms.CustomLoginForm
+        - django.contrib.auth.login
+    """
     if request.method == 'POST':
         form = CustomLoginForm(request, data=request.POST)
         if form.is_valid():
@@ -44,6 +70,23 @@ def signin_view(request):
 
 
 def signup_view(request):
+    """
+    Registra un nuevo usuario y lo autentica automáticamente al completar el registro.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP con datos del formulario en POST.
+    
+    Returns:
+        HttpResponse: Renderiza el formulario de registro en GET.
+        HttpResponseRedirect: Redirige a 'home' tras registro exitoso e inicio de sesión automático.
+    
+    Template:
+        'accounts/signup.html'
+    
+    Dependencies:
+        - accounts.forms.SignUpForm
+        - django.contrib.auth.login
+    """
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
@@ -60,11 +103,38 @@ def signup_view(request):
 
 
 def felmer_view(request):
+    """
+    Vista de felmer, es un easter egg(goat).
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+    
+    Returns:
+        HttpResponse: Renderiza la plantilla 'profile/felmer.html'.
+    
+    Template:
+        'profile/felmer.html'
+    """
     return render(request, 'profile/felmer.html')
 
-# editable profile
 def my_profile_view(request):
-    """Vista del perfil del usuario autenticado"""
+    """
+    Muestra y permite editar el perfil del usuario autenticado con múltiples formularios.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP con datos de usuario y formularios en POST.
+    
+    Returns:
+        HttpResponse: Renderiza el perfil editable con todos los formularios.
+        HttpResponseRedirect: Redirige tras actualización exitosa o si no está autenticado te lleva al login.
+    
+    Template:
+        'profile/my_profile.html'
+    
+    Dependencies:
+        - accounts.forms (DescriptionForm, ImagesForm, CareerForm, ContactInfoForm, ProfileForm)
+        - accounts.models.Perfil
+    """
     if not request.user.is_authenticated:
         messages.error(request, 'Debes iniciar sesión para ver tu perfil.')
         return redirect('accounts:login')
@@ -150,7 +220,24 @@ def my_profile_view(request):
 # only lecture
 
 def profile_detail_view(request, public_uid):
-    """Vista del perfil público de un usuario usando su UUID"""
+    """
+    Muestra el perfil público de un usuario identificado por su UUID público.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+        public_uid (UUID): Identificador público único del usuario a visualizar.
+    
+    Returns:
+        HttpResponse: Renderiza el perfil público del usuario.
+        HttpResponseRedirect: Redirige a 'my_profile' si el usuario visita su propio perfil con su uid.
+    
+    Template:
+        'profile/profile_detail_view.html'
+    
+    Dependencies:
+        - accounts.models.User
+        - django.shortcuts.get_object_or_404
+    """
     user = get_object_or_404(User, public_uid=public_uid)
     
     # Redirigir a mi perfil si es el usuario autenticado
