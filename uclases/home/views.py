@@ -2,12 +2,26 @@ from itertools import chain
 from operator import attrgetter
 
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 
 from accounts.models import Perfil
 from courses.models import OfertaClase, SolicitudClase
 
 def perfil_autocomplete_api(request):
+    """
+    API de autocompletado que busca perfiles de usuarios por nombre de usuario.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP con parámetro 'q' en GET para búsqueda.
+    
+    Returns:
+        JsonResponse: Lista JSON con los primeros 10 perfiles que coinciden con el término.
+                      Cada elemento contiene id (UUID), label (username) y description (carrera).
+    
+    Dependencies:
+        - accounts.models.Perfil
+        - django.http.JsonResponse
+    """
     term = (request.GET.get("q", "") or "").strip()
     queryset = (
         Perfil.objects.select_related("user", "carrera")
@@ -29,6 +43,24 @@ def perfil_autocomplete_api(request):
     return JsonResponse(results, safe=False)
 
 def home(request):
+    """
+    Vista principal que muestra las publicaciones recientes (ofertas y solicitudes de clases).
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP. Si incluye parámetro 'perfil' en GET,
+                               redirige al perfil del usuario especificado.
+    
+    Returns:
+        HttpResponse: Renderiza la página principal con las 5 publicaciones más recientes.
+        HttpResponseRedirect: Redirige al perfil si se proporciona 'perfil_uid' en GET.
+    
+    Template:
+        'home/home.html'
+    
+    Dependencies:
+        - courses.models (OfertaClase, SolicitudClase)
+        - itertools.chain, operator.attrgetter
+    """
     perfil_uid = request.GET.get("perfil")
     if perfil_uid:
         return redirect("accounts:profile_detail", public_uid=perfil_uid)
