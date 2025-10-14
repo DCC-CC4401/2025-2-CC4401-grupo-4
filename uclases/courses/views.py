@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
-from .models import OfertaClase, SolicitudClase
-from .enums import DiaSemana
+from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion
+from .enums import DiaSemana, EstadoInscripcion
 from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
 
 
@@ -256,3 +256,45 @@ def editar_solicitud(request, pk):
         form = SolicitudClaseForm(instance=solicitud)
 
     return render(request, "courses/editar_solicitud.html", {"form": form, "solicitud": solicitud})
+
+
+def inscribirse_view(request, pk):
+    """Vista para que un estudiante seleccione un horario y se inscriba"""
+    oferta = get_object_or_404(OfertaClase, pk=pk)
+    horarios_ordenados = oferta.horarios.all().order_by('dia', 'hora_inicio')
+
+    if request.method == "POST":
+        horario_id = request.POST.get("horario")
+        horario = get_object_or_404(HorarioOfertado, id=horario_id, oferta=oferta)
+
+        # Verificar cupos
+        inscripciones_activas = horario.inscripciones.filter(
+            estado__in=[0, 1]  # Pendiente o Aceptado
+        ).count()
+
+        if inscripciones_activas >= horario.cupos_totales:
+            messages.error(request, "Lo sentimos, este horario ya no tiene cupos disponibles.")
+            return redirect("inscribirse", pk=oferta.pk)
+
+        # Crear inscripción
+        inscripcion, created = Inscripcion.objects.get_or_create(
+            estudiante=request.user.perfil,
+            horario_ofertado=horario,
+        )
+
+        if not created:
+            messages.warning(request, "Ya estás inscrito en este horario.")
+        else:
+            # Reducir cupos solo si se crea una nueva inscripción
+            horario.cupos_totales -= 1
+            horario.save()
+            inscripcion.aceptar()
+            messages.success(request, "¡Inscripción completada con éxito!")
+
+        return redirect("courses:oferta_detail", pk=oferta.pk)
+
+    context = {
+        "oferta": oferta,
+        "horarios_ordenados": horarios_ordenados,
+    }
+    return render(request, "courses/inscribirse.html", context)

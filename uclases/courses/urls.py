@@ -12,4 +12,6 @@ urlpatterns = [
     path('solicitud/nueva/', views.crear_solicitud, name='crear_solicitud'),
     path('oferta/<int:pk>/editar/', views.editar_oferta, name='editar_oferta'),
     path('solicitud/<int:pk>/editar/', views.editar_solicitud, name='editar_solicitud'),
+    path('publications/offer/<int:pk>/inscribirse/',  views.inscribirse_view, name='inscribirse'),
+
 ]
