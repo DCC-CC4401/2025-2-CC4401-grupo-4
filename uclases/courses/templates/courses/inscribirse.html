@@ -1,41 +1,47 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Inscribirse en {{ oferta.titulo }} - U-Clases{% endblock %}
+{% block title %}Inscribirse en {{ oferta.titulo }}{% endblock %}
 
 {% block content %}
-<section class="min-h-screen flex items-center justify-center bg-background pt-20 pb-16">
-    <div class="container max-w-lg mx-auto px-4 mt-6">
-        <div class="bg-card border border-border rounded-2xl shadow-xl p-8">
+<section class="min-h-screen flex items-center justify-center bg-background py-12">
+  <div class="container max-w-2xl mx-auto bg-card border border-border rounded-2xl p-8 shadow-xl">
+    <h1 class="text-2xl font-bold mb-6 text-center">Selecciona un horario</h1>
 
-            <h2 class="text-2xl font-bold mb-4">Inscribirse en "{{ oferta.titulo }}"</h2>
-            <p class="mb-6">Profesor: {{ oferta.profesor.user.get_full_name }}</p>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="space-y-4">
+        {% for horario in horarios_ordenados %}
+          <label class="flex items-center justify-between border border-border rounded-xl p-4 cursor-pointer hover:bg-muted/40 {% if horario.cupos_totales == 0 %}opacity-60 cursor-not-allowed{% endif %}">
+            <div>
+              <p class="font-semibold">{{ horario.get_dia_display }}</p>
+              <p class="text-sm text-foreground/70">
+                {{ horario.hora_inicio|time:"H:i" }} - {{ horario.hora_fin|time:"H:i" }}
+              </p>
+            </div>
+            <div class="text-right">
+              {% if horario.cupos_totales > 0 %}
+                <input type="radio" name="horario" value="{{ horario.id }}" required class="accent-primary">
+                <p class="text-sm text-foreground/80">Cupos: {{ horario.cupos_totales }}</p>
+              {% else %}
+                <p class="text-sm text-red-500 font-semibold">Sin cupos</p>
+              {% endif %}
+            </div>
+          </label>
+        {% empty %}
+          <p class="text-center text-foreground/60">No hay horarios disponibles para esta oferta.</p>
+        {% endfor %}
+      </div>
 
-            <form method="POST">
-                {% csrf_token %}
-
-                <label for="horario" class="block font-semibold mb-2">Selecciona un horario:</label>
-                <select name="horario" id="horario" required class="form-select w-full mb-4">
-                    {% for horario in horarios_ordenados %}
-                        <option value="{{ horario.id }}">
-                            {{ horario.get_dia_display }} 
-                            {{ horario.hora_inicio|time:"H:i" }} - {{ horario.hora_fin|time:"H:i" }}
-                        </option>
-                    {% empty %}
-                        <option disabled>No hay horarios disponibles</option>
-                    {% endfor %}
-                </select>
-
-                <button type="submit" class="cosmic-button w-full bg-blue-500 hover:bg-blue-600 text-white">
-                    Confirmar inscripción
-                </button>
-            </form>
-
-            <a href="{% url 'courses:oferta_detail' pk=oferta.id %}" 
-               class="cosmic-button w-full mt-4 bg-gray-300 hover:bg-gray-400 text-black text-center">
-               Volver
-            </a>
-
-        </div>
-    </div>
+      <div class="mt-8 flex gap-3">
+        <button type="submit" class="cosmic-button flex-1 bg-blue-500/60 hover:bg-blue-500 text-foreground">
+          Confirmar inscripción
+        </button>
+        <a href="{% url 'courses:oferta_detail' oferta.pk %}"
+           class="cosmic-button flex-1 bg-foreground/10 text-foreground text-center hover:bg-foreground/20">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
 </section>
 {% endblock %}

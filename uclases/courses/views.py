@@ -7,7 +7,7 @@ from django.contrib import messages
 
 from accounts.models import Perfil
 from .models import OfertaClase, SolicitudClase, Ramo, HorarioOfertado, Inscripcion
-from .enums import DiaSemana
+from .enums import DiaSemana, EstadoInscripcion
 from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
 
 
@@ -142,24 +142,42 @@ def editar_solicitud(request, pk):
 
 
 def inscribirse_view(request, pk):
+    """Vista para que un estudiante seleccione un horario y se inscriba"""
     oferta = get_object_or_404(OfertaClase, pk=pk)
-    
-    # Traer los horarios asociados a la oferta
     horarios_ordenados = oferta.horarios.all().order_by('dia', 'hora_inicio')
-    
+
     if request.method == "POST":
         horario_id = request.POST.get("horario")
-        horario = get_object_or_404(HorarioOfertado, id=horario_id)
-        
+        horario = get_object_or_404(HorarioOfertado, id=horario_id, oferta=oferta)
+
+        # Verificar cupos
+        inscripciones_activas = horario.inscripciones.filter(
+            estado__in=[0, 1]  # Pendiente o Aceptado
+        ).count()
+
+        if inscripciones_activas >= horario.cupos_totales:
+            messages.error(request, "Lo sentimos, este horario ya no tiene cupos disponibles.")
+            return redirect("inscribirse", pk=oferta.pk)
+
         # Crear inscripción
-        Inscripcion.objects.get_or_create(
+        inscripcion, created = Inscripcion.objects.get_or_create(
             estudiante=request.user.perfil,
             horario_ofertado=horario,
-            defaults={'estado': EstadoInscripcion.ACEPTADO}
         )
-        return redirect('detalle_oferta', pk=pk)
-    
-    return render(request, 'courses/inscribirse.html', {
-        'oferta': oferta,
-        'horarios_ordenados': horarios_ordenados
-    })
+
+        if not created:
+            messages.warning(request, "Ya estás inscrito en este horario.")
+        else:
+            # Reducir cupos solo si se crea una nueva inscripción
+            horario.cupos_totales -= 1
+            horario.save()
+            inscripcion.aceptar()
+            messages.success(request, "¡Inscripción completada con éxito!")
+
+        return redirect("courses:oferta_detail", pk=oferta.pk)
+
+    context = {
+        "oferta": oferta,
+        "horarios_ordenados": horarios_ordenados,
+    }
+    return render(request, "courses/inscribirse.html", context)
