@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Inscribirse en {{ oferta.titulo }} - U-Clases{% endblock %}
+
+{% block content %}
+<section class="min-h-screen flex items-center justify-center bg-background pt-20 pb-16">
+    <div class="container max-w-lg mx-auto px-4 mt-6">
+        <div class="bg-card border border-border rounded-2xl shadow-xl p-8">
+
+            <h2 class="text-2xl font-bold mb-4">Inscribirse en "{{ oferta.titulo }}"</h2>
+            <p class="mb-6">Profesor: {{ oferta.profesor.user.get_full_name }}</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <label for="horario" class="block font-semibold mb-2">Selecciona un horario:</label>
+                <select name="horario" id="horario" required class="form-select w-full mb-4">
+                    {% for horario in horarios_ordenados %}
+                        <option value="{{ horario.id }}">
+                            {{ horario.get_dia_display }} 
+                            {{ horario.hora_inicio|time:"H:i" }} - {{ horario.hora_fin|time:"H:i" }}
+                        </option>
+                    {% empty %}
+                        <option disabled>No hay horarios disponibles</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="cosmic-button w-full bg-blue-500 hover:bg-blue-600 text-white">
+                    Confirmar inscripción
+                </button>
+            </form>
+
+            <a href="{% url 'courses:oferta_detail' pk=oferta.id %}" 
+               class="cosmic-button w-full mt-4 bg-gray-300 hover:bg-gray-400 text-black text-center">
+               Volver
+            </a>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

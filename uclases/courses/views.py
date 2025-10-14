@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
 from accounts.models import Perfil
-from .models import OfertaClase, SolicitudClase, Ramo
+from .models import OfertaClase, SolicitudClase, Ramo, HorarioOfertado, Inscripcion
 from .enums import DiaSemana
 from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
 
@@ -139,3 +139,27 @@ def editar_solicitud(request, pk):
         form = SolicitudClaseForm(instance=solicitud)
 
     return render(request, "courses/editar_solicitud.html", {"form": form, "solicitud": solicitud})
+
+
+def inscribirse_view(request, pk):
+    oferta = get_object_or_404(OfertaClase, pk=pk)
+    
+    # Traer los horarios asociados a la oferta
+    horarios_ordenados = oferta.horarios.all().order_by('dia', 'hora_inicio')
+    
+    if request.method == "POST":
+        horario_id = request.POST.get("horario")
+        horario = get_object_or_404(HorarioOfertado, id=horario_id)
+        
+        # Crear inscripción
+        Inscripcion.objects.get_or_create(
+            estudiante=request.user.perfil,
+            horario_ofertado=horario,
+            defaults={'estado': EstadoInscripcion.ACEPTADO}
+        )
+        return redirect('detalle_oferta', pk=pk)
+    
+    return render(request, 'courses/inscribirse.html', {
+        'oferta': oferta,
+        'horarios_ordenados': horarios_ordenados
+    })
