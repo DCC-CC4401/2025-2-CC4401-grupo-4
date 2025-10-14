@@ -259,7 +259,34 @@ def editar_solicitud(request, pk):
 
 
 def inscribirse_view(request, pk):
-    """Vista para que un estudiante seleccione un horario y se inscriba"""
+    """
+    Permite a un estudiante seleccionar un horario específico e inscribirse en una oferta de clase.
+    
+    GET: Muestra un formulario con los horarios disponibles de la oferta ordenados por día y hora.
+    POST: Procesa la inscripción del estudiante en el horario seleccionado.
+    
+    Validaciones realizadas:
+        - Verifica que haya cupos disponibles en el horario seleccionado
+        - Cuenta inscripciones activas (estados: Pendiente y Aceptado)
+        - Previene inscripciones duplicadas en el mismo horario
+        - Reduce automáticamente el número de cupos al inscribirse exitosamente
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP con horario_id en POST.
+        pk (int): ID de la oferta de clase en la que se desea inscribir.
+        
+    Returns:
+        HttpResponse: Renderiza el template con formulario de selección de horarios en GET.
+        HttpResponseRedirect: Redirige al detalle de la oferta tras procesar la inscripción.
+    
+    Template:
+        'courses/inscribirse.html'
+    
+    Dependencies:
+        - courses.models.OfertaClase
+        - courses.models.HorarioOfertado
+        - courses.models.Inscripcion
+    """
     oferta = get_object_or_404(OfertaClase, pk=pk)
     horarios_ordenados = oferta.horarios.all().order_by('dia', 'hora_inicio')
 
