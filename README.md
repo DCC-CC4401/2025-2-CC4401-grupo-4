@@ -137,6 +137,22 @@ Actualmente, los estudiantes deben recurrir al foro de UCursos para encontrar o 
 
 ---
 
+## 🔧 Problemas comunes
+
+### Los estilos CSS no se ven correctamente
+
+Si tienes `npm run style` ejecutándose pero los estilos no se aplican correctamente:
+
+1. **Recarga forzada del navegador** para limpiar el caché:
+   - **Windows/Linux:** `Ctrl + F5` o `Ctrl + Shift + R`
+   - **Mac:** `Cmd + Shift + R`
+
+2. Verifica que el proceso de Tailwind esté corriendo sin errores en la terminal.
+
+3. Asegúrate de que los cambios se hayan guardado en los archivos HTML/templates.
+
+---
+
 ## Guidelines para contribuir
 
 Queremos mantener un código limpio, bien documentado y coherente. Si deseas contribuir al proyecto, por favor sigue estas directrices:
