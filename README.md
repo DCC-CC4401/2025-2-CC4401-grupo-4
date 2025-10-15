@@ -33,10 +33,107 @@ Actualmente, los estudiantes deben recurrir al foro de UCursos para encontrar o 
 ## Tecnologías principales
 
 - Django (Python)
+- Node.js + npm
 - HTML/CSS
-- Tailwind
+- Tailwind CSS
 - SQLite
 - Git + GitHub
+
+---
+
+## 🚀 Cómo iniciar el proyecto
+
+### Requisitos previos
+
+- Python 3.8 o superior
+- Node.js y npm (para Tailwind CSS)
+- Git
+
+### Instalación
+
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/DCC-CC4401/2025-2-CC4401-grupo-4.git
+   cd 2025-2-CC4401-grupo-4
+   ```
+
+2. **Crear y activar el entorno virtual**
+   
+   Desde la raíz del proyecto (`2025-2-CC4401-grupo-4/`):
+   
+   En Windows (PowerShell):
+   ```powershell
+   python -m venv venv
+   .\venv\Scripts\Activate.ps1
+   ```
+   
+   En Linux/Mac:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+3. **Instalar dependencias de Python**
+   
+   Desde la raíz del proyecto (`2025-2-CC4401-grupo-4/`):
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Instalar dependencias de Node.js (para Tailwind)**
+   
+   Desde la raíz del proyecto (`2025-2-CC4401-grupo-4/`):
+   ```bash
+   npm install
+   ```
+
+5. **Aplicar migraciones**
+   
+   Desde la carpeta `uclases/`:
+   ```bash
+   cd uclases
+   python manage.py migrate
+   ```
+
+6. **(Opcional) Cargar datos de prueba**
+   
+   Desde la carpeta `uclases/`:
+   ```bash
+   python manage.py seed
+   ```
+
+### Ejecutar el proyecto
+
+1. **Iniciar el servidor de Django**
+   
+   Desde la carpeta `uclases/`:
+   ```bash
+   python manage.py runserver
+   ```
+
+2. **Iniciar Tailwind (en modo watch)**
+   
+   En otra terminal, desde la carpeta `uclases/`:
+   ```bash
+   npm run style
+   ```
+
+3. **Acceder a la aplicación**
+   
+   Abre tu navegador en: [http://localhost:8000](http://localhost:8000)
+
+### Comandos útiles
+
+- **Crear superusuario (admin):**
+  
+  Desde la carpeta `uclases/`:
+  ```bash
+  python manage.py createsuperuser
+  ```
+
+- **Acceder al panel de administración:**
+  
+  [http://localhost:8000/admin](http://localhost:8000/admin)
 
 ---
 
