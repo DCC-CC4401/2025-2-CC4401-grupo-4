@@ -3,6 +3,7 @@ from accounts.models import Perfil
 from .enums import NotificationTypes
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from notifications.strategy.factory import NotificationStrategyFactory
 
 class Notification(models.Model):
     receiver = models.ForeignKey(Perfil, on_delete=models.CASCADE,related_name='notifications')
@@ -40,5 +41,24 @@ class Notification(models.Model):
     class Meta:
         verbose_name = "Notificación"
         verbose_name_plural = "Notificaciones"
+        ordering = ['-creation_date']  # Más recientes primero
     
+    def __str__(self):
+        return f"{self.title} - {self.receiver.user.username}"
+    
+    def get_icon(self):
+        """
+        Retorna el ícono asociado a este tipo de notificación.
+        Utiliza el patrón Strategy.
+        """
+        strategy = NotificationStrategyFactory.get_strategy(self.type)
+        return strategy.get_icon()
+    
+    def get_available_actions(self):
+        """
+        Retorna las acciones disponibles para esta notificación.
+        Utiliza el patrón Strategy.
+        """
+        strategy = NotificationStrategyFactory.get_strategy(self.type)
+        return strategy.get_actions(self)
     
