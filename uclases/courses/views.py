@@ -312,11 +312,9 @@ def inscribirse_view(request, pk):
         if not created:
             messages.warning(request, "Ya estás inscrito en este horario.")
         else:
-            # Reducir cupos solo si se crea una nueva inscripción
-            horario.cupos_totales -= 1
-            horario.save()
-            inscripcion.aceptar()
-            messages.success(request, "¡Inscripción completada con éxito!")
+            # La inscripción se crea en estado PENDIENTE
+            # Los cupos solo se reducirán cuando el profesor acepte la inscripción
+            messages.success(request, "¡Inscripción enviada! El profesor debe aceptarla.")
 
         return redirect("courses:oferta_detail", pk=oferta.pk)
 
@@ -325,3 +323,111 @@ def inscribirse_view(request, pk):
         "horarios_ordenados": horarios_ordenados,
     }
     return render(request, "courses/inscribirse.html", context)
+
+
+@login_required
+def aceptar_inscripcion(request, pk):
+    """
+    Permite al profesor aceptar una inscripción pendiente.
+    
+    Solo el profesor dueño de la oferta puede aceptar inscripciones.
+    Al aceptar, reduce los cupos disponibles del horario.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP (requiere POST).
+        pk (int): ID de la inscripción a aceptar.
+    
+    Returns:
+        HttpResponseRedirect: Redirige al detalle de la oferta.
+    """
+    inscripcion = get_object_or_404(Inscripcion, pk=pk)
+    oferta = inscripcion.horario_ofertado.oferta
+    
+    # Verificar que el usuario sea el profesor de la oferta
+    if oferta.profesor != request.user.perfil:
+        messages.error(request, "No tienes permiso para gestionar esta inscripción.")
+        return redirect('courses:oferta_detail', pk=oferta.pk)
+    
+    if request.method == "POST":
+        if inscripcion.estado == EstadoInscripcion.PENDIENTE:
+            inscripcion.aceptar()
+            # Reducir cupos al aceptar
+            horario = inscripcion.horario_ofertado
+            horario.cupos_totales -= 1
+            horario.save()
+            messages.success(request, f"Inscripción de {inscripcion.estudiante.user.get_full_name()} aceptada.")
+        else:
+            messages.warning(request, "Esta inscripción ya fue procesada.")
+    
+    return redirect('courses:oferta_detail', pk=oferta.pk)
+
+
+@login_required
+def rechazar_inscripcion(request, pk):
+    """
+    Permite al profesor rechazar una inscripción pendiente.
+    
+    Solo el profesor dueño de la oferta puede rechazar inscripciones.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP (requiere POST).
+        pk (int): ID de la inscripción a rechazar.
+    
+    Returns:
+        HttpResponseRedirect: Redirige al detalle de la oferta.
+    """
+    inscripcion = get_object_or_404(Inscripcion, pk=pk)
+    oferta = inscripcion.horario_ofertado.oferta
+    
+    # Verificar que el usuario sea el profesor de la oferta
+    if oferta.profesor != request.user.perfil:
+        messages.error(request, "No tienes permiso para gestionar esta inscripción.")
+        return redirect('courses:oferta_detail', pk=oferta.pk)
+    
+    if request.method == "POST":
+        if inscripcion.estado == EstadoInscripcion.PENDIENTE:
+            inscripcion.rechazar()
+            messages.success(request, f"Inscripción de {inscripcion.estudiante.user.get_full_name()} rechazada.")
+        else:
+            messages.warning(request, "Esta inscripción ya fue procesada.")
+    
+    return redirect('courses:oferta_detail', pk=oferta.pk)
+
+
+@login_required
+def cancelar_inscripcion(request, pk):
+    """
+    Permite al estudiante cancelar su propia inscripción.
+    
+    Solo puede cancelarse si está en estado ACEPTADO o PENDIENTE.
+    Al cancelar, devuelve el cupo al horario si estaba aceptada.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP (requiere POST).
+        pk (int): ID de la inscripción a cancelar.
+    
+    Returns:
+        HttpResponseRedirect: Redirige al detalle de la oferta.
+    """
+    inscripcion = get_object_or_404(Inscripcion, pk=pk)
+    oferta = inscripcion.horario_ofertado.oferta
+    
+    # Verificar que el usuario sea el estudiante de la inscripción
+    if inscripcion.estudiante != request.user.perfil:
+        messages.error(request, "No tienes permiso para cancelar esta inscripción.")
+        return redirect('courses:oferta_detail', pk=oferta.pk)
+    
+    if request.method == "POST":
+        if inscripcion.estado in [EstadoInscripcion.PENDIENTE, EstadoInscripcion.ACEPTADO]:
+            # Si estaba aceptada, devolver el cupo
+            if inscripcion.estado == EstadoInscripcion.ACEPTADO:
+                horario = inscripcion.horario_ofertado
+                horario.cupos_totales += 1
+                horario.save()
+            
+            inscripcion.cancelar()
+            messages.success(request, "Tu inscripción ha sido cancelada.")
+        else:
+            messages.warning(request, "No puedes cancelar esta inscripción.")
+    
+    return redirect('courses:oferta_detail', pk=oferta.pk)
