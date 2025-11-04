@@ -13,5 +13,10 @@ urlpatterns = [
     path('oferta/<int:pk>/editar/', views.editar_oferta, name='editar_oferta'),
     path('solicitud/<int:pk>/editar/', views.editar_solicitud, name='editar_solicitud'),
     path('publications/offer/<int:pk>/inscribirse/',  views.inscribirse_view, name='inscribirse'),
+    
+    # Gestión de inscripciones
+    path('inscripcion/<int:pk>/aceptar/', views.aceptar_inscripcion, name='aceptar_inscripcion'),
+    path('inscripcion/<int:pk>/rechazar/', views.rechazar_inscripcion, name='rechazar_inscripcion'),
+    path('inscripcion/<int:pk>/cancelar/', views.cancelar_inscripcion, name='cancelar_inscripcion'),
 
 ]
