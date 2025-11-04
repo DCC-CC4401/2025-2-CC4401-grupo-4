@@ -38,6 +38,7 @@ INSTALLED_APPS = [
 	'home',
     'courses',
     'devtools',
+    'notifications',
 ]
 
 MIDDLEWARE = [
