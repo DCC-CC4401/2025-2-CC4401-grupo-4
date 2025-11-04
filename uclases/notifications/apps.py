@@ -6,4 +6,8 @@ class NotificationsConfig(AppConfig):
     name = 'notifications'
 
     def ready(self):
-        from .signals import inscription_accepted_signal
+        """
+        Importa los signals cuando la app esté lista.
+        Esto asegura que los receivers se registren automáticamente.
+        """
+        import notifications.signals  # noqa: F401
