@@ -7,7 +7,8 @@ class NotificationsConfig(AppConfig):
 
     def ready(self):
         """
-        Importa los signals cuando la app esté lista.
-        Esto asegura que los receivers se registren automáticamente.
+        Importa los signals y estrategias cuando la app esté lista.
+        Esto asegura que los receivers y estrategias se registren automáticamente.
         """
         import notifications.signals  # noqa: F401
+        import notifications.strategy.concretestrategies  # noqa: F401
