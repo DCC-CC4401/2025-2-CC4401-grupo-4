@@ -26,10 +26,23 @@ class InscriptionCreatedStrategy(NotificationStrategy):
             return []
         
         inscription = notification.related_object
+        inscription_id = inscription.pk
         oferta_id = inscription.horario_ofertado.oferta.pk
         estudiante_uid = inscription.estudiante.user.public_uid
         
         return [
+            {
+                'label': 'Aceptar',
+                'url': reverse('courses:aceptar_inscripcion', args=[inscription_id]),
+                'method': 'POST',
+                'style': 'success'
+            },
+            {
+                'label': 'Rechazar',
+                'url': reverse('courses:rechazar_inscripcion', args=[inscription_id]),
+                'method': 'POST',
+                'style': 'danger'
+            },
             {
                 'label': 'Ver oferta',
                 'url': reverse('courses:oferta_detail', args=[oferta_id]),
