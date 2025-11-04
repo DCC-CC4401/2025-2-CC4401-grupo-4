@@ -19,9 +19,16 @@ class InscriptionAcceptedStrategy(NotificationStrategy):
         if not notification.related_object:
             return []
         inscription = notification.related_object
+        inscription_id = inscription.pk
         oferta = inscription.horario_ofertado.oferta.pk
         profesor = inscription.horario_ofertado.oferta.profesor.user.public_uid
         return [
+            {
+                'label': 'Cancelar inscripción',
+                'url': reverse('courses:cancelar_inscripcion', args=[inscription_id]),
+                'method': 'POST',
+                'style': 'danger'
+            },
             {
                 'label': 'Ver oferta',
                 'url': reverse('courses:oferta_detail', args=[oferta]),
