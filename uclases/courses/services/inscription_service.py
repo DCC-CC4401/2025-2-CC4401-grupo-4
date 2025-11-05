@@ -124,6 +124,12 @@ class InscriptionService:
         if inscription.estado not in [EstadoInscripcion.PENDIENTE, EstadoInscripcion.ACEPTADO]:
             return False, "Esta inscripción no puede ser cancelada."
         
+        # Importar aquí para evitar circular imports
+        from notifications.enums import NotificationTypes
+        
+        # Guardar estado anterior para saber qué notificación actualizar
+        previous_state = inscription.estado
+        
         # Devolver cupo si estaba aceptada
         if inscription.estado == EstadoInscripcion.ACEPTADO:
             schedule = inscription.horario_ofertado
@@ -133,16 +139,26 @@ class InscriptionService:
         # Ejecutar acción
         inscription.cancelar()
         
-        # Actualizar notificación relacionada (si existe)
-        InscriptionService._update_notification(
-            inscription=inscription,
-            action_text="Cancelada 🚫"
-        )
+        # Actualizar notificación relacionada según el estado anterior
+        if previous_state == EstadoInscripcion.ACEPTADO:
+            # Si estaba aceptada, actualizar la notificación de aceptación
+            InscriptionService._update_notification(
+                inscription=inscription,
+                action_text="Cancelada 🚫",
+                notification_types=[NotificationTypes.INSCRIPTION_ACCEPTED]
+            )
+        else:
+            # Si estaba pendiente, actualizar la notificación de creación
+            InscriptionService._update_notification(
+                inscription=inscription,
+                action_text="Cancelada 🚫",
+                notification_types=[NotificationTypes.INSCRIPTION_CREATED]
+            )
         
         return True, "Tu inscripción ha sido cancelada exitosamente."
     
     @staticmethod
-    def _update_notification(inscription, action_text):
+    def _update_notification(inscription, action_text, notification_types=None):
         """
         Actualiza la notificación relacionada con una inscripción.
         
@@ -152,19 +168,25 @@ class InscriptionService:
         Args:
             inscription: Instancia de Inscripcion
             action_text: Texto descriptivo de la acción (ej: "Aceptada ✅")
+            notification_types: Lista de tipos de notificación a buscar. 
+                              Si es None, busca INSCRIPTION_CREATED por defecto.
         """
         try:
             # Importar aquí para evitar circular imports
             from notifications.models import Notification
             from notifications.enums import NotificationTypes
             
+            # Si no se especifican tipos, usar el tipo por defecto
+            if notification_types is None:
+                notification_types = [NotificationTypes.INSCRIPTION_CREATED]
+            
             # Buscar la notificación relacionada
             content_type = ContentType.objects.get_for_model(inscription)
             notification = Notification.objects.filter(
                 content_type=content_type,
                 object_id=inscription.id,
-                type=NotificationTypes.INSCRIPTION_CREATED
-            ).first()
+                type__in=notification_types
+            ).order_by('-creation_date').first()  # Obtener la más reciente
             
             # Si existe, actualizarla
             if notification:
