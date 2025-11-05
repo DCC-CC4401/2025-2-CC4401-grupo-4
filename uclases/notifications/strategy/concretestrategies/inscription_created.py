@@ -1,8 +1,9 @@
 from notifications.strategy.trait import NotificationStrategy
 from notifications.strategy.factory import NotificationStrategyFactory
+from notifications.enums import NotificationTypes
 from django.urls import reverse
 
-@NotificationStrategyFactory.register('inscription_created')
+@NotificationStrategyFactory.register(NotificationTypes.INSCRIPTION_CREATED)
 class InscriptionCreatedStrategy(NotificationStrategy):
     """Estrategia para notificar al profesor cuando recibe una nueva inscripción."""
 
