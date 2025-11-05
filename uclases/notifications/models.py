@@ -1,13 +1,15 @@
 from django.db import models
 from accounts.models import Perfil
-from .enums import NotificationTypes
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from notifications.strategy.factory import NotificationStrategyFactory
 
 class Notification(models.Model):
     receiver = models.ForeignKey(Perfil, on_delete=models.CASCADE,related_name='notifications')
-    type = models.CharField(max_length=50,choices=NotificationTypes.choices)
+    type = models.CharField(
+        max_length=50,
+        help_text="Tipo de notificación. Debe coincidir con una estrategia registrada en el factory."
+    )
     title = models.CharField(max_length=200)
     message = models.TextField()
     read = models.BooleanField(default=False)
