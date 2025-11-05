@@ -3,13 +3,14 @@ from django.dispatch import receiver
 from courses.models import Inscripcion
 from courses.enums import EstadoInscripcion
 from notifications.services.notification_service import NotificationService
+from notifications.enums import NotificationTypes
 
 @receiver(post_save, sender=Inscripcion)
 def notify_inscription_created(sender, instance, created, **kwargs):
     if created and instance.estado == EstadoInscripcion.PENDIENTE:
         NotificationService.send(
             receiver=instance.horario_ofertado.oferta.profesor,
-            type='inscription_created',
+            type=NotificationTypes.INSCRIPTION_CREATED,
             data={'inscripcion': instance},
             related_object=instance
         )
@@ -23,21 +24,21 @@ def notify_inscription_status_change(sender, instance, **kwargs):
                 if instance.estado == EstadoInscripcion.ACEPTADO:
                     NotificationService.send(
                         receiver=instance.estudiante,
-                        type='inscription_accepted',
+                        type=NotificationTypes.INSCRIPTION_ACCEPTED,
                         data={'inscripcion': instance},
                         related_object=instance
                     )
                 elif instance.estado == EstadoInscripcion.RECHAZADO:
                     NotificationService.send(
                         receiver=instance.estudiante,
-                        type='inscription_rejected',
+                        type=NotificationTypes.INSCRIPTION_REJECTED,
                         data={'inscripcion': instance},
                         related_object=instance
                     )
                 elif instance.estado == EstadoInscripcion.CANCELADO:
                     NotificationService.send(
                         receiver=instance.horario_ofertado.oferta.profesor,
-                        type='inscription_canceled',
+                        type=NotificationTypes.INSCRIPTION_CANCELED,
                         data={'inscripcion': instance},
                         related_object=instance
                     )
