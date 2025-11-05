@@ -1,7 +1,9 @@
 from notifications.strategy.trait import NotificationStrategy
 from notifications.strategy.factory import NotificationStrategyFactory
+from notifications.enums import NotificationTypes
 from django.urls import reverse
-@NotificationStrategyFactory.register('inscription_accepted')
+
+@NotificationStrategyFactory.register(NotificationTypes.INSCRIPTION_ACCEPTED)
 class InscriptionAcceptedStrategy(NotificationStrategy):
     """Estrategia de notificación para inscripciones aceptadas."""
 
@@ -18,10 +20,30 @@ class InscriptionAcceptedStrategy(NotificationStrategy):
     def get_actions(self, notification):
         if not notification.related_object:
             return []
+        
         inscription = notification.related_object
         inscription_id = inscription.pk
         oferta = inscription.horario_ofertado.oferta.pk
         profesor = inscription.horario_ofertado.oferta.profesor.user.public_uid
+        
+        # Si ya se realizó una acción, solo mostrar botones de navegación
+        if notification.action_taken:
+            return [
+                {
+                    'label': 'Ver oferta',
+                    'url': reverse('courses:oferta_detail', args=[oferta]),
+                    'method': 'GET',
+                    'style': 'primary'
+                },
+                {
+                    'label': 'Ver profesor',
+                    'url': reverse('accounts:profile_detail', args=[profesor]),
+                    'method': 'GET',
+                    'style': 'info'
+                }
+            ]
+        
+        # Si aún no se realizó acción, mostrar todos los botones
         return [
             {
                 'label': 'Cancelar inscripción',
