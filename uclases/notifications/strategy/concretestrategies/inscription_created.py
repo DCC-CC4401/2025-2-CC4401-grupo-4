@@ -30,6 +30,24 @@ class InscriptionCreatedStrategy(NotificationStrategy):
         oferta_id = inscription.horario_ofertado.oferta.pk
         estudiante_uid = inscription.estudiante.user.public_uid
         
+        # Si ya se realizó una acción, solo mostrar botones de navegación
+        if notification.action_taken:
+            return [
+                {
+                    'label': 'Ver oferta',
+                    'url': reverse('courses:oferta_detail', args=[oferta_id]),
+                    'method': 'GET',
+                    'style': 'primary'
+                },
+                {
+                    'label': 'Ver estudiante',
+                    'url': reverse('accounts:profile_detail', args=[estudiante_uid]),
+                    'method': 'GET',
+                    'style': 'info'
+                }
+            ]
+        
+        # Si aún no se realizó acción, mostrar todos los botones
         return [
             {
                 'label': 'Aceptar',
