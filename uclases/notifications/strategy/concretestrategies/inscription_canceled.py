@@ -1,8 +1,9 @@
 from notifications.strategy.trait import NotificationStrategy
 from notifications.strategy.factory import NotificationStrategyFactory
+from notifications.enums import NotificationTypes
 from django.urls import reverse
 
-@NotificationStrategyFactory.register('inscription_canceled')
+@NotificationStrategyFactory.register(NotificationTypes.INSCRIPTION_CANCELED)
 class InscriptionCanceledStrategy(NotificationStrategy):
     """Estrategia para notificar al profesor cuando un estudiante cancela su inscripción."""
 
