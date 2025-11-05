@@ -6,8 +6,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
 from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion
-from .enums import DiaSemana, EstadoInscripcion
+from .enums import DiaSemana
 from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
+from .services.inscription_service import InscriptionService
 
 
 def publications_view(request):
@@ -330,8 +331,8 @@ def aceptar_inscripcion(request, pk):
     """
     Permite al profesor aceptar una inscripción pendiente.
     
-    Solo el profesor dueño de la oferta puede aceptar inscripciones.
-    Al aceptar, reduce los cupos disponibles del horario.
+    Delega la lógica al InscriptionService para mantener SRP.
+    El servicio maneja: validaciones, cambio de estado, cupos y notificaciones.
     
     Args:
         request (HttpRequest): Objeto de solicitud HTTP (requiere POST).
@@ -343,21 +344,17 @@ def aceptar_inscripcion(request, pk):
     inscripcion = get_object_or_404(Inscripcion, pk=pk)
     oferta = inscripcion.horario_ofertado.oferta
     
-    # Verificar que el usuario sea el profesor de la oferta
-    if oferta.profesor != request.user.perfil:
-        messages.error(request, "No tienes permiso para gestionar esta inscripción.")
-        return redirect('courses:oferta_detail', pk=oferta.pk)
-    
     if request.method == "POST":
-        if inscripcion.estado == EstadoInscripcion.PENDIENTE:
-            inscripcion.aceptar()
-            # Reducir cupos al aceptar
-            horario = inscripcion.horario_ofertado
-            horario.cupos_totales -= 1
-            horario.save()
-            messages.success(request, f"Inscripción de {inscripcion.estudiante.user.get_full_name()} aceptada.")
+        # Usar el servicio para manejar la lógica
+        success, message = InscriptionService.accept_inscription(
+            inscription=inscripcion,
+            user=request.user
+        )
+        
+        if success:
+            messages.success(request, message)
         else:
-            messages.warning(request, "Esta inscripción ya fue procesada.")
+            messages.error(request, message)
     
     return redirect('courses:oferta_detail', pk=oferta.pk)
 
@@ -367,7 +364,8 @@ def rechazar_inscripcion(request, pk):
     """
     Permite al profesor rechazar una inscripción pendiente.
     
-    Solo el profesor dueño de la oferta puede rechazar inscripciones.
+    Delega la lógica al InscriptionService para mantener SRP.
+    El servicio maneja: validaciones, cambio de estado y notificaciones.
     
     Args:
         request (HttpRequest): Objeto de solicitud HTTP (requiere POST).
@@ -379,17 +377,17 @@ def rechazar_inscripcion(request, pk):
     inscripcion = get_object_or_404(Inscripcion, pk=pk)
     oferta = inscripcion.horario_ofertado.oferta
     
-    # Verificar que el usuario sea el profesor de la oferta
-    if oferta.profesor != request.user.perfil:
-        messages.error(request, "No tienes permiso para gestionar esta inscripción.")
-        return redirect('courses:oferta_detail', pk=oferta.pk)
-    
     if request.method == "POST":
-        if inscripcion.estado == EstadoInscripcion.PENDIENTE:
-            inscripcion.rechazar()
-            messages.success(request, f"Inscripción de {inscripcion.estudiante.user.get_full_name()} rechazada.")
+        # Usar el servicio para manejar la lógica
+        success, message = InscriptionService.reject_inscription(
+            inscription=inscripcion,
+            user=request.user
+        )
+        
+        if success:
+            messages.success(request, message)
         else:
-            messages.warning(request, "Esta inscripción ya fue procesada.")
+            messages.error(request, message)
     
     return redirect('courses:oferta_detail', pk=oferta.pk)
 
@@ -399,8 +397,8 @@ def cancelar_inscripcion(request, pk):
     """
     Permite al estudiante cancelar su propia inscripción.
     
-    Solo puede cancelarse si está en estado ACEPTADO o PENDIENTE.
-    Al cancelar, devuelve el cupo al horario si estaba aceptada.
+    Delega la lógica al InscriptionService para mantener SRP.
+    El servicio maneja: validaciones, cambio de estado, cupos y notificaciones.
     
     Args:
         request (HttpRequest): Objeto de solicitud HTTP (requiere POST).
@@ -412,22 +410,16 @@ def cancelar_inscripcion(request, pk):
     inscripcion = get_object_or_404(Inscripcion, pk=pk)
     oferta = inscripcion.horario_ofertado.oferta
     
-    # Verificar que el usuario sea el estudiante de la inscripción
-    if inscripcion.estudiante != request.user.perfil:
-        messages.error(request, "No tienes permiso para cancelar esta inscripción.")
-        return redirect('courses:oferta_detail', pk=oferta.pk)
-    
     if request.method == "POST":
-        if inscripcion.estado in [EstadoInscripcion.PENDIENTE, EstadoInscripcion.ACEPTADO]:
-            # Si estaba aceptada, devolver el cupo
-            if inscripcion.estado == EstadoInscripcion.ACEPTADO:
-                horario = inscripcion.horario_ofertado
-                horario.cupos_totales += 1
-                horario.save()
-            
-            inscripcion.cancelar()
-            messages.success(request, "Tu inscripción ha sido cancelada.")
+        # Usar el servicio para manejar la lógica
+        success, message = InscriptionService.cancel_inscription(
+            inscription=inscripcion,
+            user=request.user
+        )
+        
+        if success:
+            messages.success(request, message)
         else:
-            messages.warning(request, "No puedes cancelar esta inscripción.")
+            messages.error(request, message)
     
     return redirect('courses:oferta_detail', pk=oferta.pk)
