@@ -329,7 +329,7 @@ def inscribirse_view(request, pk):
 @login_required
 def aceptar_inscripcion(request, pk):
     """
-    Permite al profesor aceptar una inscripción pendiente.
+    Permite al profesor aceptar una inscripción pendiente desde notificaciones.
     
     Delega la lógica al InscriptionService para mantener SRP.
     El servicio maneja: validaciones, cambio de estado, cupos y notificaciones.
@@ -339,10 +339,9 @@ def aceptar_inscripcion(request, pk):
         pk (int): ID de la inscripción a aceptar.
     
     Returns:
-        HttpResponseRedirect: Redirige al detalle de la oferta.
+        HttpResponseRedirect: Redirige a la lista de notificaciones.
     """
     inscripcion = get_object_or_404(Inscripcion, pk=pk)
-    oferta = inscripcion.horario_ofertado.oferta
     
     if request.method == "POST":
         # Usar el servicio para manejar la lógica
@@ -356,13 +355,13 @@ def aceptar_inscripcion(request, pk):
         else:
             messages.error(request, message)
     
-    return redirect('courses:oferta_detail', pk=oferta.pk)
+    return redirect('notifications:list')
 
 
 @login_required
 def rechazar_inscripcion(request, pk):
     """
-    Permite al profesor rechazar una inscripción pendiente.
+    Permite al profesor rechazar una inscripción pendiente desde notificaciones.
     
     Delega la lógica al InscriptionService para mantener SRP.
     El servicio maneja: validaciones, cambio de estado y notificaciones.
@@ -372,10 +371,9 @@ def rechazar_inscripcion(request, pk):
         pk (int): ID de la inscripción a rechazar.
     
     Returns:
-        HttpResponseRedirect: Redirige al detalle de la oferta.
+        HttpResponseRedirect: Redirige a la lista de notificaciones.
     """
     inscripcion = get_object_or_404(Inscripcion, pk=pk)
-    oferta = inscripcion.horario_ofertado.oferta
     
     if request.method == "POST":
         # Usar el servicio para manejar la lógica
@@ -389,13 +387,13 @@ def rechazar_inscripcion(request, pk):
         else:
             messages.error(request, message)
     
-    return redirect('courses:oferta_detail', pk=oferta.pk)
+    return redirect('notifications:list')
 
 
 @login_required
 def cancelar_inscripcion(request, pk):
     """
-    Permite al estudiante cancelar su propia inscripción.
+    Permite al estudiante cancelar su propia inscripción desde notificaciones.
     
     Delega la lógica al InscriptionService para mantener SRP.
     El servicio maneja: validaciones, cambio de estado, cupos y notificaciones.
@@ -405,10 +403,9 @@ def cancelar_inscripcion(request, pk):
         pk (int): ID de la inscripción a cancelar.
     
     Returns:
-        HttpResponseRedirect: Redirige al detalle de la oferta.
+        HttpResponseRedirect: Redirige a la lista de notificaciones.
     """
     inscripcion = get_object_or_404(Inscripcion, pk=pk)
-    oferta = inscripcion.horario_ofertado.oferta
     
     if request.method == "POST":
         # Usar el servicio para manejar la lógica
@@ -422,4 +419,4 @@ def cancelar_inscripcion(request, pk):
         else:
             messages.error(request, message)
     
-    return redirect('courses:oferta_detail', pk=oferta.pk)
+    return redirect('notifications:list')
