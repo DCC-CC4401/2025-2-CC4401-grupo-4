@@ -11,6 +11,7 @@ urlpatterns = [
     path('', home_view, name='home'),
     path('accounts/', include('accounts.urls')),
     path('courses/', include('courses.urls')),
+    path('notifications/', include('notifications.urls')),
 ]
 
 # Servir archivos media en desarrollo

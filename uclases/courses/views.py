@@ -6,8 +6,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
 from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion
-from .enums import DiaSemana, EstadoInscripcion
+from .enums import DiaSemana
 from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
+from .services.inscription_service import InscriptionService
 
 
 def publications_view(request):
@@ -312,11 +313,9 @@ def inscribirse_view(request, pk):
         if not created:
             messages.warning(request, "Ya estás inscrito en este horario.")
         else:
-            # Reducir cupos solo si se crea una nueva inscripción
-            horario.cupos_totales -= 1
-            horario.save()
-            inscripcion.aceptar()
-            messages.success(request, "¡Inscripción completada con éxito!")
+            # La inscripción se crea en estado PENDIENTE
+            # Los cupos solo se reducirán cuando el profesor acepte la inscripción
+            messages.success(request, "¡Inscripción enviada! El profesor debe aceptarla.")
 
         return redirect("courses:oferta_detail", pk=oferta.pk)
 
@@ -325,3 +324,99 @@ def inscribirse_view(request, pk):
         "horarios_ordenados": horarios_ordenados,
     }
     return render(request, "courses/inscribirse.html", context)
+
+
+@login_required
+def aceptar_inscripcion(request, pk):
+    """
+    Permite al profesor aceptar una inscripción pendiente desde notificaciones.
+    
+    Delega la lógica al InscriptionService para mantener SRP.
+    El servicio maneja: validaciones, cambio de estado, cupos y notificaciones.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP (requiere POST).
+        pk (int): ID de la inscripción a aceptar.
+    
+    Returns:
+        HttpResponseRedirect: Redirige a la lista de notificaciones.
+    """
+    inscripcion = get_object_or_404(Inscripcion, pk=pk)
+    
+    if request.method == "POST":
+        # Usar el servicio para manejar la lógica
+        success, message = InscriptionService.accept_inscription(
+            inscription=inscripcion,
+            user=request.user
+        )
+        
+        if success:
+            messages.success(request, message)
+        else:
+            messages.error(request, message)
+    
+    return redirect('notifications:list')
+
+
+@login_required
+def rechazar_inscripcion(request, pk):
+    """
+    Permite al profesor rechazar una inscripción pendiente desde notificaciones.
+    
+    Delega la lógica al InscriptionService para mantener SRP.
+    El servicio maneja: validaciones, cambio de estado y notificaciones.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP (requiere POST).
+        pk (int): ID de la inscripción a rechazar.
+    
+    Returns:
+        HttpResponseRedirect: Redirige a la lista de notificaciones.
+    """
+    inscripcion = get_object_or_404(Inscripcion, pk=pk)
+    
+    if request.method == "POST":
+        # Usar el servicio para manejar la lógica
+        success, message = InscriptionService.reject_inscription(
+            inscription=inscripcion,
+            user=request.user
+        )
+        
+        if success:
+            messages.success(request, message)
+        else:
+            messages.error(request, message)
+    
+    return redirect('notifications:list')
+
+
+@login_required
+def cancelar_inscripcion(request, pk):
+    """
+    Permite al estudiante cancelar su propia inscripción desde notificaciones.
+    
+    Delega la lógica al InscriptionService para mantener SRP.
+    El servicio maneja: validaciones, cambio de estado, cupos y notificaciones.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP (requiere POST).
+        pk (int): ID de la inscripción a cancelar.
+    
+    Returns:
+        HttpResponseRedirect: Redirige a la lista de notificaciones.
+    """
+    inscripcion = get_object_or_404(Inscripcion, pk=pk)
+    
+    if request.method == "POST":
+        # Usar el servicio para manejar la lógica
+        success, message = InscriptionService.cancel_inscription(
+            inscription=inscripcion,
+            user=request.user
+        )
+        
+        if success:
+            messages.success(request, message)
+        else:
+            messages.error(request, message)
+    
+    return redirect('notifications:list')

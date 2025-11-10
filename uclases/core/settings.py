@@ -38,6 +38,7 @@ INSTALLED_APPS = [
 	'home',
     'courses',
     'devtools',
+    'notifications.apps.NotificationsConfig',
 ]
 
 MIDDLEWARE = [
