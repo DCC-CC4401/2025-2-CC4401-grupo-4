@@ -19,3 +19,18 @@ class NotificationTypes:
     INSCRIPTION_ACCEPTED = 'inscription_accepted'
     INSCRIPTION_REJECTED = 'inscription_rejected'
     INSCRIPTION_CANCELED = 'inscription_canceled'
+    INSCRIPTION_COMPLETED = 'inscription_completed'
+    
+    # Notificaciones de comentarios
+    NEW_COMMENT = 'new_comment'
+    COMMENT_REPLY = 'comment_reply'
+    OFFER_ON_REQUEST = 'offer_on_request'
+    
+    # Notificaciones de reviews
+    RATING_RECEIVED = 'rating_received'
+    
+    # Notificaciones de cupos
+    SLOTS_FULL = 'slots_full'
+    
+    # Notificaciones de recordatorios
+    REMINDER_CLASS_SOON = 'reminder_class_soon'
