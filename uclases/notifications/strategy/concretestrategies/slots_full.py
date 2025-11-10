@@ -1,0 +1,27 @@
+from notifications.strategy.trait import NotificationStrategy
+from notifications.strategy.factory import NotificationStrategyFactory
+from notifications.enums import NotificationTypes
+from django.urls import reverse
+
+@NotificationStrategyFactory.register(NotificationTypes.SLOTS_FULL)
+class SlotsFullStrategy(NotificationStrategy):
+    """Estrategia para notificar al profesor cuando se agotan los cupos de un horario."""
+
+    def get_title(self, data):
+        return ""
+
+    def get_message(self, data):
+        schedule = data['horario']
+        offer = schedule.oferta
+        day = schedule.get_dia_display()
+        start_time = schedule.hora_inicio.strftime('%H:%M')
+        end_time = schedule.hora_fin.strftime('%H:%M')
+        
+        return (f"¡Todos los cupos del horario {day} ({start_time} - {end_time}) "
+                f"de tu oferta '{offer.titulo}' están llenos! 🎉")
+
+    def get_actions(self, notification):
+        return []
+
+    def get_icon(self):
+        return "🎉"
