@@ -98,74 +98,76 @@
         {% if publicaciones_recientes %}
         <div class="space-y-4">
             {% for publicacion in publicaciones_recientes %}
-            <a href="{% if publicacion.profesor %}{% url 'courses:oferta_detail' publicacion.id %}{% else %}{% url 'courses:solicitud_detail' publicacion.id %}{% endif %}"
-               class="block bg-card text-foreground rounded-xl border border-border shadow-sm card-hover cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
-               aria-label="Ver detalles de la publicación {{ publicacion.titulo }}">
-                <div class="p-6">
-                    <!-- Header: Usuario, Carrera, Ramos y Tipo -->
-                    <div class="flex items-start justify-between mb-4 gap-4">
-                        <div class="flex items-center gap-3 flex-wrap flex-1">
-                            <!-- Usuario -->
+            {% if publicacion.public}
+                <a href="{% if publicacion.profesor %}{% url 'courses:oferta_detail' publicacion.id %}{% else %}{% url 'courses:solicitud_detail' publicacion.id %}{% endif %}"
+                class="block bg-card text-foreground rounded-xl border border-border shadow-sm card-hover cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                aria-label="Ver detalles de la publicación {{ publicacion.titulo }}">
+                    <div class="p-6">
+                        <!-- Header: Usuario, Carrera, Ramos y Tipo -->
+                        <div class="flex items-start justify-between mb-4 gap-4">
+                            <div class="flex items-center gap-3 flex-wrap flex-1">
+                                <!-- Usuario -->
+                                {% if publicacion.profesor %}
+                                    <!-- Es una Oferta -->
+                                    <span class="font-semibold text-foreground">
+                                        @{{ publicacion.profesor.user.username }}
+                                    </span>
+                                    
+                                    <!-- Carrera -->
+                                    {% if publicacion.profesor.carrera %}
+                                    <span class="badge font-medium text-green-500 border-green-500/30 bg-green-500/10">
+                                        {{ publicacion.profesor.carrera.name }}
+                                    </span>
+                                    {% endif %}
+                                    
+                                    <!-- Ramo (ahora es un solo ramo) -->
+                                    {% if publicacion.ramo %}
+                                    <span class="badge font-medium text-violet-500 border-violet-500/30 bg-violet-500/10">
+                                        {{ publicacion.ramo.name }}
+                                    </span>
+                                    {% endif %}
+                                {% else %}
+                                    <!-- Es una Solicitud -->
+                                    <span class="font-semibold text-foreground">
+                                        @{{ publicacion.solicitante.user.username }}
+                                    </span>
+                                    
+                                    <!-- Carrera -->
+                                    {% if publicacion.solicitante.carrera %}
+                                    <span class="badge font-medium text-green-500 border-green-500/30 bg-green-500/10">
+                                        {{ publicacion.solicitante.carrera.name }}
+                                    </span>
+                                    {% endif %}
+                                    
+                                    <!-- Ramo (solo uno) -->
+                                    <span class="badge font-medium text-violet-500 border-violet-500/30 bg-violet-500/10">
+                                        {{ publicacion.ramo.name }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Tipo: Oferta o Solicitud -->
                             {% if publicacion.profesor %}
-                                <!-- Es una Oferta -->
-                                <span class="font-semibold text-foreground">
-                                    @{{ publicacion.profesor.user.username }}
-                                </span>
-                                
-                                <!-- Carrera -->
-                                {% if publicacion.profesor.carrera %}
-                                <span class="badge font-medium text-green-500 border-green-500/30 bg-green-500/10">
-                                    {{ publicacion.profesor.carrera.name }}
-                                </span>
-                                {% endif %}
-                                
-                                <!-- Ramo (ahora es un solo ramo) -->
-                                {% if publicacion.ramo %}
-                                <span class="badge font-medium text-violet-500 border-violet-500/30 bg-violet-500/10">
-                                    {{ publicacion.ramo.name }}
-                                </span>
-                                {% endif %}
+                            <span class="badge font-medium flex-shrink-0 text-red-500 border-red-500/30 bg-red-500/10">
+                                Oferta
+                            </span>
                             {% else %}
-                                <!-- Es una Solicitud -->
-                                <span class="font-semibold text-foreground">
-                                    @{{ publicacion.solicitante.user.username }}
-                                </span>
-                                
-                                <!-- Carrera -->
-                                {% if publicacion.solicitante.carrera %}
-                                <span class="badge font-medium text-green-500 border-green-500/30 bg-green-500/10">
-                                    {{ publicacion.solicitante.carrera.name }}
-                                </span>
-                                {% endif %}
-                                
-                                <!-- Ramo (solo uno) -->
-                                <span class="badge font-medium text-violet-500 border-violet-500/30 bg-violet-500/10">
-                                    {{ publicacion.ramo.name }}
-                                </span>
+                            <span class="badge font-medium flex-shrink-0 text-cyan-500 border-cyan-500/30 bg-cyan-500/10">
+                                Solicitud
+                            </span>
                             {% endif %}
                         </div>
                         
-                        <!-- Tipo: Oferta o Solicitud -->
-                        {% if publicacion.profesor %}
-                        <span class="badge font-medium flex-shrink-0 text-red-500 border-red-500/30 bg-red-500/10">
-                            Oferta
-                        </span>
-                        {% else %}
-                        <span class="badge font-medium flex-shrink-0 text-cyan-500 border-cyan-500/30 bg-cyan-500/10">
-                            Solicitud
-                        </span>
-                        {% endif %}
+                        <!-- Título -->
+                        <h3 class="text-lg font-semibold text-foreground mb-2">{{ publicacion.titulo }}</h3>
+                        
+                        <!-- Descripción truncada -->
+                        <p class="text-sm text-foreground/70 truncate">
+                            {{ publicacion.descripcion }}
+                        </p>
                     </div>
-                    
-                    <!-- Título -->
-                    <h3 class="text-lg font-semibold text-foreground mb-2">{{ publicacion.titulo }}</h3>
-                    
-                    <!-- Descripción truncada -->
-                    <p class="text-sm text-foreground/70 truncate">
-                        {{ publicacion.descripcion }}
-                    </p>
-                </div>
-            </a>
+                </a>
+            {% endif %}
             {% endfor %}
 
             {% if mostrar_ver_todas %}
