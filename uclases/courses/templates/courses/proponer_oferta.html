@@ -1,0 +1,125 @@
+{% extends "base.html" %}  {% load static %}
+
+{% block content %}
+<div class="container mx-auto p-4 max-w-4xl">
+    <h1 class="text-3xl font-bold mb-6">Proponer Clase</h1>
+    <p class="mb-4 text-secondary-foreground">Estás proponiendo una clase al solicitante: <strong>{{ solicitante.user.username }}</strong>.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+
+        <section class="mb-6 p-6 border rounded-lg bg-indigo-100/50 border-indigo-300">
+            <h2 class="text-xl font-semibold mb-2 text-indigo-800">Curso</h2>
+            <p class="text-lg font-bold text-indigo-900">{{ ramo.name }}</p>
+            <p class="text-sm text-indigo-700 mt-1">Este es el curso de la solicitud original. No puede ser modificado.</p>
+        </section>
+        <section class="mb-6 p-6 border rounded-lg bg-card shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">Información de la Oferta</h2>
+            
+            {% for field in form %}
+                {% if field.name != 'ramo' %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ field.errors }}</p>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <p class="text-gray-500 text-xs mt-1">{{ field.help_text }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            
+            <input type="hidden" name="ramo" value="{{ ramo.id }}"> 
+        </section>
+
+        <section class="mb-6 p-6 border rounded-lg bg-card shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">Horarios Ofertados</h2>
+            
+            {{ formset.management_form }}
+            
+            <div id="formset-container">
+                {% for horario_form in formset %}
+                    <div class="horario-item p-4 border rounded-md mb-2 bg-background shadow-inner">
+                        {{ horario_form.as_p }}
+                        {% if horario_form.instance.pk %}
+                            <button type="button" class="btn btn-sm btn-delete text-red-500 hover:text-red-700 transition" 
+                                    onclick="deleteForm(this)">
+                                Eliminar Horario
+                            </button>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" id="add-horario-btn" 
+                    class="cosmic-button bg-blue-500/50 hover:bg-blue-500/90 text-foreground mt-4">
+                Agregar horario
+            </button>
+        </section>
+
+        <button type="submit" 
+                class="cosmic-button bg-green-600/50 hover:bg-green-600/90 text-foreground mt-6 w-full">
+            Publicar Oferta y Proponer
+        </button>
+    </form>
+</div>
+
+<script>
+    const formsetContainer = document.getElementById('formset-container');
+    const addButton = document.getElementById('add-horario-btn');
+    const totalForms = document.getElementById('id_horarios-TOTAL_FORMS');
+    
+    const emptyFormElement = formsetContainer.querySelector('.horario-item');
+    let template = emptyFormElement.outerHTML.replace(/-\d-/g, '-__prefix__-').replace(/_\d_/g, '_prefix_');
+    template = template.replace(/value=".*?"/g, 'value=""');
+
+    emptyFormElement.style.display = 'none';
+
+    
+    // Función para añadir un nuevo formulario
+    function addForm(event) {
+        event.preventDefault();
+        
+        let currentTotal = parseInt(totalForms.value);
+        
+        let newForm = template.replace(/__prefix__/g, currentTotal);
+        let newElement = document.createElement('div');
+        newElement.innerHTML = newForm;
+        
+        formsetContainer.appendChild(newElement.firstChild);
+        
+        totalForms.value = currentTotal + 1;
+        
+        const lastForm = formsetContainer.lastElementChild;
+        let deleteButton = lastForm.querySelector('.btn-delete');
+
+        if (!deleteButton) {
+             deleteButton = document.createElement('button');
+             deleteButton.type = 'button';
+             deleteButton.className = 'btn btn-sm btn-delete text-red-500 hover:text-red-700 transition';
+             deleteButton.textContent = 'Eliminar Horario';
+             lastForm.appendChild(deleteButton);
+        }
+        deleteButton.onclick = function() { deleteForm(lastForm); };
+    }
+    
+    // Función para eliminar un formulario
+    function deleteForm(formElement) {
+        const formItem = formElement.closest('.horario-item');
+        const deleteCheckbox = formItem.querySelector('input[id$="-DELETE"]');
+        
+        if (deleteCheckbox) {
+            deleteCheckbox.checked = true;
+            formItem.style.display = 'none';
+        } else {
+             formItem.remove();
+             let currentTotal = parseInt(totalForms.value);
+             totalForms.value = currentTotal - 1;
+        }
+    }
+
+    addButton.addEventListener('click', addForm);
+</script>
+{% endblock content %}
