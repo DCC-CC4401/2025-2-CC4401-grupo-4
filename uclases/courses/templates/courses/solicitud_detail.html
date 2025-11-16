@@ -104,16 +104,14 @@
                 {% if user.is_authenticated and solicitud.solicitante.user == user %}
                     <!-- Botón de Editar si eres el dueño -->
                     <a href="{% url 'courses:editar_solicitud' solicitud.pk %}"
-                       class="cosmic-button flex-1 flex items-center justify-center text-foreground border border-yellow-500/30 bg-yellow-500/50 hover:bg-yellow-500/90">
+                    class="cosmic-button flex-1 flex items-center justify-center text-foreground border border-yellow-500/30 bg-yellow-500/50 hover:bg-yellow-500/90">
                         Editar Solicitud
                     </a>
                 {% else %}
-                    <!-- Botón de Proponer clase si NO eres el dueño -->
-                    <button id="proponerClaseBtn"
-                            class="cosmic-button flex-1 justify-center text-foreground border border-green-600/30 bg-green-600/50 hover:bg-green-600/90"
-                            aria-haspopup="dialog" aria-controls="proponerClaseModal">
+                    <a href="{% url 'courses:proponer_oferta_clase' ramo_id=solicitud.ramo.id solicitante_id=solicitud.solicitante.user.id %}"
+                    class="cosmic-button flex-1 flex items-center justify-center text-foreground border border-green-600/30 bg-green-600/50 hover:bg-green-600/90">
                         Proponer clase
-                    </button>
+                    </a>
                 {% endif %}
             </footer>
         </div>
