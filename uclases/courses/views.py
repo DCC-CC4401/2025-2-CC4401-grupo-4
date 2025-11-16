@@ -5,7 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
-from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion
+from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion, Ramo
+from accounts.models import Perfil
 from .enums import DiaSemana
 from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
 from .services.inscription_service import InscriptionService
@@ -420,3 +421,75 @@ def cancelar_inscripcion(request, pk):
             messages.error(request, message)
     
     return redirect('notifications:list')
+
+
+@login_required
+def proponer_oferta_clase(request, ramo_id, solicitante_id):
+    """
+    Vista que permite a un profesor crear una OfertaClase en respuesta
+    a una SolicitudClase, pre-rellenando el ramo y notificando al solicitante.
+    """
+    
+    # 1. Obtener objetos de la URL (ramo y perfil del solicitante)
+    ramo = get_object_or_404(Ramo, id=ramo_id)
+    # Ya que SolicitudClase.solicitante es un Perfil, solicitante_id debe ser el ID del Perfil
+    solicitante_perfil = get_object_or_404(Perfil, user_id=solicitante_id)
+    profesor_perfil = request.user.perfil
+    
+    # Restricción de seguridad: Evitar auto-proposición
+    if profesor_perfil.user.id == solicitante_perfil.user.id:
+        messages.error(request, 'No puedes proponer una clase a tu propia solicitud. Usa el botón de editar.')
+        # Asumiendo que 'courses:lista_solicitudes' es una URL válida
+        return redirect('courses:lista_solicitudes') 
+        
+    # Manejo del POST: Validar y guardar
+    if request.method == 'POST':
+        # Pasamos el usuario para el filtrado de ramos en OfertaForm
+        form = OfertaForm(request.POST, user=request.user)
+        # HorarioFormSet sin instancia (para nueva oferta)
+        formset = HorarioFormSet(request.POST) 
+        
+        if form.is_valid() and formset.is_valid():
+            # 2. Guardar OfertaClase
+            oferta = form.save(commit=False)
+            oferta.profesor = profesor_perfil # Asignar el perfil del profesor (FK)
+            
+            # Asignar el ramo desde la URL/parámetro (seguro contra manipulación)
+            oferta.ramo = ramo 
+            oferta.save()
+            
+            # 3. Guardar HorariosOfertados (usando el formset)
+            formset.instance = oferta # Enlazar el formset a la nueva oferta
+            formset.save()
+            
+            # Enviar notificación
+
+            messages.success(request, f'Tu oferta de clase de {ramo.name} ha sido publicada y el solicitante ha sido notificado.')
+            
+            # Redirigir al detalle de la oferta (usando get_absolute_url)
+            return redirect(oferta) 
+    
+    # Manejo del GET: Mostrar formulario inicial
+    else:
+        # 2. Inicializar el formulario
+        initial_data = {
+            'ramo': ramo.id,
+            'titulo': f'Clase propuesta: {ramo.name}', 
+            'descripcion': f'Propuesta en respuesta a la solicitud de {solicitante_perfil.user.username}.',
+        }
+        
+        form = OfertaForm(initial=initial_data, user=request.user) 
+        formset = HorarioFormSet()
+        
+        # Deshabilitar visualmente el campo 'ramo' para forzar que sea el de la solicitud
+        form.fields['ramo'].initial = ramo
+        form.fields['ramo'].widget.attrs['disabled'] = 'disabled'
+        form.fields['ramo'].widget.attrs['class'] += ' opacity-50 cursor-not-allowed'
+        
+    context = {
+        'form': form,
+        'formset': formset,
+        'ramo': ramo,
+        'solicitante': solicitante_perfil,
+    }
+    return render(request, 'courses/proponer_oferta.html', context)
