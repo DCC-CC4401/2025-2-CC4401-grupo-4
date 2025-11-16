@@ -72,6 +72,8 @@ class OfertaClase(models.Model):
     #ID Usuario (Profesor) (FK)
     profesor = models.ForeignKey(Perfil, on_delete=models.CASCADE, related_name= 'ofertas_creadas')
 
+    public = models.BooleanField(default=True, verbose_name= "Oferta pública")
+    
     #Relación N:1 con RAMO (Pertenece a) - Una oferta es de UN solo ramo
     ramo = models.ForeignKey(Ramo, on_delete=models.CASCADE, related_name='ofertas')
 
