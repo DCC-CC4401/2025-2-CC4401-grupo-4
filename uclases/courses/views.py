@@ -424,16 +424,15 @@ def cancelar_inscripcion(request, pk):
 
 
 @login_required
-def proponer_oferta_clase(request, ramo_id, solicitante_id):
+def proponer_oferta_clase(request, solicitud_id):
     """
     Vista que permite a un profesor crear una OfertaClase en respuesta
     a una SolicitudClase, pre-rellenando el ramo y notificando al solicitante.
     """
     
-    # 1. Obtener objetos de la URL (ramo y perfil del solicitante)
-    ramo = get_object_or_404(Ramo, id=ramo_id)
-    # Ya que SolicitudClase.solicitante es un Perfil, solicitante_id debe ser el ID del Perfil
-    solicitante_perfil = get_object_or_404(Perfil, user_id=solicitante_id)
+    solicitud = get_object_or_404(SolicitudClase, id=solicitud_id)
+    ramo = solicitud.ramo
+    solicitante_perfil = solicitud.solicitante
     profesor_perfil = request.user.perfil
     
     # Restricción de seguridad: Evitar auto-proposición
@@ -448,14 +447,16 @@ def proponer_oferta_clase(request, ramo_id, solicitante_id):
         form = OfertaForm(request.POST, user=request.user)
         # HorarioFormSet sin instancia (para nueva oferta)
         formset = HorarioFormSet(request.POST) 
-        
         if form.is_valid() and formset.is_valid():
             # 2. Guardar OfertaClase
             oferta = form.save(commit=False)
             oferta.profesor = profesor_perfil # Asignar el perfil del profesor (FK)
             
             # Asignar el ramo desde la URL/parámetro (seguro contra manipulación)
-            oferta.ramo = ramo 
+            oferta.ramo = ramo
+
+            oferta.public = False
+
             oferta.save()
             
             # 3. Guardar HorariosOfertados (usando el formset)
@@ -467,10 +468,19 @@ def proponer_oferta_clase(request, ramo_id, solicitante_id):
             messages.success(request, f'Tu oferta de clase de {ramo.name} ha sido publicada y el solicitante ha sido notificado.')
             
             # Redirigir al detalle de la oferta (usando get_absolute_url)
-            return redirect(oferta) 
-    
+            return redirect('courses:solicitud_detail', solicitud_id) 
+        else:
+            print("\n--- Errores del OfertaForm (Formulario Principal) ---")
+            print(form.errors)
+            
+            print("\n--- Errores del HorarioFormSet ---")
+            print(formset.errors)
+            
+            print("\n--- Errores No de Campo del Formset (Globales) ---")
+            print(formset.non_form_errors())
     # Manejo del GET: Mostrar formulario inicial
     else:
+
         # 2. Inicializar el formulario
         initial_data = {
             'ramo': ramo.id,

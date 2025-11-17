@@ -108,7 +108,7 @@
                         Editar Solicitud
                     </a>
                 {% else %}
-                    <a href="{% url 'courses:proponer_oferta_clase' ramo_id=solicitud.ramo.id solicitante_id=solicitud.solicitante.user.id %}"
+                    <a href="{% url 'courses:proponer_oferta' solicitud.id %}"
                     class="cosmic-button flex-1 flex items-center justify-center text-foreground border border-green-600/30 bg-green-600/50 hover:bg-green-600/90">
                         Proponer clase
                     </a>
