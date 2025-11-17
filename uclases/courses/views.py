@@ -7,7 +7,7 @@ from django.contrib import messages
 
 from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion
 from .enums import DiaSemana
-from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
+from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm, ComentarioForm
 from .services.inscription_service import InscriptionService
 
 
@@ -65,11 +65,24 @@ def oferta_detail(request, pk):
     
     # Ordenar horarios por día de la semana (de lunes a domingo)
     horarios_ordenados = oferta.horarios.all().order_by('dia', 'hora_inicio')
-    
+    if request.method == "POST":
+        form = ComentarioForm(request.POST)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            comentario.oferta_clase = oferta
+            comentario.publicador = request.user.perfil
+            comentario.save()
+            messages.success(request, "Comentario agregado correctamente.")
+            return redirect('courses:oferta_detail', pk=oferta.pk)
+    else:
+        form = ComentarioForm()
+
     context = {
         'oferta': oferta,
         'horarios_ordenados': horarios_ordenados,
         'dias_semana': DiaSemana,
+        'comentario_form': form,
+        'comentarios': oferta.comentarios.all()
     }
     return render(request, 'courses/oferta_detail.html', context)
 

@@ -99,7 +99,7 @@
                 </section>
 
                 <!-- Comentarios -->
-                {% if oferta.comentarios.all %}
+                
                 <section class="rounded-xl border border-border bg-background/60 p-6">
                     <h2 class="text-lg font-semibold text-foreground mb-4">Comentarios</h2>
                     <div class="space-y-4">
@@ -118,10 +118,26 @@
                                 {{ comentario.contenido }}
                             </p>
                         </article>
+                        {% empty %}
+                        <p class="text-foreground/60 text-sm">No hay comentarios aún.</p>
                         {% endfor %}
                     </div>
+
+                    {% if user.is_authenticated %}
+                    <form method="post" class="space-y-3">
+                        {% csrf_token %}
+                        {{ comentario_form.as_p }}
+                        <button type="submit"
+                                class="px-4 py-2 bg-primary text-primary-foreground rounded-xl shadow hover:bg-primary/80 transition">
+                            Agregar Comentario
+                        </button>
+                    </form>
+                    {% else %}
+                    <p class="text-foreground/60 text-sm">
+                        Debes iniciar sesión para agregar un comentario.
+                    </p>
+                    {% endif %}
                 </section>
-                {% endif %}
             </div>
 
             <!-- Botones de Acción -->
