@@ -93,9 +93,15 @@ def solicitud_detail(request, pk):
         - courses.models.SolicitudClase
     """
     solicitud = get_object_or_404(SolicitudClase, pk=pk)
+
+    puede_proponer_clase = False
+    if request.user.is_authenticated:
+        if request.user.perfil.ramos_cursados.filter(pk=solicitud.ramo.pk).exists():
+             puede_proponer_clase = True
     
     context = {
         'solicitud': solicitud,
+        'puede_proponer_clase': puede_proponer_clase,
     }
     return render(request, 'courses/solicitud_detail.html', context)
 
@@ -426,8 +432,30 @@ def cancelar_inscripcion(request, pk):
 @login_required
 def proponer_oferta_clase(request, solicitud_id):
     """
-    Vista que permite a un profesor crear una OfertaClase en respuesta
-    a una SolicitudClase, pre-rellenando el ramo y notificando al solicitante.
+    Permite a un profesor crear y enviar una OfertaClase privada en respuesta
+    a una SolicitudClase específica. La oferta queda automáticamente vinculada
+    al Ramo de la solicitud y marcada como 'privada'.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP. Contiene los datos del
+                               OfertaForm y HorarioFormSet en el método POST.
+        solicitud_id (int): ID de la SolicitudClase a la que se está respondiendo.
+    
+    Returns:
+        HttpResponse: Renderiza el formulario de propuesta de clase.
+        HttpResponseRedirect: 
+            1. Redirige al detalle de la Solicitud (almacenamiento exitoso).
+            2. Redirige a la lista de solicitudes (si el profesor es el mismo solicitante).
+    
+    Template:
+        'courses/proponer_oferta.html'
+    
+    Dependencies:
+        - courses.forms.OfertaForm
+        - courses.forms.HorarioFormSet (inline formset)
+        - courses.models.SolicitudClase
+        - courses.models.OfertaClase
+        - django.contrib.auth.decorators.login_required
     """
     
     solicitud = get_object_or_404(SolicitudClase, id=solicitud_id)
@@ -435,53 +463,33 @@ def proponer_oferta_clase(request, solicitud_id):
     solicitante_perfil = solicitud.solicitante
     profesor_perfil = request.user.perfil
     
-    # Restricción de seguridad: Evitar auto-proposición
     if profesor_perfil.user.id == solicitante_perfil.user.id:
         messages.error(request, 'No puedes proponer una clase a tu propia solicitud. Usa el botón de editar.')
-        # Asumiendo que 'courses:lista_solicitudes' es una URL válida
         return redirect('courses:lista_solicitudes') 
         
-    # Manejo del POST: Validar y guardar
     if request.method == 'POST':
-        # Pasamos el usuario para el filtrado de ramos en OfertaForm
         form = OfertaForm(request.POST, user=request.user)
-        # HorarioFormSet sin instancia (para nueva oferta)
         formset = HorarioFormSet(request.POST) 
         if form.is_valid() and formset.is_valid():
-            # 2. Guardar OfertaClase
             oferta = form.save(commit=False)
-            oferta.profesor = profesor_perfil # Asignar el perfil del profesor (FK)
+            oferta.profesor = profesor_perfil
             
-            # Asignar el ramo desde la URL/parámetro (seguro contra manipulación)
             oferta.ramo = ramo
 
             oferta.public = False
 
             oferta.save()
             
-            # 3. Guardar HorariosOfertados (usando el formset)
-            formset.instance = oferta # Enlazar el formset a la nueva oferta
+            formset.instance = oferta 
             formset.save()
             
-            # Enviar notificación
 
             messages.success(request, f'Tu oferta de clase de {ramo.name} ha sido publicada y el solicitante ha sido notificado.')
             
-            # Redirigir al detalle de la oferta (usando get_absolute_url)
             return redirect('courses:solicitud_detail', solicitud_id) 
-        else:
-            print("\n--- Errores del OfertaForm (Formulario Principal) ---")
-            print(form.errors)
-            
-            print("\n--- Errores del HorarioFormSet ---")
-            print(formset.errors)
-            
-            print("\n--- Errores No de Campo del Formset (Globales) ---")
-            print(formset.non_form_errors())
-    # Manejo del GET: Mostrar formulario inicial
+
     else:
 
-        # 2. Inicializar el formulario
         initial_data = {
             'ramo': ramo.id,
             'titulo': f'Clase propuesta: {ramo.name}', 
@@ -491,7 +499,6 @@ def proponer_oferta_clase(request, solicitud_id):
         form = OfertaForm(initial=initial_data, user=request.user) 
         formset = HorarioFormSet()
         
-        # Deshabilitar visualmente el campo 'ramo' para forzar que sea el de la solicitud
         form.fields['ramo'].initial = ramo
         form.fields['ramo'].widget.attrs['disabled'] = 'disabled'
         form.fields['ramo'].widget.attrs['class'] += ' opacity-50 cursor-not-allowed'
