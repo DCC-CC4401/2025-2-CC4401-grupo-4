@@ -465,8 +465,12 @@ def proponer_oferta_clase(request, solicitud_id):
     
     if profesor_perfil.user.id == solicitante_perfil.user.id:
         messages.error(request, 'No puedes proponer una clase a tu propia solicitud. Usa el botón de editar.')
-        return redirect('courses:lista_solicitudes') 
-        
+        return redirect('courses:solicitud_detail', solicitud_id) 
+    
+    if not request.user.perfil.ramos_cursados.filter(pk=ramo.pk).exists():
+        messages.error(request, f'No tienes permiso para proponer clases de {ramo.name}.')
+        return redirect('courses:solicitud_detail', solicitud_id)
+    
     if request.method == 'POST':
         form = OfertaForm(request.POST, user=request.user)
         formset = HorarioFormSet(request.POST) 
