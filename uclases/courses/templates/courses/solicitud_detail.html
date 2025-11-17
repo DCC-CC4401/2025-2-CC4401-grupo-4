@@ -107,7 +107,7 @@
                     class="cosmic-button flex-1 flex items-center justify-center text-foreground border border-yellow-500/30 bg-yellow-500/50 hover:bg-yellow-500/90">
                         Editar Solicitud
                     </a>
-                {% elif user.is_authenticated and solicitud.ramo in user.ramos_cursados%}
+                {% elif user.is_authenticated and puede_proponer_clase %}
                     <a href="{% url 'courses:proponer_oferta' solicitud.id %}"
                     class="cosmic-button flex-1 flex items-center justify-center text-foreground border border-green-600/30 bg-green-600/50 hover:bg-green-600/90">
                         Proponer clase
