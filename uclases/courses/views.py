@@ -105,9 +105,22 @@ def solicitud_detail(request, pk):
         - courses.models.SolicitudClase
     """
     solicitud = get_object_or_404(SolicitudClase, pk=pk)
+    if request.method == "POST":
+        form = ComentarioForm(request.POST)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            comentario.solicitud_clase = solicitud
+            comentario.publicador = request.user.perfil
+            comentario.save()
+            messages.success(request, "Comentario agregado correctamente.")
+            return redirect('courses:solicitud_detail', pk=solicitud.pk)
+    else:
+        form = ComentarioForm()
     
     context = {
         'solicitud': solicitud,
+        'comentario_form': form,
+        'comentarios': solicitud.comentarios.all()
     }
     return render(request, 'courses/solicitud_detail.html', context)
 

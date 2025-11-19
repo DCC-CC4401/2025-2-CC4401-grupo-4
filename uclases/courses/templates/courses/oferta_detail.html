@@ -119,21 +119,21 @@
                             </p>
                         </article>
                         {% empty %}
-                        <p class="text-foreground/60 text-sm">No hay comentarios aún.</p>
+                        <p class="text-foreground/70 italic">No hay comentarios aún. Sé el primero en comentar.</p>
                         {% endfor %}
                     </div>
 
                     {% if user.is_authenticated %}
-                    <form method="post" class="space-y-3">
+                    <form method="post" class="mt-6">
                         {% csrf_token %}
                         {{ comentario_form.as_p }}
                         <button type="submit"
-                                class="px-4 py-2 bg-primary text-primary-foreground rounded-xl shadow hover:bg-primary/80 transition">
+                                class="cosmic-button bg-primary text-white hover:bg-primary/90 w-full">
                             Agregar Comentario
                         </button>
                     </form>
                     {% else %}
-                    <p class="text-foreground/60 text-sm">
+                    <p class="text-foreground/70 italic mt-4">
                         Debes iniciar sesión para agregar un comentario.
                     </p>
                     {% endif %}
