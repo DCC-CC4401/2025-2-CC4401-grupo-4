@@ -87,6 +87,35 @@
             </div>
             {% endfor %}
         </div>
+
+        <!-- Paginación -->
+        {% if notifications.has_other_pages %}
+        <div class="mt-8 flex justify-center">
+            <nav class="flex items-center gap-2">
+                {% if notifications.has_previous %}
+                    <a href="?page=1" class="px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent transition-colors text-sm font-medium">
+                        Primera
+                    </a>
+                    <a href="?page={{ notifications.previous_page_number }}" class="px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent transition-colors text-sm font-medium">
+                        Anterior
+                    </a>
+                {% endif %}
+
+                <span class="px-4 py-2 text-sm text-foreground/60">
+                    Página {{ notifications.number }} de {{ notifications.paginator.num_pages }}
+                </span>
+
+                {% if notifications.has_next %}
+                    <a href="?page={{ notifications.next_page_number }}" class="px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent transition-colors text-sm font-medium">
+                        Siguiente
+                    </a>
+                    <a href="?page={{ notifications.paginator.num_pages }}" class="px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent transition-colors text-sm font-medium">
+                        Última
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
     </div>
 </section>
 {% endblock %}
