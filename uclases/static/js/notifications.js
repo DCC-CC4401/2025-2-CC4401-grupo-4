@@ -62,6 +62,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Actualizar contador si existe
                 updateUnreadCount(data.unread_count);
+                
+                // Actualizar el botón "Marcar todas como leídas"
+                updateMarkAllButton(data.unread_count);
             } else {
                 alert(data.error || 'Error al actualizar la notificación');
             }
@@ -85,7 +88,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData(this);
             const button = this.querySelector('button');
             
+            // Si ya está deshabilitado, no hacer nada
+            if (button.disabled) {
+                return;
+            }
+            
             button.disabled = true;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span>⏳</span><span>Marcando...</span>';
             
             fetch(url, {
                 method: 'POST',
@@ -97,16 +107,43 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Recargar la página para mostrar todos los cambios
-                    location.reload();
+                    // Actualizar todas las tarjetas visualmente
+                    const notificationCards = document.querySelectorAll('.notification-card');
+                    notificationCards.forEach(card => {
+                        // Quitar estilos de "no leída"
+                        card.classList.remove('border-l-4', 'border-l-blue-500', 'bg-blue-50/50', 'dark:bg-blue-900/10');
+                        
+                        // Actualizar badge de cada notificación
+                        const form = card.querySelector('.mark-notification-form');
+                        if (form) {
+                            const badgeButton = form.querySelector('button');
+                            if (badgeButton) {
+                                // Actualizar a estado "leída"
+                                badgeButton.className = 'group px-2 py-1 text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors';
+                                badgeButton.innerHTML = `
+                                    <span class="group-hover:hidden">Leída</span>
+                                    <span class="hidden group-hover:inline">✕ Desmarcar</span>
+                                `;
+                                // Actualizar la URL del formulario para desmarcar
+                                const notifId = form.action.match(/\/(\d+)\//)[1];
+                                form.action = form.action.replace('/mark-read/', '/mark-unread/');
+                            }
+                        }
+                    });
+                    
+                    // Actualizar contadores (esto también actualiza el botón)
+                    updateUnreadCount(0);
+                    updateMarkAllButton(0);
                 } else {
-                    alert(data.message || 'No hay notificaciones sin leer');
+                    // Restaurar el botón si falló
+                    button.innerHTML = originalText;
                     button.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error al marcar todas como leídas');
+                button.innerHTML = originalText;
                 button.disabled = false;
             });
         });
@@ -125,5 +162,41 @@ function updateUnreadCount(count) {
         } else {
             badge.classList.add('hidden');
         }
+    }
+}
+
+/**
+ * Actualiza el botón "Marcar todas como leídas" según el contador
+ */
+function updateMarkAllButton(count) {
+    const markAllForm = document.getElementById('mark-all-read-form');
+    if (!markAllForm) return;
+    
+    const button = markAllForm.querySelector('button');
+    if (!button) return;
+    
+    if (count > 0) {
+        // Activar botón
+        button.disabled = false;
+        button.className = 'px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white';
+        button.removeAttribute('title');
+        
+        // Reconstruir contenido con badge
+        button.innerHTML = `
+            <span>✓</span>
+            <span>Marcar todas como leídas</span>
+            <span class="ml-1 px-2 py-0.5 bg-white/20 rounded-full text-xs font-bold">${count}</span>
+        `;
+    } else {
+        // Desactivar botón
+        button.disabled = true;
+        button.className = 'px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed';
+        button.setAttribute('title', 'Todas las notificaciones están leídas');
+        
+        // Reconstruir contenido sin badge - texto diferente
+        button.innerHTML = `
+            <span>✓</span>
+            <span>Todas leídas</span>
+        `;
     }
 }

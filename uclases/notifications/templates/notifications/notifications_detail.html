@@ -17,9 +17,16 @@
                 <form method="post" action="{% url 'notifications:mark_all_read' %}" id="mark-all-read-form">
                     {% csrf_token %}
                     <button type="submit" 
-                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors flex items-center gap-2">
+                            {% if unread_notifications_count == 0 %}disabled title="Todas las notificaciones están leídas"{% endif %}
+                            class="px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 
+                                   {% if unread_notifications_count > 0 %}bg-blue-600 hover:bg-blue-700 text-white{% else %}bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed{% endif %}">
                         <span>✓</span>
-                        <span>Marcar todas como leídas</span>
+                        <span>{% if unread_notifications_count > 0 %}Marcar todas como leídas{% else %}Todas leídas{% endif %}</span>
+                        {% if unread_notifications_count > 0 %}
+                            <span class="ml-1 px-2 py-0.5 bg-white/20 rounded-full text-xs font-bold">
+                                {{ unread_notifications_count }}
+                            </span>
+                        {% endif %}
                     </button>
                 </form>
             {% endif %}
