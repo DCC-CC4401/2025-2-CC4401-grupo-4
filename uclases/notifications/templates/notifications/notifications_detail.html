@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Mis Notificaciones{% endblock %}
 
@@ -6,16 +7,28 @@
 <section class="min-h-screen bg-background py-12">
     <div class="container mx-auto px-4 max-w-4xl">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
             <h1 class="text-3xl font-bold text-foreground">
                 Notificaciones
             </h1>
+            
+            <!-- Botón Marcar todas como leídas -->
+            {% if notifications.object_list %}
+                <form method="post" action="{% url 'notifications:mark_all_read' %}" id="mark-all-read-form">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors flex items-center gap-2">
+                        <span>✓</span>
+                        <span>Marcar todas como leídas</span>
+                    </button>
+                </form>
+            {% endif %}
         </div>
 
         <!-- Notificaciones -->
         <div class="space-y-4">
             {% for notif in notifications %}
-            <div class="border border-border rounded-xl p-5 bg-card shadow-sm hover:shadow-md transition-shadow">
+            <div class="notification-card border border-border rounded-xl p-5 bg-card shadow-sm hover:shadow-md transition-shadow {% if not notif.read %}border-l-4 border-l-blue-500 bg-blue-50/50 dark:bg-blue-900/10{% endif %}">
                 <div class="flex gap-4">
                     <!-- Icono -->
                     <div class="text-3xl flex-shrink-0">
@@ -25,7 +38,25 @@
                     <!-- Contenido -->
                     <div class="flex-1 min-w-0">
                         <div class="flex items-start justify-between gap-3 mb-2">
-                            <h3 class="font-bold text-foreground text-lg">{{ notif.title }}</h3>
+                            <h3 class="font-bold text-foreground text-lg">
+                                {{ notif.title }}
+                            </h3>
+                            
+                            <!-- Badge interactivo de estado de lectura -->
+                            <form method="post" action="{% if notif.read %}{% url 'notifications:mark_unread' notif.id %}{% else %}{% url 'notifications:mark_read' notif.id %}{% endif %}" class="flex-shrink-0 mark-notification-form">
+                                {% csrf_token %}
+                                {% if notif.read %}
+                                    <button type="submit" class="group px-2 py-1 text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                                        <span class="group-hover:hidden">Leída</span>
+                                        <span class="hidden group-hover:inline">✕ Desmarcar</span>
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="px-2 py-1 text-xs font-bold bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center gap-1">
+                                        <span class="inline-block w-1.5 h-1.5 bg-white rounded-full"></span>
+                                        Marcar como leída
+                                    </button>
+                                {% endif %}
+                            </form>
                         </div>
                         
                         <p class="text-foreground/80 mb-3">{{ notif.message }}</p>
@@ -118,4 +149,7 @@
         {% endif %}
     </div>
 </section>
+
+<!-- Script para manejo AJAX de notificaciones -->
+<script src="{% static 'js/notifications.js' %}"></script>
 {% endblock %}
