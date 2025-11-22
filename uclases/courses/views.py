@@ -486,7 +486,20 @@ def proponer_oferta_clase(request, solicitud_id):
             
             formset.instance = oferta 
             formset.save()
-            
+            # Intentar enviar notificación al solicitante (si el módulo notifications está disponible)
+            try:
+                from notifications.services.notification_service import NotificationService
+                from notifications.enums import NotificationTypes
+
+                NotificationService.send(
+                    receiver=solicitante_perfil,
+                    type=NotificationTypes.OFERTA_PROPOSED,
+                    data={'oferta': oferta},
+                    related_object=oferta
+                )
+            except Exception:
+                # Si algo falla con las notificaciones, no interrumpimos el flujo principal.
+                pass
 
             messages.success(request, f'Tu oferta de clase de {ramo.name} ha sido publicada y el solicitante ha sido notificado.')
             
