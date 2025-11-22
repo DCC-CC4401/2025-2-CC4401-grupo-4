@@ -6,8 +6,13 @@ def notifications_view(request):
     """
     Muestra todas las notificaciones del usuario.
     El orden está definido en el modelo Notification (más recientes primero).
+    Optimizado con select_related y prefetch_related para evitar N+1 queries.
     """
-    notifications = request.user.perfil.notifications.all()
+    notifications = request.user.perfil.notifications.select_related(
+        'content_type'
+    ).prefetch_related(
+        'related_object'
+    ).all()
     
     context = {
         'notifications': notifications
