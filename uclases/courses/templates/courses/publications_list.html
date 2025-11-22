@@ -57,6 +57,7 @@
         {% if publicaciones %}
         <div class="space-y-4" id="publications-list">
             {% for publicacion in publicaciones %}
+            {% if publicacion.public %}
             <a href="{% if publicacion.profesor %}{% url 'courses:oferta_detail' publicacion.id %}{% else %}{% url 'courses:solicitud_detail' publicacion.id %}{% endif %}"
                class="block bg-card text-foreground rounded-xl border border-border shadow-sm card-hover cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
                aria-label="Ver detalles de la publicación {{ publicacion.titulo }}"
@@ -129,6 +130,7 @@
                     </p>
                 </div>
             </a>
+            {% endif %}
             {% endfor %}
         </div>
 
