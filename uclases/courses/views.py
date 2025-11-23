@@ -5,10 +5,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
-from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion
+from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion, Rating
 from .enums import DiaSemana, EstadoInscripcion
-from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
+from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm, RatingForm
 from .services.inscription_service import InscriptionService
+from accounts.models import Perfil
 
 
 def publications_view(request):
@@ -594,3 +595,77 @@ def completar_horario_view(request, pk):
     )
     
     return redirect('courses:mis_clases')
+
+
+@login_required
+def crear_rating_view(request):
+    """
+    Procesa la creación de un rating (valoración y comentario) para un profesor.
+    
+    Solo permite crear ratings si:
+    - El usuario tiene una inscripción COMPLETADA con ese profesor
+    - Aún no ha dejado un rating para esa clase
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP con datos POST del formulario.
+    
+    Returns:
+        HttpResponseRedirect: Redirige al perfil del profesor con mensaje de éxito/error.
+    
+    Dependencies:
+        - courses.forms.RatingForm
+        - courses.models.Rating, Inscripcion
+        - courses.enums.EstadoInscripcion
+        - accounts.models.Perfil
+    """
+    if request.method != 'POST':
+        messages.error(request, 'Método no permitido.')
+        return redirect('home')
+    
+    form = RatingForm(request.POST)
+    profesor_id = request.POST.get('profesor_id')
+    
+    if not profesor_id:
+        messages.error(request, 'Profesor no especificado.')
+        return redirect('home')
+    
+    try:
+        profesor = Perfil.objects.get(id=profesor_id)
+    except Perfil.DoesNotExist:
+        messages.error(request, 'Profesor no encontrado.')
+        return redirect('home')
+    
+    if not form.is_valid():
+        messages.error(request, 'Formulario inválido. Por favor verifica los datos.')
+        return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)
+    
+    # Buscar inscripciones completadas del usuario con este profesor
+    inscripciones_completadas = Inscripcion.objects.filter(
+        estudiante=request.user.perfil,
+        horario_ofertado__oferta__profesor=profesor,
+        estado=EstadoInscripcion.COMPLETADO
+    ).select_related('horario_ofertado__oferta')
+    
+    if not inscripciones_completadas.exists():
+        messages.error(request, 'No tienes clases completadas con este profesor.')
+        return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)
+    
+    # Buscar la primera inscripción sin rating
+    inscripcion_sin_rating = None
+    for inscripcion in inscripciones_completadas:
+        if not Rating.objects.filter(inscripcion=inscripcion).exists():
+            inscripcion_sin_rating = inscripcion
+            break
+    
+    if not inscripcion_sin_rating:
+        messages.warning(request, 'Ya has calificado todas tus clases con este profesor.')
+        return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)
+    
+    # Crear el rating
+    rating = form.save(commit=False)
+    rating.inscripcion = inscripcion_sin_rating
+    rating.calificador = request.user.perfil
+    rating.save()
+    
+    messages.success(request, f'¡Gracias por tu reseña! Has calificado con {rating.valoracion} estrellas.')
+    return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)

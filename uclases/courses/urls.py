@@ -23,5 +23,8 @@ urlpatterns = [
     # Gestión de clases para profesores
     path('mis-clases/', views.mis_clases_view, name='mis_clases'),
     path('horario/<int:pk>/completar/', views.completar_horario_view, name='completar_horario'),
+    
+    # Ratings
+    path('rating/crear/', views.crear_rating_view, name='crear_rating'),
 
 ]
