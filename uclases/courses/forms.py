@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
-from .models import HorarioOfertado, OfertaClase, SolicitudClase
+from .models import HorarioOfertado, OfertaClase, SolicitudClase, Comentario
 from django.core.exceptions import ValidationError
 
 INPUT = "appearance-none w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
@@ -231,3 +231,29 @@ class SolicitudClaseForm(forms.ModelForm):
                 "class": INPUT,
             }),
         }
+
+class ComentarioForm(forms.ModelForm):
+    """
+    Formulario para agregar comentarios a una oferta de clase.
+    
+    Permite a los usuarios dejar comentarios relacionados con una oferta
+    específica, facilitando la comunicación y retroalimentación.
+    
+    Tipo: ModelForm
+    Modelo: courses.models.ComentarioOferta
+    
+    Campos:
+        - contenido: Texto del comentario
+    """
+    class Meta:
+        model = Comentario
+        fields = ['contenido']
+        widgets = {
+            "contenido": forms.Textarea(attrs={
+                "class": "w-full p-3 rounded-xl border border-border bg-background",
+                "rows": 3,
+                "placeholder": "Escribe un comentario..."
+            })
+        }
+
+   
