@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
 from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion
-from .enums import DiaSemana
+from .enums import DiaSemana, EstadoInscripcion
 from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm
 from .services.inscription_service import InscriptionService
 
@@ -329,7 +329,7 @@ def inscribirse_view(request, pk):
 @login_required
 def aceptar_inscripcion(request, pk):
     """
-    Permite al profesor aceptar una inscripción pendiente desde notificaciones.
+    Permite al profesor aceptar una inscripción pendiente.
     
     Delega la lógica al InscriptionService para mantener SRP.
     El servicio maneja: validaciones, cambio de estado, cupos y notificaciones.
@@ -339,7 +339,7 @@ def aceptar_inscripcion(request, pk):
         pk (int): ID de la inscripción a aceptar.
     
     Returns:
-        HttpResponseRedirect: Redirige a la lista de notificaciones.
+        HttpResponseRedirect: Redirige a la página anterior o a mis inscripciones.
     """
     inscripcion = get_object_or_404(Inscripcion, pk=pk)
     
@@ -355,13 +355,15 @@ def aceptar_inscripcion(request, pk):
         else:
             messages.error(request, message)
     
-    return redirect('notifications:list')
+    # Redirigir a la página anterior o a mis inscripciones
+    next_url = request.GET.get('next') or request.POST.get('next') or 'courses:mis_inscripciones'
+    return redirect(next_url)
 
 
 @login_required
 def rechazar_inscripcion(request, pk):
     """
-    Permite al profesor rechazar una inscripción pendiente desde notificaciones.
+    Permite al profesor rechazar una inscripción pendiente.
     
     Delega la lógica al InscriptionService para mantener SRP.
     El servicio maneja: validaciones, cambio de estado y notificaciones.
@@ -371,7 +373,7 @@ def rechazar_inscripcion(request, pk):
         pk (int): ID de la inscripción a rechazar.
     
     Returns:
-        HttpResponseRedirect: Redirige a la lista de notificaciones.
+        HttpResponseRedirect: Redirige a la página anterior o a mis inscripciones.
     """
     inscripcion = get_object_or_404(Inscripcion, pk=pk)
     
@@ -387,13 +389,15 @@ def rechazar_inscripcion(request, pk):
         else:
             messages.error(request, message)
     
-    return redirect('notifications:list')
+    # Redirigir a la página anterior o a mis inscripciones
+    next_url = request.GET.get('next') or request.POST.get('next') or 'courses:mis_inscripciones'
+    return redirect(next_url)
 
 
 @login_required
 def cancelar_inscripcion(request, pk):
     """
-    Permite al estudiante cancelar su propia inscripción desde notificaciones.
+    Permite al estudiante cancelar su propia inscripción.
     
     Delega la lógica al InscriptionService para mantener SRP.
     El servicio maneja: validaciones, cambio de estado, cupos y notificaciones.
@@ -403,7 +407,7 @@ def cancelar_inscripcion(request, pk):
         pk (int): ID de la inscripción a cancelar.
     
     Returns:
-        HttpResponseRedirect: Redirige a la lista de notificaciones.
+        HttpResponseRedirect: Redirige a la página anterior o a mis inscripciones.
     """
     inscripcion = get_object_or_404(Inscripcion, pk=pk)
     
@@ -419,4 +423,74 @@ def cancelar_inscripcion(request, pk):
         else:
             messages.error(request, message)
     
-    return redirect('notifications:list')
+    # Redirigir a la página anterior o a mis inscripciones
+    next_url = request.GET.get('next') or request.POST.get('next') or 'courses:mis_inscripciones'
+    return redirect(next_url)
+
+
+@login_required
+def mis_inscripciones_view(request):
+    """
+    Vista de gestión de inscripciones.
+    
+    Para profesores: Muestra inscripciones a sus ofertas de clase con opción de aceptar/rechazar.
+    Para estudiantes: Muestra sus propias inscripciones con opción de cancelar las pendientes.
+    
+    Incluye contadores por estado y filtrado client-side con JavaScript.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+    
+    Returns:
+        HttpResponse: Renderiza la vista de gestión con inscripciones filtradas según el rol.
+    
+    Template:
+        'courses/mis_inscripciones.html'
+    
+    Dependencies:
+        - courses.models.Inscripcion
+        - courses.models.EstadoInscripcion
+    """
+    perfil = request.user.perfil
+    
+    # Obtener TODAS las inscripciones relevantes para el usuario
+    # 1. Inscripciones a ofertas donde este perfil es el profesor
+    inscripciones_como_profesor = Inscripcion.objects.filter(
+        horario_ofertado__oferta__profesor=perfil
+    ).select_related(
+        'estudiante',
+        'estudiante__user',
+        'estudiante__carrera',
+        'horario_ofertado__oferta__ramo'
+    )
+    
+    # 2. Inscripciones propias donde este perfil es el estudiante
+    inscripciones_como_estudiante = Inscripcion.objects.filter(
+        estudiante=perfil
+    ).select_related(
+        'horario_ofertado__oferta__profesor',
+        'horario_ofertado__oferta__profesor__user',
+        'horario_ofertado__oferta__ramo'
+    )
+    
+    # Combinar ambas querysets y eliminar duplicados
+    inscripciones = (inscripciones_como_profesor | inscripciones_como_estudiante).distinct().order_by('-fecha_reserva')
+    
+    # Calcular contadores por estado
+    all_count = inscripciones.count()
+    pendiente_count = inscripciones.filter(estado=EstadoInscripcion.PENDIENTE).count()
+    aceptado_count = inscripciones.filter(estado=EstadoInscripcion.ACEPTADO).count()
+    rechazado_count = inscripciones.filter(estado=EstadoInscripcion.RECHAZADO).count()
+    cancelado_count = inscripciones.filter(estado=EstadoInscripcion.CANCELADO).count()
+    
+    context = {
+        'inscripciones': inscripciones,
+        'EstadoInscripcion': EstadoInscripcion,
+        'all_count': all_count,
+        'pendiente_count': pendiente_count,
+        'aceptado_count': aceptado_count,
+        'rechazado_count': rechazado_count,
+        'cancelado_count': cancelado_count,
+    }
+    
+    return render(request, 'courses/mis_inscripciones.html', context)
