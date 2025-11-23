@@ -622,21 +622,30 @@ def crear_rating_view(request):
         messages.error(request, 'Método no permitido.')
         return redirect('home')
     
-    form = RatingForm(request.POST)
     profesor_id = request.POST.get('profesor_id')
+    print(f"DEBUG - profesor_id recibido: {profesor_id}")
+    print(f"DEBUG - POST data completo: {request.POST}")
     
     if not profesor_id:
-        messages.error(request, 'Profesor no especificado.')
+        messages.error(request, f'Profesor no especificado. POST data: {dict(request.POST)}')
         return redirect('home')
     
     try:
-        profesor = Perfil.objects.get(id=profesor_id)
+        # Perfil usa user como primary key, entonces buscamos por user_id
+        profesor = Perfil.objects.get(user_id=profesor_id)
+        print(f"DEBUG - Profesor encontrado: {profesor.user.username}")
     except Perfil.DoesNotExist:
-        messages.error(request, 'Profesor no encontrado.')
+        messages.error(request, f'Profesor con ID {profesor_id} no encontrado.')
         return redirect('home')
     
+    form = RatingForm(request.POST)
+    
     if not form.is_valid():
-        messages.error(request, 'Formulario inválido. Por favor verifica los datos.')
+        # Debug: mostrar errores específicos del formulario
+        error_messages = []
+        for field, errors in form.errors.items():
+            error_messages.append(f"{field}: {', '.join(errors)}")
+        messages.error(request, f'Formulario inválido: {"; ".join(error_messages)}')
         return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)
     
     # Buscar inscripciones completadas del usuario con este profesor
@@ -665,6 +674,7 @@ def crear_rating_view(request):
     rating = form.save(commit=False)
     rating.inscripcion = inscripcion_sin_rating
     rating.calificador = request.user.perfil
+    rating.calificado = profesor  # El profesor siendo calificado
     rating.save()
     
     messages.success(request, f'¡Gracias por tu reseña! Has calificado con {rating.valoracion} estrellas.')

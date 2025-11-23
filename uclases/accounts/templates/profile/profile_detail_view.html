@@ -219,8 +219,8 @@
 				<form method="POST" action="{% url 'courses:crear_rating' %}" class="space-y-4" id="rating-form">
 					{% csrf_token %}
 					
-					<!-- Hidden field para la inscripción -->
-					<input type="hidden" name="profesor_id" value="{{ perfil.id }}">
+					<!-- Hidden field para el perfil del profesor -->
+					<input type="hidden" name="profesor_id" value="{{ perfil.user_id }}">
 					
 					<div data-slot="form-item" class="grid gap-2">
 						<label
