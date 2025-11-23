@@ -99,29 +99,7 @@
                 </section>
 
                 <!-- Comentarios -->
-                {% if oferta.comentarios.all %}
-                <section class="rounded-xl border border-border bg-background/60 p-6">
-                    <h2 class="text-lg font-semibold text-foreground mb-4">Comentarios</h2>
-                    <div class="space-y-4">
-                        {% for comentario in oferta.comentarios.all %}
-                        <article class="rounded-xl border border-border bg-card/80 p-4 shadow-sm">
-                            <div class="flex items-start justify-between gap-4 mb-2">
-                                <a href="{% url 'accounts:profile_detail' comentario.publicador.user.public_uid %}"
-                                   class="font-semibold text-primary hover:underline">
-                                    @{{ comentario.publicador.user.username }}
-                                </a>
-                                <span class="text-xs text-foreground/60 whitespace-nowrap">
-                                    {{ comentario.fecha_comentario|date:"d/m/Y H:i" }}
-                                </span>
-                            </div>
-                            <p class="text-sm text-foreground/80 leading-relaxed break-words">
-                                {{ comentario.contenido }}
-                            </p>
-                        </article>
-                        {% endfor %}
-                    </div>
-                </section>
-                {% endif %}
+                
             </div>
 
             <!-- Botones de Acción -->
@@ -150,6 +128,45 @@
                 {% endif %}
             </footer>
         </div>
+        <!--Commentarios-->
+        <section class="rounded-xl border border-border bg-background/60 p-6">
+                    <h2 class="text-lg font-semibold text-foreground mb-4">Comentarios</h2>
+                    <div class="space-y-4">
+                        {% for comentario in oferta.comentarios.all %}
+                        <article class="rounded-xl border border-border bg-card/80 p-4 shadow-sm">
+                            <div class="flex items-start justify-between gap-4 mb-2">
+                                <a href="{% url 'accounts:profile_detail' comentario.publicador.user.public_uid %}"
+                                   class="font-semibold text-primary hover:underline">
+                                    @{{ comentario.publicador.user.username }}
+                                </a>
+                                <span class="text-xs text-foreground/60 whitespace-nowrap">
+                                    {{ comentario.fecha_comentario|date:"d/m/Y H:i" }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-foreground/80 leading-relaxed break-words">
+                                {{ comentario.contenido }}
+                            </p>
+                        </article>
+                        {% empty %}
+                        <p class="text-foreground/70 italic">No hay comentarios aún. Sé el primero en comentar.</p>
+                        {% endfor %}
+                    </div>
+
+                    {% if user.is_authenticated %}
+                    <form method="post" class="mt-6">
+                        {% csrf_token %}
+                        {{ comentario_form.as_p }}
+                        <button type="submit"
+                                class="cosmic-button bg-primary text-white hover:bg-primary/90 w-full">
+                            Agregar Comentario
+                        </button>
+                    </form>
+                    {% else %}
+                    <p class="text-foreground/70 italic mt-4">
+                        Debes iniciar sesión para agregar un comentario.
+                    </p>
+                    {% endif %}
+        </section>
     </div>
 </section>
 
