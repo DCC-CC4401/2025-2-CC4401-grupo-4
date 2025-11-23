@@ -15,6 +15,7 @@ urlpatterns = [
     path('publications/offer/<int:pk>/inscribirse/',  views.inscribirse_view, name='inscribirse'),
     
     # Gestión de inscripciones
+    path('mis-inscripciones/', views.mis_inscripciones_view, name='mis_inscripciones'),
     path('inscripcion/<int:pk>/aceptar/', views.aceptar_inscripcion, name='aceptar_inscripcion'),
     path('inscripcion/<int:pk>/rechazar/', views.rechazar_inscripcion, name='rechazar_inscripcion'),
     path('inscripcion/<int:pk>/cancelar/', views.cancelar_inscripcion, name='cancelar_inscripcion'),

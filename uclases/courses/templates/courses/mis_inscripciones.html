@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Inscripciones{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-background py-12">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-foreground mb-2">
+                Gestión de Inscripciones
+            </h1>
+            <p class="text-foreground/60">
+                Administra las solicitudes de inscripción a tus clases
+            </p>
+        </div>
+
+        <!-- Tabs de filtro -->
+        <div class="mb-6 border-b border-border">
+            <nav class="flex gap-4">
+                <button onclick="filterByStatus('all')" 
+                        class="tab-button px-4 py-2 font-medium transition-colors hover:text-primary border-b-2"
+                        data-status="all">
+                    Todas ({{ all_count }})
+                </button>
+                <button onclick="filterByStatus('{{ EstadoInscripcion.PENDIENTE }}')" 
+                        class="tab-button px-4 py-2 font-medium transition-colors hover:text-primary border-b-2"
+                        data-status="{{ EstadoInscripcion.PENDIENTE }}">
+                    Pendientes ({{ pendiente_count }})
+                </button>
+                <button onclick="filterByStatus('{{ EstadoInscripcion.ACEPTADO }}')" 
+                        class="tab-button px-4 py-2 font-medium transition-colors hover:text-primary border-b-2"
+                        data-status="{{ EstadoInscripcion.ACEPTADO }}">
+                    Aceptadas ({{ aceptado_count }})
+                </button>
+                <button onclick="filterByStatus('{{ EstadoInscripcion.RECHAZADO }}')" 
+                        class="tab-button px-4 py-2 font-medium transition-colors hover:text-primary border-b-2"
+                        data-status="{{ EstadoInscripcion.RECHAZADO }}">
+                    Rechazadas ({{ rechazado_count }})
+                </button>
+                <button onclick="filterByStatus('{{ EstadoInscripcion.CANCELADO }}')" 
+                        class="tab-button px-4 py-2 font-medium transition-colors hover:text-primary border-b-2"
+                        data-status="{{ EstadoInscripcion.CANCELADO }}">
+                    Canceladas ({{ cancelado_count }})
+                </button>
+            </nav>
+        </div>
+
+        <!-- Lista de inscripciones -->
+        <div class="space-y-4">
+            {% for inscripcion in inscripciones %}
+            <div class="inscription-card border border-border rounded-xl p-6 bg-card shadow-sm hover:shadow-md transition-shadow"
+                 data-status="{{ inscripcion.estado }}">
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                    <!-- Información principal -->
+                    <div class="flex-1">
+                        <div class="flex items-start gap-4">
+                            <!-- Avatar (profesor si eres estudiante, estudiante si eres profesor) -->
+                            <div class="flex-shrink-0">
+                                {% if request.user.perfil == inscripcion.estudiante %}
+                                    {# Eres el estudiante, muestra el profesor #}
+                                    {% with perfil=inscripcion.horario_ofertado.oferta.profesor %}
+                                    {% if perfil.foto_file %}
+                                    <img src="{{ perfil.foto_file.url }}" 
+                                         alt="{{ perfil.user.get_full_name }}"
+                                         class="w-12 h-12 rounded-full object-cover border-2 border-border">
+                                    {% elif perfil.foto_url %}
+                                    <img src="{{ perfil.foto_url }}" 
+                                         alt="{{ perfil.user.get_full_name }}"
+                                         class="w-12 h-12 rounded-full object-cover border-2 border-border">
+                                    {% else %}
+                                    <div class="w-12 h-12 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center border-2 border-border">
+                                        {{ perfil.user.first_name|first|upper }}{{ perfil.user.last_name|first|upper }}
+                                    </div>
+                                    {% endif %}
+                                    {% endwith %}
+                                {% else %}
+                                    {# Eres el profesor, muestra el estudiante #}
+                                    {% if inscripcion.estudiante.foto_file %}
+                                    <img src="{{ inscripcion.estudiante.foto_file.url }}" 
+                                         alt="{{ inscripcion.estudiante.user.get_full_name }}"
+                                         class="w-12 h-12 rounded-full object-cover border-2 border-border">
+                                    {% elif inscripcion.estudiante.foto_url %}
+                                    <img src="{{ inscripcion.estudiante.foto_url }}" 
+                                         alt="{{ inscripcion.estudiante.user.get_full_name }}"
+                                         class="w-12 h-12 rounded-full object-cover border-2 border-border">
+                                    {% else %}
+                                    <div class="w-12 h-12 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center border-2 border-border">
+                                        {{ inscripcion.estudiante.user.first_name|first|upper }}{{ inscripcion.estudiante.user.last_name|first|upper }}
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+
+                            <!-- Detalles -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    {% if request.user.perfil == inscripcion.estudiante %}
+                                        {# Eres el estudiante, muestra el profesor #}
+                                        {% with perfil=inscripcion.horario_ofertado.oferta.profesor %}
+                                        <h3 class="font-bold text-lg text-foreground">
+                                            {{ perfil.user.get_full_name }}
+                                        </h3>
+                                        <a href="{% url 'accounts:profile_detail' perfil.user.public_uid %}"
+                                           class="text-primary hover:text-primary/80 transition-colors"
+                                           title="Ver perfil del profesor">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                    <p class="text-sm text-foreground/70 mb-2">
+                                        <span class="text-foreground/50">Profesor:</span> @{{ perfil.user.username }}
+                                    </p>
+                                        {% endwith %}
+                                    {% else %}
+                                        {# Eres el profesor, muestra el estudiante #}
+                                        <h3 class="font-bold text-lg text-foreground">
+                                            {{ inscripcion.estudiante.user.get_full_name }}
+                                        </h3>
+                                        <a href="{% url 'accounts:profile_detail' inscripcion.estudiante.user.public_uid %}"
+                                           class="text-primary hover:text-primary/80 transition-colors"
+                                           title="Ver perfil del estudiante">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                    <p class="text-sm text-foreground/70 mb-2">
+                                        <span class="text-foreground/50">Estudiante:</span> @{{ inscripcion.estudiante.user.username }}
+                                    </p>
+                                    {% endif %}
+                                
+                                <!-- Info de la clase -->
+                                <div class="space-y-1 text-sm">
+                                    <p class="text-foreground/80">
+                                        <span class="font-medium">Título:</span> {{ inscripcion.horario_ofertado.oferta.titulo }}
+                                    </p>
+                                    <p class="text-foreground/80">
+                                        <span class="font-medium">Ramo:</span> {{ inscripcion.horario_ofertado.oferta.ramo.name }}
+                                    </p>
+                                    <p class="text-foreground/80">
+                                        <span class="font-medium">Horario:</span> 
+                                        {{ inscripcion.horario_ofertado.get_dia_display }} 
+                                        {{ inscripcion.horario_ofertado.hora_inicio|time:"H:i" }} - 
+                                        {{ inscripcion.horario_ofertado.hora_fin|time:"H:i" }}
+                                    </p>
+                                    <p class="text-foreground/60 text-xs">
+                                        Solicitud: {{ inscripcion.fecha_reserva|timesince }} atrás
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estado y acciones -->
+                    <div class="flex flex-col items-end gap-3">
+                        <!-- Badge de estado -->
+                        <span class="px-3 py-1 rounded-full text-xs font-bold
+                            {% if inscripcion.estado == EstadoInscripcion.PENDIENTE %}
+                                bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300
+                            {% elif inscripcion.estado == EstadoInscripcion.ACEPTADO %}
+                                bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300
+                            {% elif inscripcion.estado == EstadoInscripcion.RECHAZADO %}
+                                bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300
+                            {% elif inscripcion.estado == EstadoInscripcion.CANCELADO %}
+                                bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300
+                            {% elif inscripcion.estado == EstadoInscripcion.COMPLETADO %}
+                                bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300
+                            {% endif %}">
+                            {{ inscripcion.get_estado_display }}
+                        </span>
+
+                        <!-- Botones de acción contextuales según estado y rol -->
+                        <div class="flex gap-2 flex-wrap justify-end">
+                            {% if inscripcion.estado == EstadoInscripcion.PENDIENTE %}
+                                <!-- Profesor puede aceptar/rechazar -->
+                                {% if request.user.perfil == inscripcion.horario_ofertado.oferta.profesor %}
+                                <form method="post" action="{% url 'courses:aceptar_inscripcion' inscripcion.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Aceptar
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'courses:rechazar_inscripcion' inscripcion.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                        Rechazar
+                                    </button>
+                                </form>
+                                {% else %}
+                                <!-- Estudiante puede cancelar su solicitud pendiente -->
+                                <form method="post" action="{% url 'courses:cancelar_inscripcion' inscripcion.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                        Cancelar solicitud
+                                    </button>
+                                </form>
+                                {% endif %}
+                            
+                            {% elif inscripcion.estado == EstadoInscripcion.ACEPTADO %}
+                                <!-- Ver detalles de la clase -->
+                                <a href="{% url 'courses:oferta_detail' inscripcion.horario_ofertado.oferta.id %}"
+                                   class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    Ver detalles
+                                </a>
+                                <!-- Estudiante puede cancelar clase aceptada -->
+                                {% if request.user.perfil == inscripcion.estudiante %}
+                                <button type="button" 
+                                        data-inscripcion-id="{{ inscripcion.id }}"
+                                        class="cancel-button px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                    Cancelar clase
+                                </button>
+                                {% endif %}
+                            
+                            {% elif inscripcion.estado == EstadoInscripcion.RECHAZADO or inscripcion.estado == EstadoInscripcion.CANCELADO %}
+                                <!-- Solo ver detalles para estados finales -->
+                                <a href="{% url 'courses:oferta_detail' inscripcion.horario_ofertado.oferta.id %}"
+                                   class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    Ver detalles
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-16">
+                <div class="text-6xl mb-4">📋</div>
+                <p class="text-foreground/60 text-lg">No tienes inscripciones pendientes</p>
+                <p class="text-foreground/40 text-sm mt-2">Las solicitudes de inscripción a tus clases aparecerán aquí</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Modal de confirmación de cancelación -->
+<div id="cancelModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+        <div class="flex items-start gap-4 mb-4">
+            <div class="flex-shrink-0 w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-foreground mb-2">¿Cancelar clase?</h3>
+                <p class="text-foreground/70 text-sm mb-2">
+                    Estás a punto de cancelar esta clase aceptada.
+                </p>
+                <p class="text-red-600 dark:text-red-400 text-sm font-medium mb-2">
+                    🚫 Esta acción es irreversible
+                </p>
+                <p class="text-foreground/60 text-sm">
+                    <span class="font-medium text-foreground/80">ℹ️ El profesor será notificado</span> automáticamente y se liberará el cupo.
+                </p>
+            </div>
+        </div>
+        
+        <div class="flex gap-3 justify-end mt-6">
+            <button type="button" 
+                    onclick="closeCancelModal()"
+                    class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-foreground rounded-lg text-sm font-medium transition-colors">
+                No, mantener
+            </button>
+            <form id="cancelForm" method="post" action="" class="inline">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors">
+                    Sí, cancelar clase
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sistema de tabs para filtrar por estado
+function filterByStatus(status) {
+    const cards = document.querySelectorAll('.inscription-card');
+    const buttons = document.querySelectorAll('.tab-button');
+    
+    // Actualizar estilos de tabs
+    buttons.forEach(btn => {
+        if (btn.dataset.status === status) {
+            btn.classList.add('border-primary', 'text-primary');
+            btn.classList.remove('border-transparent', 'text-foreground/60');
+        } else {
+            btn.classList.remove('border-primary', 'text-primary');
+            btn.classList.add('border-transparent', 'text-foreground/60');
+        }
+    });
+    
+    // Filtrar tarjetas
+    cards.forEach(card => {
+        if (status === 'all' || card.dataset.status === status) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Modal de cancelación
+function openCancelModal(inscripcionId) {
+    const modal = document.getElementById('cancelModal');
+    const form = document.getElementById('cancelForm');
+    form.action = `/courses/inscripcion/${inscripcionId}/cancelar/`;
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCancelModal() {
+    const modal = document.getElementById('cancelModal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+// Event listener para botones de cancelar
+document.addEventListener('DOMContentLoaded', function() {
+    // Botones de cancelar clase
+    document.querySelectorAll('.cancel-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const inscripcionId = this.getAttribute('data-inscripcion-id');
+            openCancelModal(inscripcionId);
+        });
+    });
+});
+
+// Cerrar modal al hacer click fuera
+document.getElementById('cancelModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeCancelModal();
+    }
+});
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeCancelModal();
+    }
+});
+
+// Activar tab "Todas" por defecto
+document.addEventListener('DOMContentLoaded', function() {
+    filterByStatus('all');
+});
+</script>
+{% endblock %}
