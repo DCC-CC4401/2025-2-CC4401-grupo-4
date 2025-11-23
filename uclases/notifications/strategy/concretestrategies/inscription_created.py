@@ -12,15 +12,15 @@ class InscriptionCreatedStrategy(NotificationStrategy):
 
     def get_message(self, data):
         inscription = data['inscripcion']
-        estudiante = inscription.estudiante.user.get_full_name() or inscription.estudiante.user.username
-        oferta = inscription.horario_ofertado.oferta.titulo
-        ramo = inscription.horario_ofertado.oferta.ramo.name
-        horario = inscription.horario_ofertado
-        dia = horario.get_dia_display()
+        student = inscription.estudiante.user.get_full_name() or inscription.estudiante.user.username
+        offer = inscription.horario_ofertado.oferta.titulo
+        course = inscription.horario_ofertado.oferta.ramo.name
+        schedule = inscription.horario_ofertado
+        day = schedule.get_dia_display()
         
-        return (f"El estudiante {estudiante} se ha inscrito en tu oferta '{oferta}' "
-                f"del ramo {ramo}. Horario: {dia} {horario.hora_inicio.strftime('%H:%M')} - "
-                f"{horario.hora_fin.strftime('%H:%M')}.")
+        return (f"El estudiante {student} se ha inscrito en tu oferta '{offer}' "
+                f"del ramo {course}. Horario: {day} {schedule.hora_inicio.strftime('%H:%M')} - "
+                f"{schedule.hora_fin.strftime('%H:%M')}.")
 
     def get_actions(self, notification):
         if not notification.related_object:
@@ -28,21 +28,21 @@ class InscriptionCreatedStrategy(NotificationStrategy):
         
         inscription = notification.related_object
         inscription_id = inscription.pk
-        oferta_id = inscription.horario_ofertado.oferta.pk
-        estudiante_uid = inscription.estudiante.user.public_uid
+        offer_id = inscription.horario_ofertado.oferta.pk
+        student_uid = inscription.estudiante.user.public_uid
         
         # Si ya se realizó una acción, solo mostrar botones de navegación
         if notification.action_taken:
             return [
                 {
                     'label': 'Ver oferta',
-                    'url': reverse('courses:oferta_detail', args=[oferta_id]),
+                    'url': reverse('courses:oferta_detail', args=[offer_id]),
                     'method': 'GET',
                     'style': 'primary'
                 },
                 {
                     'label': 'Ver estudiante',
-                    'url': reverse('accounts:profile_detail', args=[estudiante_uid]),
+                    'url': reverse('accounts:profile_detail', args=[student_uid]),
                     'method': 'GET',
                     'style': 'info'
                 }
@@ -64,13 +64,13 @@ class InscriptionCreatedStrategy(NotificationStrategy):
             },
             {
                 'label': 'Ver oferta',
-                'url': reverse('courses:oferta_detail', args=[oferta_id]),
+                'url': reverse('courses:oferta_detail', args=[offer_id]),
                 'method': 'GET',
                 'style': 'primary'
             },
             {
                 'label': 'Ver estudiante',
-                'url': reverse('accounts:profile_detail', args=[estudiante_uid]),
+                'url': reverse('accounts:profile_detail', args=[student_uid]),
                 'method': 'GET',
                 'style': 'info'
             }
