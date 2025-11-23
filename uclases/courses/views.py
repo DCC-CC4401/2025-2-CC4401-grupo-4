@@ -494,3 +494,103 @@ def mis_inscripciones_view(request):
     }
     
     return render(request, 'courses/mis_inscripciones.html', context)
+
+
+@login_required
+def mis_clases_view(request):
+    """
+    Vista para que el profesor gestione sus clases/horarios publicados.
+    
+    Muestra todas las ofertas creadas por el profesor con sus horarios
+    e inscripciones aceptadas, permitiendo marcar horarios como completados.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+    
+    Returns:
+        HttpResponse: Renderiza la lista de clases del profesor.
+    
+    Template:
+        'courses/mis_clases.html'
+    
+    Context:
+        - ofertas: QuerySet de ofertas del profesor con horarios e inscripciones
+    """
+    perfil = request.user.perfil
+    
+    # Obtener ofertas del profesor con sus horarios e inscripciones
+    ofertas = perfil.ofertas_creadas.prefetch_related(
+        'horarios__inscripciones__estudiante__user',
+        'horarios__inscripciones__estudiante__carrera',
+        'ramo'
+    ).all()
+    
+    # Para cada horario, contar inscripciones por estado
+    for oferta in ofertas:
+        for horario in oferta.horarios.all():
+            horario.inscritos_aceptados = horario.inscripciones.filter(
+                estado=EstadoInscripcion.ACEPTADO
+            )
+            horario.inscritos_completados = horario.inscripciones.filter(
+                estado=EstadoInscripcion.COMPLETADO
+            )
+    
+    context = {
+        'ofertas': ofertas,
+    }
+    
+    return render(request, 'courses/mis_clases.html', context)
+
+
+@login_required
+def completar_horario_view(request, pk):
+    """
+    Marca un horario como completado, actualizando todas las inscripciones
+    aceptadas a estado COMPLETADO.
+    
+    Solo el profesor propietario de la oferta puede completar el horario.
+    Notifica a todos los estudiantes afectados.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+        pk (int): ID del horario a completar.
+    
+    Returns:
+        HttpResponse: Redirecciona a 'mis_clases' con mensaje de confirmación.
+    
+    Permissions:
+        - Usuario autenticado
+        - Ser el profesor de la oferta asociada al horario
+    """
+    horario = get_object_or_404(HorarioOfertado, pk=pk)
+    
+    # Validar que el usuario sea el profesor de la oferta
+    if horario.oferta.profesor != request.user.perfil:
+        messages.error(request, "No tienes permiso para completar este horario.")
+        return redirect('courses:mis_clases')
+    
+    # Obtener inscripciones aceptadas para completar
+    inscripciones_aceptadas = horario.inscripciones.filter(
+        estado=EstadoInscripcion.ACEPTADO
+    )
+    
+    if not inscripciones_aceptadas.exists():
+        messages.warning(request, "No hay inscripciones aceptadas en este horario.")
+        return redirect('courses:mis_clases')
+    
+    # Completar cada inscripción aceptada
+    count = 0
+    for inscripcion in inscripciones_aceptadas:
+        inscripcion.completar()
+        count += 1
+    
+    # Mensaje de confirmación
+    dia = horario.get_dia_display()
+    hora = f"{horario.hora_inicio.strftime('%H:%M')} - {horario.hora_fin.strftime('%H:%M')}"
+    messages.success(
+        request,
+        f"Clase del {dia} ({hora}) marcada como completada. "
+        f"{count} {'estudiante' if count == 1 else 'estudiantes'} {'notificado' if count == 1 else 'notificados'}."
+    )
+    
+    return redirect('courses:mis_clases')
