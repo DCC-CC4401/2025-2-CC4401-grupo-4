@@ -66,15 +66,16 @@
 
                                 <!-- Botón completar horario -->
                                 {% if horario.inscritos_aceptados %}
-                                <form method="POST" action="{% url 'courses:completar_horario' horario.id %}" onsubmit="return confirm('¿Confirmas que esta clase se realizó? Se notificará a {{ horario.inscritos_aceptados.count }} estudiante{{ horario.inscritos_aceptados.count|pluralize }}.')">
-                                    {% csrf_token %}
-                                    <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Marcar completada
-                                    </button>
-                                </form>
+                                <button 
+                                    type="button" 
+                                    onclick="openCompleteModal({{ horario.id }}, {{ horario.inscritos_aceptados.count }}, '{{ horario.get_dia_display }}', '{{ horario.hora_inicio|time:"H:i" }}')"
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Marcar completada
+                                </button>
                                 {% endif %}
                             </div>
 
@@ -140,4 +141,103 @@
         </div>
     {% endif %}
 </div>
+
+<!-- Modal de confirmación -->
+<div id="complete-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-card border border-border rounded-lg shadow-xl max-w-md w-full animate-in fade-in zoom-in duration-200">
+        <div class="px-6 py-4 border-b border-border">
+            <h3 class="text-lg font-semibold text-foreground">Confirmar clase completada</h3>
+        </div>
+        
+        <div class="px-6 py-4">
+            <div class="flex items-start gap-3 mb-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-foreground/90 mb-2">
+                        ¿Confirmas que esta clase se realizó exitosamente?
+                    </p>
+                    <div class="text-sm text-foreground/60 space-y-1">
+                        <p><strong>Horario:</strong> <span id="modal-horario"></span></p>
+                        <p><strong>Estudiantes:</strong> <span id="modal-estudiantes"></span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3 mb-4">
+                <div class="flex gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-sm text-blue-800 dark:text-blue-300">
+                        Los estudiantes recibirán una notificación y podrán dejar una reseña de la clase.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="px-6 py-4 bg-muted/50 border-t border-border flex gap-3 justify-end rounded-b-lg">
+            <button 
+                type="button" 
+                onclick="closeCompleteModal()"
+                class="px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground bg-background border border-border rounded-md hover:bg-accent transition-colors"
+            >
+                Cancelar
+            </button>
+            <form id="complete-form" method="POST" action="" class="inline">
+                {% csrf_token %}
+                <button 
+                    type="submit"
+                    class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
+                >
+                    Confirmar y marcar completada
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openCompleteModal(horarioId, estudiantesCount, dia, hora) {
+    const modal = document.getElementById('complete-modal');
+    const form = document.getElementById('complete-form');
+    const modalHorario = document.getElementById('modal-horario');
+    const modalEstudiantes = document.getElementById('modal-estudiantes');
+    
+    // Actualizar contenido del modal
+    modalHorario.textContent = `${dia} ${hora}`;
+    modalEstudiantes.textContent = `${estudiantesCount} estudiante${estudiantesCount !== 1 ? 's' : ''}`;
+    
+    // Configurar acción del formulario
+    form.action = `/courses/horario/${horarioId}/completar/`;
+    
+    // Mostrar modal
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCompleteModal() {
+    const modal = document.getElementById('complete-modal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('complete-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeCompleteModal();
+    }
+});
+
+// Cerrar modal con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeCompleteModal();
+    }
+});
+</script>
+
 {% endblock %}
