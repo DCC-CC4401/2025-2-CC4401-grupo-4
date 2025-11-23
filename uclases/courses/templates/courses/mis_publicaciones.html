@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Publicaciones - U-Clases{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-background pt-20 pb-16">
+    <div class="container max-w-5xl mx-auto px-4">
+
+        <h1 class="text-3xl font-bold text-foreground mb-10">Mis Publicaciones</h1>
+
+        <!-- OFERTAS PUBLICADAS -->
+        <div class="mb-12">
+            <h2 class="text-2xl font-semibold text-foreground mb-4">Ofertas Publicadas</h2>
+
+            {% if mis_ofertas %}
+            <div class="grid md:grid-cols-2 gap-6">
+                {% for oferta in mis_ofertas %}
+                <div class="bg-card border border-border rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold text-foreground">
+                        {{ oferta.titulo }}
+                    </h3>
+
+                    <p class="text-sm text-foreground/60 mt-1">
+                        Publicado el {{ oferta.fecha_publicacion|date:"d/m/Y H:i" }}
+                    </p>
+
+                    {% if oferta.ramo %}
+                    <p class="mt-2 inline-block px-3 py-1 bg-blue-500/20 text-blue-500 rounded-lg text-sm font-medium">
+                        {{ oferta.ramo.name }}
+                    </p>
+                    {% endif %}
+
+                    <div class="mt-4 flex gap-2">
+                        <a href="{% url 'courses:oferta_detail' oferta.id %}"
+                           class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/80">
+                            Ver
+                        </a>
+                        <a href="{% url 'courses:editar_oferta' oferta.id %}"
+                           class="px-4 py-2 bg-yellow-600/70 text-foreground rounded-lg hover:bg-yellow-600">
+                            Editar
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <p class="text-foreground/60">No has publicado ofertas aún.</p>
+            {% endif %}
+        </div>
+
+        <!-- SOLICITUDES PUBLICADAS -->
+        <div>
+            <h2 class="text-2xl font-semibold text-foreground mb-4">Solicitudes Publicadas</h2>
+
+            {% if mis_solicitudes %}
+            <div class="grid md:grid-cols-2 gap-6">
+                {% for solicitud in mis_solicitudes %}
+                <div class="bg-card border border-border rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold text-foreground">
+                        {{ solicitud.titulo }}
+                    </h3>
+
+                    <p class="text-sm text-foreground/60 mt-1">
+                        Publicado el {{ solicitud.fecha_publicacion|date:"d/m/Y H:i" }}
+                    </p>
+
+                    {% if solicitud.ramo %}
+                    <p class="mt-2 inline-block px-3 py-1 bg-green-500/20 text-green-500 rounded-lg text-sm font-medium">
+                        {{ solicitud.ramo.name }}
+                    </p>
+                    {% endif %}
+
+                    <div class="mt-4 flex gap-2">
+                        <a href="{% url 'courses:solicitud_detail' solicitud.id %}"
+                           class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/80">
+                            Ver
+                        </a>
+                        <a href="{% url 'courses:editar_solicitud' solicitud.id %}"
+                           class="px-4 py-2 bg-yellow-600/70 text-foreground rounded-lg hover:bg-yellow-600">
+                            Editar
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <p class="text-foreground/60">No has publicado solicitudes aún.</p>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}

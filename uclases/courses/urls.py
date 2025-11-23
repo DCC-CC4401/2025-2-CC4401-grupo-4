@@ -19,5 +19,7 @@ urlpatterns = [
     path('inscripcion/<int:pk>/aceptar/', views.aceptar_inscripcion, name='aceptar_inscripcion'),
     path('inscripcion/<int:pk>/rechazar/', views.rechazar_inscripcion, name='rechazar_inscripcion'),
     path('inscripcion/<int:pk>/cancelar/', views.cancelar_inscripcion, name='cancelar_inscripcion'),
-
+    
+    #dashboard mis publis
+    path('mis-publicaciones/', views.dashboard_mis_publicaciones, name='mis_publicaciones'),
 ]
