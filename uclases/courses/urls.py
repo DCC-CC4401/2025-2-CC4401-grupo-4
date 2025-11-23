@@ -27,4 +27,8 @@ urlpatterns = [
     # Ratings
     path('rating/crear/', views.crear_rating_view, name='crear_rating'),
 
+    
+    #dashboard mis publis
+    path('mis-ofertas/', views.dashboard_mis_ofertas, name='mis_ofertas'),
+    path('mis-solicitudes/', views.dashboard_mis_solicitudes, name='mis_solicitudes'),
 ]

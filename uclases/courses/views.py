@@ -6,8 +6,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
 from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion, Rating
+
 from .enums import DiaSemana, EstadoInscripcion
-from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm, RatingForm
+from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm, ComentarioForm, RatingForm
 from .services.inscription_service import InscriptionService
 from accounts.models import Perfil
 
@@ -66,11 +67,24 @@ def oferta_detail(request, pk):
     
     # Ordenar horarios por día de la semana (de lunes a domingo)
     horarios_ordenados = oferta.horarios.all().order_by('dia', 'hora_inicio')
-    
+    if request.method == "POST":
+        form = ComentarioForm(request.POST)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            comentario.oferta_clase = oferta
+            comentario.publicador = request.user.perfil
+            comentario.save()
+            messages.success(request, "Comentario agregado correctamente.")
+            return redirect('courses:oferta_detail', pk=oferta.pk)
+    else:
+        form = ComentarioForm()
+
     context = {
         'oferta': oferta,
         'horarios_ordenados': horarios_ordenados,
         'dias_semana': DiaSemana,
+        'comentario_form': form,
+        'comentarios': oferta.comentarios.all()
     }
     return render(request, 'courses/oferta_detail.html', context)
 
@@ -93,9 +107,22 @@ def solicitud_detail(request, pk):
         - courses.models.SolicitudClase
     """
     solicitud = get_object_or_404(SolicitudClase, pk=pk)
+    if request.method == "POST":
+        form = ComentarioForm(request.POST)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            comentario.solicitud_clase = solicitud
+            comentario.publicador = request.user.perfil
+            comentario.save()
+            messages.success(request, "Comentario agregado correctamente.")
+            return redirect('courses:solicitud_detail', pk=solicitud.pk)
+    else:
+        form = ComentarioForm()
     
     context = {
         'solicitud': solicitud,
+        'comentario_form': form,
+        'comentarios': solicitud.comentarios.all()
     }
     return render(request, 'courses/solicitud_detail.html', context)
 
@@ -495,6 +522,69 @@ def mis_inscripciones_view(request):
     }
     
     return render(request, 'courses/mis_inscripciones.html', context)
+
+
+@login_required
+def dashboard_mis_ofertas(request):
+    """
+    Muestra un dashboard con las publicaciones (ofertas y solicitudes) creadas por el usuario autenticado.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+    
+    Returns:
+        HttpResponse: Renderiza la vista del dashboard con las publicaciones del usuario.
+    
+    Template:
+        'courses/dashboard_mis_publicaciones.html'
+    
+    Dependencies:
+        - courses.models.OfertaClase
+        - courses.models.SolicitudClase
+        - django.contrib.auth.decorators.login_required
+    """
+    perfil = request.user.perfil
+    
+    mis_ofertas = OfertaClase.objects.filter(profesor=perfil).order_by('-fecha_publicacion')
+    
+    
+    context = {
+        'mis_ofertas': mis_ofertas,
+    }
+    
+    return render(request, 'courses/dashboard_ofertas.html', context)
+
+@login_required
+def dashboard_mis_solicitudes(request):
+    """
+    Muestra un dashboard con las publicaciones (ofertas y solicitudes) creadas por el usuario autenticado.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+    
+    Returns:
+        HttpResponse: Renderiza la vista del dashboard con las publicaciones del usuario.
+    
+    Template:
+        'courses/dashboard_mis_publicaciones.html'
+    
+    Dependencies:
+        - courses.models.OfertaClase
+        - courses.models.SolicitudClase
+        - django.contrib.auth.decorators.login_required
+    """
+    perfil = request.user.perfil
+    
+    mis_solicitudes = SolicitudClase.objects.filter(solicitante=perfil).order_by('-fecha_publicacion')
+    
+    
+    context = {
+        
+        'mis_solicitudes': mis_solicitudes,
+    }
+    
+    return render(request, 'courses/dashboard_solicitudes.html', context)
+
 
 
 @login_required
