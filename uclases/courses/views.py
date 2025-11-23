@@ -497,7 +497,7 @@ def mis_inscripciones_view(request):
 
 
 @login_required
-def dashboard_mis_publicaciones(request):
+def dashboard_mis_ofertas(request):
     """
     Muestra un dashboard con las publicaciones (ofertas y solicitudes) creadas por el usuario autenticado.
     
@@ -518,11 +518,41 @@ def dashboard_mis_publicaciones(request):
     perfil = request.user.perfil
     
     mis_ofertas = OfertaClase.objects.filter(profesor=perfil).order_by('-fecha_publicacion')
-    mis_solicitudes = SolicitudClase.objects.filter(solicitante=perfil).order_by('-fecha_publicacion')
+    
     
     context = {
         'mis_ofertas': mis_ofertas,
+    }
+    
+    return render(request, 'courses/dashboard_ofertas.html', context)
+
+@login_required
+def dashboard_mis_solicitudes(request):
+    """
+    Muestra un dashboard con las publicaciones (ofertas y solicitudes) creadas por el usuario autenticado.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+    
+    Returns:
+        HttpResponse: Renderiza la vista del dashboard con las publicaciones del usuario.
+    
+    Template:
+        'courses/dashboard_mis_publicaciones.html'
+    
+    Dependencies:
+        - courses.models.OfertaClase
+        - courses.models.SolicitudClase
+        - django.contrib.auth.decorators.login_required
+    """
+    perfil = request.user.perfil
+    
+    mis_solicitudes = SolicitudClase.objects.filter(solicitante=perfil).order_by('-fecha_publicacion')
+    
+    
+    context = {
+        
         'mis_solicitudes': mis_solicitudes,
     }
     
-    return render(request, 'courses/mis_publicaciones.html', context)
+    return render(request, 'courses/dashboard_solicitudes.html', context)
