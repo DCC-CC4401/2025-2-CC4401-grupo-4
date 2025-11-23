@@ -100,7 +100,36 @@
 
                 <!-- Comentarios -->
                 
-                <section class="rounded-xl border border-border bg-background/60 p-6">
+            </div>
+
+            <!-- Botones de Acción -->
+            <footer class="flex gap-3 border-t border-border pt-6 md:flex-row">
+                <a href="{% url 'home' %}"
+                   class="cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Volver
+                </a>
+                
+                {% if user.is_authenticated and oferta.profesor.user == user %}
+                    <!-- Botón de Editar si eres el dueño -->
+                    <a href="{% url 'courses:editar_oferta' oferta.pk %}"
+                       class="cosmic-button flex-1 flex items-center justify-center text-foreground border border-yellow-500/30 bg-yellow-500/50 hover:bg-yellow-500/90">
+                        Editar Oferta
+                    </a>
+                {% else %}
+                    <!-- Botón de Inscribirse si NO eres el dueño -->
+                    <a href="{% url 'courses:inscribirse' oferta.id %}"
+                            class="cosmic-button flex-1 justify-center text-foreground border border-blue-500/30 bg-blue-500/50 hover:bg-blue-500/80"
+                            aria-haspopup="dialog" aria-controls="modalInscripcion">
+                        Inscribirse en esta oferta
+                    </a>
+                {% endif %}
+            </footer>
+        </div>
+        <!--Commentarios-->
+        <section class="rounded-xl border border-border bg-background/60 p-6">
                     <h2 class="text-lg font-semibold text-foreground mb-4">Comentarios</h2>
                     <div class="space-y-4">
                         {% for comentario in oferta.comentarios.all %}
@@ -137,35 +166,7 @@
                         Debes iniciar sesión para agregar un comentario.
                     </p>
                     {% endif %}
-                </section>
-            </div>
-
-            <!-- Botones de Acción -->
-            <footer class="flex gap-3 border-t border-border pt-6 md:flex-row">
-                <a href="{% url 'home' %}"
-                   class="cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                    </svg>
-                    Volver
-                </a>
-                
-                {% if user.is_authenticated and oferta.profesor.user == user %}
-                    <!-- Botón de Editar si eres el dueño -->
-                    <a href="{% url 'courses:editar_oferta' oferta.pk %}"
-                       class="cosmic-button flex-1 flex items-center justify-center text-foreground border border-yellow-500/30 bg-yellow-500/50 hover:bg-yellow-500/90">
-                        Editar Oferta
-                    </a>
-                {% else %}
-                    <!-- Botón de Inscribirse si NO eres el dueño -->
-                    <a href="{% url 'courses:inscribirse' oferta.id %}"
-                            class="cosmic-button flex-1 justify-center text-foreground border border-blue-500/30 bg-blue-500/50 hover:bg-blue-500/80"
-                            aria-haspopup="dialog" aria-controls="modalInscripcion">
-                        Inscribirse en esta oferta
-                    </a>
-                {% endif %}
-            </footer>
-        </div>
+        </section>
     </div>
 </section>
 
