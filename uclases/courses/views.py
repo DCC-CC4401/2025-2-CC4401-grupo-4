@@ -330,7 +330,7 @@ def inscribirse_view(request, pk):
 
         if inscripciones_activas >= horario.cupos_totales:
             messages.error(request, "Lo sentimos, este horario ya no tiene cupos disponibles.")
-            return redirect("inscribirse", pk=oferta.pk)
+            return redirect("courses:inscribirse", pk=oferta.pk)
 
         # Crear inscripción
         inscripcion, created = Inscripcion.objects.get_or_create(
