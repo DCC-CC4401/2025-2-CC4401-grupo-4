@@ -5,11 +5,12 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
-from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion
+from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion, Rating
 
 from .enums import DiaSemana, EstadoInscripcion
-from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm, ComentarioForm
+from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm, ComentarioForm, RatingForm
 from .services.inscription_service import InscriptionService
+from accounts.models import Perfil
 
 
 def publications_view(request):
@@ -553,6 +554,61 @@ def dashboard_mis_ofertas(request):
     
     return render(request, 'courses/dashboard_ofertas.html', context)
 
+
+@login_required
+def mis_ofertas_horarios_view(request, oferta_id):
+    """
+    Muestra los horarios e inscritos de una oferta específica del profesor.
+    
+    Similar a mis_inscripciones_view pero filtrada solo por una oferta.
+    Muestra todos los horarios de la oferta con inscripciones aceptadas y completadas.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+        oferta_id (int): ID de la oferta a visualizar.
+    
+    Returns:
+        HttpResponse: Renderiza los horarios e inscritos de la oferta.
+    
+    Template:
+        'courses/mis_ofertas_horarios.html'
+    
+    Dependencies:
+        - courses.models.OfertaClase
+        - courses.models.HorarioOfertado
+        - courses.models.Inscripcion
+    """
+    perfil = request.user.perfil
+    
+    # Obtener la oferta verificando que pertenezca al profesor
+    oferta = get_object_or_404(
+        OfertaClase.objects.prefetch_related(
+            'horarios__inscripciones__estudiante__user',
+            'horarios__inscripciones__estudiante__carrera',
+        ).select_related('ramo'),
+        id=oferta_id,
+        profesor=perfil
+    )
+    
+    # Obtener todos los horarios de la oferta
+    horarios = oferta.horarios.all().order_by('dia', 'hora_inicio')
+    
+    # Para cada horario, filtrar inscripciones por estado
+    for horario in horarios:
+        horario.inscritos_aceptados = horario.inscripciones.filter(
+            estado=EstadoInscripcion.ACEPTADO
+        ).select_related('estudiante__user', 'estudiante__carrera')
+        horario.inscritos_completados = horario.inscripciones.filter(
+            estado=EstadoInscripcion.COMPLETADO
+        ).select_related('estudiante__user', 'estudiante__carrera')
+    
+    context = {
+        'oferta': oferta,
+        'horarios': horarios,
+    }
+    
+    return render(request, 'courses/mis_ofertas_horarios.html', context)
+
 @login_required
 def dashboard_mis_solicitudes(request):
     """
@@ -583,3 +639,172 @@ def dashboard_mis_solicitudes(request):
     }
     
     return render(request, 'courses/dashboard_solicitudes.html', context)
+
+
+
+@login_required
+def mis_horarios_view(request, id_oferta):
+   
+    perfil = request.user.perfil
+    
+    # Obtener ofertas del profesor con sus horarios e inscripciones
+    ofertas = perfil.ofertas_creadas.prefetch_related(
+        'horarios__inscripciones__estudiante__user',
+        'horarios__inscripciones__estudiante__carrera',
+        'ramo'
+    ).all()
+    
+    # Para cada horario, contar inscripciones por estado
+    for oferta in ofertas:
+        for horario in oferta.horarios.all():
+            horario.inscritos_aceptados = horario.inscripciones.filter(
+                estado=EstadoInscripcion.ACEPTADO
+            )
+            horario.inscritos_completados = horario.inscripciones.filter(
+                estado=EstadoInscripcion.COMPLETADO
+            )
+    
+    context = {
+        'ofertas': ofertas,
+    }
+    
+    return render(request, 'courses/mis_clases.html', context)
+
+
+@login_required
+def completar_horario_view(request, pk):
+    """
+    Marca un horario como completado, actualizando todas las inscripciones
+    aceptadas a estado COMPLETADO.
+    
+    Solo el profesor propietario de la oferta puede completar el horario.
+    Notifica a todos los estudiantes afectados.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+        pk (int): ID del horario a completar.
+    
+    Returns:
+        HttpResponse: Redirecciona a 'mis_clases' con mensaje de confirmación.
+    
+    Permissions:
+        - Usuario autenticado
+        - Ser el profesor de la oferta asociada al horario
+    """
+    horario = get_object_or_404(HorarioOfertado, pk=pk)
+    
+    # Validar que el usuario sea el profesor de la oferta
+    if horario.oferta.profesor != request.user.perfil:
+        messages.error(request, "No tienes permiso para completar este horario.")
+        return redirect('courses:mis_clases')
+    
+    # Obtener inscripciones aceptadas para completar
+    inscripciones_aceptadas = horario.inscripciones.filter(
+        estado=EstadoInscripcion.ACEPTADO
+    )
+    
+    if not inscripciones_aceptadas.exists():
+        messages.warning(request, "No hay inscripciones aceptadas en este horario.")
+        return redirect('courses:mis_clases')
+    
+    # Completar cada inscripción aceptada
+    count = 0
+    for inscripcion in inscripciones_aceptadas:
+        inscripcion.completar()
+        count += 1
+    
+    # Mensaje de confirmación
+    dia = horario.get_dia_display()
+    hora = f"{horario.hora_inicio.strftime('%H:%M')} - {horario.hora_fin.strftime('%H:%M')}"
+    messages.success(
+        request,
+        f"Clase del {dia} ({hora}) marcada como completada. "
+        f"{count} {'estudiante' if count == 1 else 'estudiantes'} {'notificado' if count == 1 else 'notificados'}."
+    )
+    
+    # Redirigir a la vista de horarios de la oferta específica
+    return redirect('courses:mis_ofertas_horarios', oferta_id=horario.oferta.id)
+
+
+@login_required
+def crear_rating_view(request):
+    """
+    Procesa la creación de un rating (valoración y comentario) para un profesor.
+    
+    Solo permite crear ratings si:
+    - El usuario tiene una inscripción COMPLETADA con ese profesor
+    - Aún no ha dejado un rating para esa clase
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP con datos POST del formulario.
+    
+    Returns:
+        HttpResponseRedirect: Redirige al perfil del profesor con mensaje de éxito/error.
+    
+    Dependencies:
+        - courses.forms.RatingForm
+        - courses.models.Rating, Inscripcion
+        - courses.enums.EstadoInscripcion
+        - accounts.models.Perfil
+    """
+    if request.method != 'POST':
+        messages.error(request, 'Método no permitido.')
+        return redirect('home')
+    
+    profesor_id = request.POST.get('profesor_id')
+    print(f"DEBUG - profesor_id recibido: {profesor_id}")
+    print(f"DEBUG - POST data completo: {request.POST}")
+    
+    if not profesor_id:
+        messages.error(request, f'Profesor no especificado. POST data: {dict(request.POST)}')
+        return redirect('home')
+    
+    try:
+        # Perfil usa user como primary key, entonces buscamos por user_id
+        profesor = Perfil.objects.get(user_id=profesor_id)
+        print(f"DEBUG - Profesor encontrado: {profesor.user.username}")
+    except Perfil.DoesNotExist:
+        messages.error(request, f'Profesor con ID {profesor_id} no encontrado.')
+        return redirect('home')
+    
+    form = RatingForm(request.POST)
+    
+    if not form.is_valid():
+        # Debug: mostrar errores específicos del formulario
+        error_messages = []
+        for field, errors in form.errors.items():
+            error_messages.append(f"{field}: {', '.join(errors)}")
+        messages.error(request, f'Formulario inválido: {"; ".join(error_messages)}')
+        return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)
+    
+    # Buscar inscripciones completadas del usuario con este profesor
+    inscripciones_completadas = Inscripcion.objects.filter(
+        estudiante=request.user.perfil,
+        horario_ofertado__oferta__profesor=profesor,
+        estado=EstadoInscripcion.COMPLETADO
+    ).select_related('horario_ofertado__oferta')
+    
+    if not inscripciones_completadas.exists():
+        messages.error(request, 'No tienes clases completadas con este profesor.')
+        return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)
+    
+    # Buscar la primera inscripción sin rating
+    inscripcion_sin_rating = None
+    for inscripcion in inscripciones_completadas:
+        if not Rating.objects.filter(inscripcion=inscripcion).exists():
+            inscripcion_sin_rating = inscripcion
+            break
+    
+    if not inscripcion_sin_rating:
+        messages.warning(request, 'Ya has calificado todas tus clases con este profesor.')
+        return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)
+    
+    # Crear el rating
+    rating = form.save(commit=False)
+    rating.inscripcion = inscripcion_sin_rating
+    rating.calificador = request.user.perfil
+    rating.calificado = profesor  # El profesor siendo calificado
+    rating.save()
+    
+    messages.success(request, f'¡Gracias por tu reseña! Has calificado con {rating.valoracion} estrellas.')
+    return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)
