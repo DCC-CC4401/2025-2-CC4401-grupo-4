@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+
+{% block title %}Horarios de {{ oferta.titulo }} - U-Clases{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-background py-12">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <!-- Breadcrumb -->
+        <nav class="mb-6 flex items-center gap-2 text-sm text-foreground/60">
+            <a href="{% url 'courses:mis_ofertas' %}" class="hover:text-primary transition-colors">Mis Ofertas</a>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+            <span class="text-foreground font-medium">Horarios e Inscritos</span>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-foreground mb-2">
+                {{ oferta.titulo }}
+            </h1>
+            <p class="text-foreground/60">
+                {{ oferta.ramo.name }}
+            </p>
+            {% if oferta.descripcion %}
+            <p class="text-sm text-foreground/70 mt-2 max-w-3xl">
+                {{ oferta.descripcion }}
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Horarios e inscritos -->
+        {% if horarios %}
+            <div class="space-y-6">
+                {% for horario in horarios %}
+                <div class="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <!-- Header del horario -->
+                    <div class="bg-primary/5 border-b border-border px-6 py-4">
+                        <div class="flex items-center justify-between flex-wrap gap-4">
+                            <div class="flex items-center gap-6">
+                                <!-- Día -->
+                                <div class="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="font-semibold text-foreground text-lg">{{ horario.get_dia_display }}</span>
+                                </div>
+                                
+                                <!-- Hora -->
+                                <div class="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="text-foreground/80 font-medium">{{ horario.hora_inicio|time:"H:i" }} - {{ horario.hora_fin|time:"H:i" }}</span>
+                                </div>
+
+                                <!-- Cupos -->
+                                <div class="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <span class="text-foreground/80 text-sm">{{ horario.cupos_totales }} cupos disponibles</span>
+                                </div>
+                            </div>
+
+                            <!-- Botón completar horario -->
+                            {% if horario.inscritos_aceptados %}
+                            <button 
+                                type="button" 
+                                onclick="openCompleteModal({{ horario.id }}, {{ horario.inscritos_aceptados.count }}, '{{ horario.get_dia_display }}', '{{ horario.hora_inicio|time:"H:i" }}')"
+                                class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Marcar completada
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Lista de inscritos -->
+                    <div class="px-6 py-5">
+                        {% if horario.inscritos_aceptados or horario.inscritos_completados %}
+                        <h3 class="text-sm font-semibold text-foreground/70 mb-4 uppercase tracking-wide">
+                            Estudiantes inscritos ({{ horario.inscritos_aceptados.count|add:horario.inscritos_completados.count }})
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {% for inscripcion in horario.inscritos_aceptados %}
+                            <div class="flex items-center gap-3 p-3 bg-background/50 rounded-lg border border-border hover:border-primary/50 transition-colors">
+                                <!-- Avatar -->
+                                <div class="flex-shrink-0">
+                                    {% if inscripcion.estudiante.foto_file %}
+                                    <img src="{{ inscripcion.estudiante.foto_file.url }}" 
+                                         alt="{{ inscripcion.estudiante.user.get_full_name }}"
+                                         class="w-10 h-10 rounded-full object-cover border-2 border-border">
+                                    {% elif inscripcion.estudiante.foto_url %}
+                                    <img src="{{ inscripcion.estudiante.foto_url }}" 
+                                         alt="{{ inscripcion.estudiante.user.get_full_name }}"
+                                         class="w-10 h-10 rounded-full object-cover border-2 border-border">
+                                    {% else %}
+                                    <div class="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm">
+                                        {{ inscripcion.estudiante.user.username|first|upper }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Info -->
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-foreground truncate">
+                                        {{ inscripcion.estudiante.user.get_full_name|default:inscripcion.estudiante.user.username }}
+                                    </p>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-blue-600 font-medium">● Confirmada</span>
+                                        {% if inscripcion.estudiante.carrera %}
+                                        <span class="text-xs text-foreground/50">• {{ inscripcion.estudiante.carrera.name|truncatewords:2 }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                            {% for inscripcion in horario.inscritos_completados %}
+                            <div class="flex items-center gap-3 p-3 bg-background/50 rounded-lg border border-border hover:border-primary/50 transition-colors">
+                                <!-- Avatar -->
+                                <div class="flex-shrink-0">
+                                    {% if inscripcion.estudiante.foto_file %}
+                                    <img src="{{ inscripcion.estudiante.foto_file.url }}" 
+                                         alt="{{ inscripcion.estudiante.user.get_full_name }}"
+                                         class="w-10 h-10 rounded-full object-cover border-2 border-border">
+                                    {% elif inscripcion.estudiante.foto_url %}
+                                    <img src="{{ inscripcion.estudiante.foto_url }}" 
+                                         alt="{{ inscripcion.estudiante.user.get_full_name }}"
+                                         class="w-10 h-10 rounded-full object-cover border-2 border-border">
+                                    {% else %}
+                                    <div class="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm">
+                                        {{ inscripcion.estudiante.user.username|first|upper }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Info -->
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-foreground truncate">
+                                        {{ inscripcion.estudiante.user.get_full_name|default:inscripcion.estudiante.user.username }}
+                                    </p>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-green-600 font-medium">✓ Completada</span>
+                                        {% if inscripcion.estudiante.carrera %}
+                                        <span class="text-xs text-foreground/50">• {{ inscripcion.estudiante.carrera.name|truncatewords:2 }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-foreground/20 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <p class="text-sm text-foreground/50 italic">Sin inscripciones aceptadas en este horario</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Sin horarios -->
+            <div class="bg-card border border-border rounded-xl shadow-sm p-12 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-foreground/30 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 class="text-xl font-semibold text-foreground mb-2">No hay horarios configurados</h3>
+                <p class="text-foreground/60 mb-6">Esta oferta aún no tiene horarios disponibles</p>
+                <a href="{% url 'courses:editar_oferta' oferta.id %}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+                    Agregar horarios
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Modal de confirmación -->
+<div id="complete-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-card border border-border rounded-lg shadow-xl max-w-md w-full animate-in fade-in zoom-in duration-200">
+        <div class="px-6 py-4 border-b border-border">
+            <h3 class="text-lg font-semibold text-foreground">Confirmar clase completada</h3>
+        </div>
+        
+        <div class="px-6 py-4">
+            <div class="flex items-start gap-3 mb-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-foreground/90 mb-2">
+                        ¿Confirmas que esta clase se realizó exitosamente?
+                    </p>
+                    <div class="text-sm text-foreground/60 space-y-1">
+                        <p><strong>Horario:</strong> <span id="modal-horario"></span></p>
+                        <p><strong>Estudiantes:</strong> <span id="modal-estudiantes"></span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3 mb-4">
+                <div class="flex gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-sm text-blue-800 dark:text-blue-300">
+                        Los estudiantes recibirán una notificación y podrán dejar una reseña de la clase.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="px-6 py-4 bg-muted/50 border-t border-border flex gap-3 justify-end rounded-b-lg">
+            <button 
+                type="button" 
+                onclick="closeCompleteModal()"
+                class="px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground bg-background border border-border rounded-md hover:bg-accent transition-colors"
+            >
+                Cancelar
+            </button>
+            <form id="complete-form" method="POST" action="" class="inline">
+                {% csrf_token %}
+                <button 
+                    type="submit"
+                    class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
+                >
+                    Confirmar y marcar completada
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openCompleteModal(horarioId, estudiantesCount, dia, hora) {
+    const modal = document.getElementById('complete-modal');
+    const form = document.getElementById('complete-form');
+    const modalHorario = document.getElementById('modal-horario');
+    const modalEstudiantes = document.getElementById('modal-estudiantes');
+    
+    // Actualizar contenido del modal
+    modalHorario.textContent = `${dia} ${hora}`;
+    modalEstudiantes.textContent = `${estudiantesCount} estudiante${estudiantesCount !== 1 ? 's' : ''}`;
+    
+    // Configurar acción del formulario
+    form.action = `/courses/horario/${horarioId}/completar/`;
+    
+    // Mostrar modal
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCompleteModal() {
+    const modal = document.getElementById('complete-modal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('complete-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeCompleteModal();
+    }
+});
+
+// Cerrar modal con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeCompleteModal();
+    }
+});
+</script>
+
+{% endblock %}

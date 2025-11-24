@@ -554,6 +554,61 @@ def dashboard_mis_ofertas(request):
     
     return render(request, 'courses/dashboard_ofertas.html', context)
 
+
+@login_required
+def mis_ofertas_horarios_view(request, oferta_id):
+    """
+    Muestra los horarios e inscritos de una oferta específica del profesor.
+    
+    Similar a mis_inscripciones_view pero filtrada solo por una oferta.
+    Muestra todos los horarios de la oferta con inscripciones aceptadas y completadas.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+        oferta_id (int): ID de la oferta a visualizar.
+    
+    Returns:
+        HttpResponse: Renderiza los horarios e inscritos de la oferta.
+    
+    Template:
+        'courses/mis_ofertas_horarios.html'
+    
+    Dependencies:
+        - courses.models.OfertaClase
+        - courses.models.HorarioOfertado
+        - courses.models.Inscripcion
+    """
+    perfil = request.user.perfil
+    
+    # Obtener la oferta verificando que pertenezca al profesor
+    oferta = get_object_or_404(
+        OfertaClase.objects.prefetch_related(
+            'horarios__inscripciones__estudiante__user',
+            'horarios__inscripciones__estudiante__carrera',
+        ).select_related('ramo'),
+        id=oferta_id,
+        profesor=perfil
+    )
+    
+    # Obtener todos los horarios de la oferta
+    horarios = oferta.horarios.all().order_by('dia', 'hora_inicio')
+    
+    # Para cada horario, filtrar inscripciones por estado
+    for horario in horarios:
+        horario.inscritos_aceptados = horario.inscripciones.filter(
+            estado=EstadoInscripcion.ACEPTADO
+        ).select_related('estudiante__user', 'estudiante__carrera')
+        horario.inscritos_completados = horario.inscripciones.filter(
+            estado=EstadoInscripcion.COMPLETADO
+        ).select_related('estudiante__user', 'estudiante__carrera')
+    
+    context = {
+        'oferta': oferta,
+        'horarios': horarios,
+    }
+    
+    return render(request, 'courses/mis_ofertas_horarios.html', context)
+
 @login_required
 def dashboard_mis_solicitudes(request):
     """
@@ -588,25 +643,8 @@ def dashboard_mis_solicitudes(request):
 
 
 @login_required
-def mis_clases_view(request):
-    """
-    Vista para que el profesor gestione sus clases/horarios publicados.
-    
-    Muestra todas las ofertas creadas por el profesor con sus horarios
-    e inscripciones aceptadas, permitiendo marcar horarios como completados.
-    
-    Args:
-        request (HttpRequest): Objeto de solicitud HTTP.
-    
-    Returns:
-        HttpResponse: Renderiza la lista de clases del profesor.
-    
-    Template:
-        'courses/mis_clases.html'
-    
-    Context:
-        - ofertas: QuerySet de ofertas del profesor con horarios e inscripciones
-    """
+def mis_horarios_view(request, id_oferta):
+   
     perfil = request.user.perfil
     
     # Obtener ofertas del profesor con sus horarios e inscripciones
@@ -684,7 +722,8 @@ def completar_horario_view(request, pk):
         f"{count} {'estudiante' if count == 1 else 'estudiantes'} {'notificado' if count == 1 else 'notificados'}."
     )
     
-    return redirect('courses:mis_clases')
+    # Redirigir a la vista de horarios de la oferta específica
+    return redirect('courses:mis_ofertas_horarios', oferta_id=horario.oferta.id)
 
 
 @login_required

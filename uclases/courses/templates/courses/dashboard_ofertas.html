@@ -31,6 +31,10 @@
                     {% endif %}
 
                     <div class="mt-4 flex gap-2">
+                        <a href="{% url 'courses:mis_ofertas_horarios' oferta.id %}"
+                           class="px-4 py-2 bg-green-600/70 text-foreground rounded-lg hover:bg-green-600">
+                            Ver Horarios
+                        </a>
                         <a href="{% url 'courses:oferta_detail' oferta.id %}"
                            class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/80">
                             Ver

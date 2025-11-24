@@ -21,7 +21,6 @@ urlpatterns = [
     path('inscripcion/<int:pk>/cancelar/', views.cancelar_inscripcion, name='cancelar_inscripcion'),
 
     # Gestión de clases para profesores
-    path('mis-clases/', views.mis_clases_view, name='mis_clases'),
     path('horario/<int:pk>/completar/', views.completar_horario_view, name='completar_horario'),
     
     # Ratings
@@ -30,5 +29,6 @@ urlpatterns = [
     
     #dashboard mis publis
     path('mis-ofertas/', views.dashboard_mis_ofertas, name='mis_ofertas'),
+    path('mis-ofertas/<int:oferta_id>/', views.mis_ofertas_horarios_view, name='mis_ofertas_horarios'),
     path('mis-solicitudes/', views.dashboard_mis_solicitudes, name='mis_solicitudes'),
 ]
