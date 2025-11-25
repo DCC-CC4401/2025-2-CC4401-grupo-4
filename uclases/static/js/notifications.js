@@ -41,23 +41,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Actualizar el contenido del botón
                 if (isRead) {
-                    button.className = 'group px-2 py-1 text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors';
+                    button.className = 'group px-2 py-1 text-xs font-medium bg-foreground/10 text-foreground rounded hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30 transition-colors';
                     button.innerHTML = `
                         <span class="group-hover:hidden">Leída</span>
                         <span class="hidden group-hover:inline">✕ Desmarcar</span>
                     `;
                     
                     // Quitar estilos de "no leída" de la tarjeta
-                    notificationCard.classList.remove('border-l-4', 'border-l-blue-500', 'bg-blue-50/50', 'dark:bg-blue-900/10');
+                    notificationCard.classList.remove('border-l-4', 'badge-info');
                 } else {
-                    button.className = 'px-2 py-1 text-xs font-bold bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center gap-1';
+                    button.className = 'px-2 py-1 text-xs font-bold badge-info text-white rounded hover:bg-blue-100 transition-colors flex items-center gap-1';
                     button.innerHTML = `
                         <span class="inline-block w-1.5 h-1.5 bg-white rounded-full"></span>
                         Marcar como leída
                     `;
                     
                     // Agregar estilos de "no leída" a la tarjeta
-                    notificationCard.classList.add('border-l-4', 'border-l-blue-500', 'bg-blue-50/50', 'dark:bg-blue-900/10');
+                    notificationCard.classList.add('border-l-4', 'badge-info');
                 }
                 
                 // Actualizar contador si existe
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const notificationCards = document.querySelectorAll('.notification-card');
                     notificationCards.forEach(card => {
                         // Quitar estilos de "no leída"
-                        card.classList.remove('border-l-4', 'border-l-blue-500', 'bg-blue-50/50', 'dark:bg-blue-900/10');
+                        card.classList.remove('border-l-4', 'badge-info');
                         
                         // Actualizar badge de cada notificación
                         const form = card.querySelector('.mark-notification-form');
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             const badgeButton = form.querySelector('button');
                             if (badgeButton) {
                                 // Actualizar a estado "leída"
-                                badgeButton.className = 'group px-2 py-1 text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors';
+                                badgeButton.className = 'group px-2 py-1 text-xs font-medium bg-foreground/10 text-foreground rounded hover:bg-red-100 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30 transition-colors';
                                 badgeButton.innerHTML = `
                                     <span class="group-hover:hidden">Leída</span>
                                     <span class="hidden group-hover:inline">✕ Desmarcar</span>
@@ -178,7 +178,7 @@ function updateMarkAllButton(count) {
     if (count > 0) {
         // Activar botón
         button.disabled = false;
-        button.className = 'px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white';
+        button.className = 'px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 badge-info hover:bg-blue-100';
         button.removeAttribute('title');
         
         // Reconstruir contenido con badge
@@ -190,7 +190,7 @@ function updateMarkAllButton(count) {
     } else {
         // Desactivar botón
         button.disabled = true;
-        button.className = 'px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed';
+        button.className = 'px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 bg-foreground/10 text-foreground';
         button.setAttribute('title', 'Todas las notificaciones están leídas');
         
         // Reconstruir contenido sin badge - texto diferente
