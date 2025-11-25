@@ -349,6 +349,9 @@ def inscribirse_view(request, pk):
             horario.usuario_inscrito = False
             horario.inscripcion_estado = None
 
+    # Determinar si existe al menos un horario con cupos disponibles
+    has_available = any((not h.usuario_inscrito) and (h.cupos_totales > 0) for h in horarios_ordenados)
+
     if request.method == "POST":
         horario_id = request.POST.get("horario")
         
@@ -402,6 +405,7 @@ def inscribirse_view(request, pk):
     context = {
         "oferta": oferta,
         "horarios_ordenados": horarios_ordenados,
+        "has_available": has_available,
     }
     return render(request, "courses/inscribirse.html", context)
 
