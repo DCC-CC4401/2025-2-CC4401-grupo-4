@@ -179,7 +179,7 @@
                                 <form method="post" action="{% url 'courses:aceptar_inscripcion' inscripcion.id %}" class="inline">
                                     {% csrf_token %}
                                     <button type="submit" 
-                                            class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                                            class="px-4 py-2 bg-green-600/10 text-green-700 border-green-600/30 hover:bg-green-600/20 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                         </svg>
@@ -189,7 +189,7 @@
                                 <form method="post" action="{% url 'courses:rechazar_inscripcion' inscripcion.id %}" class="inline">
                                     {% csrf_token %}
                                     <button type="submit" 
-                                            class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                                            class="px-4 py-2 bg-red-600/10 text-red-600 border-red-600/30 hover:bg-red-600/20 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
@@ -201,7 +201,7 @@
                                 <form method="post" action="{% url 'courses:cancelar_inscripcion' inscripcion.id %}" class="inline">
                                     {% csrf_token %}
                                     <button type="submit" 
-                                            class="px-4 py-2 rounded-lg cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
+                                            class="px-4 py-2 rounded-lg cosmic-button flex-1 text-center justify-center inline-flex items-center bg-red-500/10 text-red-500 border-red-500/30 hover:bg-red-500/20 gap-2">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
