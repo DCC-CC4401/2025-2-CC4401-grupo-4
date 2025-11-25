@@ -1,6 +1,7 @@
 from notifications.strategy.trait import NotificationStrategy
 from notifications.strategy.factory import NotificationStrategyFactory
 from notifications.enums import NotificationTypes
+from django.urls import reverse
 
 @NotificationStrategyFactory.register(NotificationTypes.RATING_RECEIVED)
 class RatingReceivedStrategy(NotificationStrategy):
@@ -10,10 +11,10 @@ class RatingReceivedStrategy(NotificationStrategy):
         return ""
 
     def get_message(self, data):
-        rating = data['rating']
-        student = rating.estudiante.user.get_full_name() or rating.estudiante.user.username
+        rating = data['calificacion']
+        student = rating.calificador.user.get_full_name() or rating.calificador.user.username
         course = rating.inscripcion.horario_ofertado.oferta.ramo.name
-        stars = rating.puntuacion
+        stars = rating.valoracion
 
         message = f"{student} te ha calificado con {'⭐' * stars} ({stars}/5) en tu clase de {course}"
 
@@ -27,6 +28,9 @@ class RatingReceivedStrategy(NotificationStrategy):
         return message
 
     def get_actions(self, notification):
+        rating = notification.related_object
+        myself = rating.calificado
+        # Boton para ir a perfil a ver ratings
         return []
 
     def get_icon(self):
