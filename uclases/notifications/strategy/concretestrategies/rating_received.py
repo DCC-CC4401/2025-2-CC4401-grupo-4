@@ -11,10 +11,10 @@ class RatingReceivedStrategy(NotificationStrategy):
         return "Nueva Calificación Recibida"
 
     def get_message(self, data):
-        rating = data['rating']
-        student = rating.estudiante.user.get_full_name() or rating.estudiante.user.username
+        rating = data['calificacion']
+        student = rating.calificador.user.get_full_name() or rating.calificador.user.username
         course = rating.inscripcion.horario_ofertado.oferta.ramo.name
-        stars = rating.puntuacion
+        stars = rating.valoracion
 
         message = f"{student} te ha calificado con {'⭐' * stars} ({stars}/5) en tu clase de {course}"
 
