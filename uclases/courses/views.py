@@ -325,7 +325,29 @@ def inscribirse_view(request, pk):
         - courses.models.Inscripcion
     """
     oferta = get_object_or_404(OfertaClase, pk=pk)
+    
+    # Obtener todos los horarios ordenados
     horarios_ordenados = oferta.horarios.all().order_by('dia', 'hora_inicio')
+    
+    # Obtener inscripciones del usuario en esta oferta con su estado
+    inscripciones_usuario = Inscripcion.objects.filter(
+        estudiante=request.user.perfil,
+        horario_ofertado__oferta=oferta,
+        estado__in=[EstadoInscripcion.PENDIENTE, EstadoInscripcion.ACEPTADO, EstadoInscripcion.COMPLETADO]
+    ).select_related('horario_ofertado')
+    
+    # Crear diccionario de horario_id -> inscripción
+    inscripciones_dict = {ins.horario_ofertado_id: ins for ins in inscripciones_usuario}
+    
+    # Anotar cada horario con el estado de inscripción del usuario
+    for horario in horarios_ordenados:
+        if horario.id in inscripciones_dict:
+            horario.usuario_inscrito = True
+            horario.inscripcion_estado = inscripciones_dict[horario.id].estado
+            horario.inscripcion_estado_display = inscripciones_dict[horario.id].get_estado_display()
+        else:
+            horario.usuario_inscrito = False
+            horario.inscripcion_estado = None
 
     if request.method == "POST":
         horario_id = request.POST.get("horario")
@@ -340,6 +362,17 @@ def inscribirse_view(request, pk):
             horario = HorarioOfertado.objects.get(id=horario_id, oferta=oferta)
         except HorarioOfertado.DoesNotExist:
             messages.error(request, "El horario seleccionado no es válido.")
+            return redirect("courses:inscribirse", pk=oferta.pk)
+        
+        # Verificar si el usuario ya está inscrito en este horario
+        inscripcion_existente = Inscripcion.objects.filter(
+            estudiante=request.user.perfil,
+            horario_ofertado=horario,
+            estado__in=[EstadoInscripcion.PENDIENTE, EstadoInscripcion.ACEPTADO, EstadoInscripcion.COMPLETADO]
+        ).exists()
+        
+        if inscripcion_existente:
+            messages.warning(request, "Ya estás inscrito en este horario.")
             return redirect("courses:inscribirse", pk=oferta.pk)
 
         # Verificar cupos
