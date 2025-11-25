@@ -68,22 +68,15 @@
       
       <!-- Mensaje cuando todos están inscritos -->
       {% if horarios_ordenados %}
-        {% with tiene_disponibles=False %}
-          {% for h in horarios_ordenados %}
-            {% if not h.usuario_inscrito and h.cupos_totales > 0 %}
-              {% with tiene_disponibles=True %}{% endwith %}
-            {% endif %}
-          {% endfor %}
-          {% if not tiene_disponibles %}
-            <div class="text-center py-8 mt-4 border border-border rounded-xl bg-muted/10">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-green-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p class="text-foreground/80 font-semibold">Ya estás inscrito en todos los horarios disponibles</p>
-              <p class="text-sm text-foreground/60 mt-2">No hay más horarios en los que puedas inscribirte</p>
-            </div>
-          {% endif %}
-        {% endwith %}
+        {% if not has_available %}
+          <div class="text-center py-8 mt-4 border border-border rounded-xl bg-muted/10">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-green-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-foreground/80 font-semibold">Ya estás inscrito en todos los horarios disponibles</p>
+            <p class="text-sm text-foreground/60 mt-2">No hay más horarios en los que puedas inscribirte</p>
+          </div>
+        {% endif %}
       {% endif %}
 
       <div class="mt-8 flex gap-3">
