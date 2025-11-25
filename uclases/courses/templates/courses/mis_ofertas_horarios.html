@@ -3,7 +3,7 @@
 {% block title %}Horarios de {{ oferta.titulo }} - U-Clases{% endblock %}
 
 {% block content %}
-<section class="min-h-screen bg-background py-12">
+<section class="min-h-screen items-center justify-center bg-background pt-20 pb-16">
     <div class="container mx-auto px-4 max-w-6xl">
         <!-- Breadcrumb -->
         <nav class="mb-6 flex items-center gap-2 text-sm text-foreground/60">
@@ -68,7 +68,7 @@
                             <button 
                                 type="button" 
                                 onclick="openCompleteModal({{ horario.id }}, {{ horario.inscritos_aceptados.count }}, '{{ horario.get_dia_display }}', '{{ horario.hora_inicio|time:"H:i" }}')"
-                                class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                class="px-4 py-2 bg-green-600/10 text-green-700 border-green-600/30 hover:bg-green-600/20 font-medium transition-colors flex items-center gap-1 rounded-lg"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -191,7 +191,7 @@
         
         <div class="px-6 py-4">
             <div class="flex items-start gap-3 mb-4">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-green-600/10 flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -207,23 +207,23 @@
                 </div>
             </div>
             
-            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3 mb-4">
+            <div class="badge-info rounded-md p-3 mb-4">
                 <div class="flex gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p class="text-sm text-blue-800 dark:text-blue-300">
+                    <p class="text-sm">
                         Los estudiantes recibirán una notificación y podrán dejar una reseña de la clase.
                     </p>
                 </div>
             </div>
         </div>
         
-        <div class="px-6 py-4 bg-muted/50 border-t border-border flex gap-3 justify-end rounded-b-lg">
+        <div class="px-6 py-4 bg-muted/50 border-t border-border flex justify-center gap-3 rounded-b-lg">
             <button 
                 type="button" 
                 onclick="closeCompleteModal()"
-                class="px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground bg-background border border-border rounded-md hover:bg-accent transition-colors"
+                class="px-4 py-2 bg-red-600/10 text-red-600 border-red-600/30 hover:bg-red-600/20 rounded-lg text-sm font-medium transition-colors flex items-center gap-1"
             >
                 Cancelar
             </button>
@@ -231,7 +231,7 @@
                 {% csrf_token %}
                 <button 
                     type="submit"
-                    class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
+                    class="px-4 py-2 bg-green-600/10 text-green-700 border-green-600/30 hover:bg-green-600/20 rounded-lg text-sm font-medium transition-colors flex items-center gap-1"
                 >
                     Confirmar y marcar completada
                 </button>
