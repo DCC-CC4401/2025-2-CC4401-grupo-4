@@ -20,7 +20,6 @@ class InscriptionCompletedStrategy(NotificationStrategy):
                 f"Ayúdanos a mejorar calificando tu experiencia.")
 
     def get_actions(self, notification):
-        # Ofrecer un botón para ir al perfil del profesor y permitir al estudiante calificarlo
         if not notification.related_object:
             return []
 
