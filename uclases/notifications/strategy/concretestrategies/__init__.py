@@ -14,6 +14,9 @@ from . import inscription_canceled
 from . import oferta_proposed
 from . import inscription_completed
 
+# Notificaciones de ofertas
+from . import offer_deleted
+
 # Notificaciones de comentarios
 from . import new_comment
 
