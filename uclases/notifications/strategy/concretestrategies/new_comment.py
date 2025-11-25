@@ -8,7 +8,7 @@ class NewCommentStrategy(NotificationStrategy):
     """Estrategia para notificar cuando alguien comenta en una publicación (oferta o solicitud)."""
 
     def get_title(self, data):
-        return ""
+        return "Nuevo comentario"
 
     def get_message(self, data):
         comment = data['comentario']
@@ -24,6 +24,38 @@ class NewCommentStrategy(NotificationStrategy):
             return f"{commenter} comentó en tu solicitud '{publication_title}': '{content_preview}'"
 
     def get_actions(self, notification):
+        
+        if not notification.related_object:
+            return []
+
+        comment = notification.related_object
+
+        oferta = getattr(comment, 'oferta_clase', None)
+        if oferta:
+            offer_id = getattr(oferta, 'pk', None)
+            if offer_id:
+                return [
+                    {
+                        'label': 'Ir al comentario en la oferta',
+                        'url': reverse('courses:oferta_detail', args=[offer_id]),
+                        'method': 'GET',
+                        'style': 'primary'
+                    }
+                ]
+
+        solicitud = getattr(comment, 'solicitud_clase', None)
+        if solicitud:
+            solicitud_id = getattr(solicitud, 'pk', None)
+            if solicitud_id:
+                return [
+                    {
+                        'label': 'Ir al comentario en la solicitud',
+                        'url': reverse('courses:solicitud_detail', args=[solicitud_id]),
+                        'method': 'GET',
+                        'style': 'primary'
+                    }
+                ]
+
         return []
 
     def get_icon(self):
