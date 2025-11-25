@@ -3,7 +3,7 @@
 {% block title %}Mis Publicaciones - U-Clases{% endblock %}
 
 {% block content %}
-<section class="min-h-screen bg-background pt-20 pb-16">
+<section class="min-h-screen flex items-center justify-center bg-background pt-20 pb-16">
     <div class="container max-w-5xl mx-auto px-4">
 
         <h1 class="text-3xl font-bold text-foreground mb-10">Mis Publicaciones</h1>
@@ -32,15 +32,15 @@
 
                     <div class="mt-4 flex gap-2">
                         <a href="{% url 'courses:mis_ofertas_horarios' oferta.id %}"
-                           class="px-4 py-2 bg-green-600/70 text-foreground rounded-lg hover:bg-green-600">
+                           class="px-4 py-2 cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
                             Ver Horarios
                         </a>
                         <a href="{% url 'courses:oferta_detail' oferta.id %}"
-                           class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/80">
+                           class="px-4 py-2 cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
                             Ver
                         </a>
                         <a href="{% url 'courses:editar_oferta' oferta.id %}"
-                           class="px-4 py-2 bg-yellow-600/70 text-foreground rounded-lg hover:bg-yellow-600">
+                           class="px-4 py-2 cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
                             Editar
                         </a>
                     </div>
