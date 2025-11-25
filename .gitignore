@@ -9,7 +9,7 @@ dist/
 build/
 
 # Virtual environments
-
+myvenv/
 venv/
 env/
 .venv/

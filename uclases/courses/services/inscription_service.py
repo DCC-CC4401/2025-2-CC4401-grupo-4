@@ -188,11 +188,11 @@ class InscriptionService:
                 type__in=notification_types
             ).order_by('-creation_date').first()  # Obtener la más reciente
             
-            # Si existe, actualizarla
+            # Si existe, actualizarla y marcarla como leída
             if notification:
-                notification.read = True
                 notification.action_taken = action_text
                 notification.action_date = timezone.now()
+                notification.read = True  # Marcar como leída al tomar acción
                 notification.save()
                 
         except ImportError:

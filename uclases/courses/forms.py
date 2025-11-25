@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
-from .models import HorarioOfertado, OfertaClase, SolicitudClase
+from .models import HorarioOfertado, OfertaClase, SolicitudClase, Comentario, Rating
 from django.core.exceptions import ValidationError
 
 INPUT = "appearance-none w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
@@ -231,3 +231,68 @@ class SolicitudClaseForm(forms.ModelForm):
                 "class": INPUT,
             }),
         }
+
+class ComentarioForm(forms.ModelForm):
+    """
+    Formulario para agregar comentarios a una oferta de clase.
+    
+    Permite a los usuarios dejar comentarios relacionados con una oferta
+    específica, facilitando la comunicación y retroalimentación.
+    
+    Tipo: ModelForm
+    Modelo: courses.models.ComentarioOferta
+    
+    Campos:
+        - contenido: Texto del comentario
+    """
+    class Meta:
+        model = Comentario
+        fields = ['contenido']
+        widgets = {
+            "contenido": forms.Textarea(attrs={
+                "class": "w-full p-3 rounded-xl border border-border bg-background",
+                "rows": 3,
+                "placeholder": "Escribe un comentario..."
+            })
+        }
+
+   
+
+
+class RatingForm(forms.ModelForm):
+    """
+    Formulario para crear una reseña/calificación de una clase completada.
+    
+    Permite al estudiante calificar con estrellas (1-5) y dejar un comentario
+    opcional sobre su experiencia con el profesor.
+    
+    Tipo: ModelForm
+    Modelo: courses.models.Rating
+    
+    Campos:
+        - valoracion: Puntuación de 1 a 5 estrellas
+        - comentario: Comentario opcional sobre la experiencia
+    """
+    valoracion = forms.IntegerField(
+        label="Calificación",
+        min_value=1,
+        max_value=5,
+        widget=forms.HiddenInput(attrs={
+            "id": "rating-value"
+        }),
+        help_text="Selecciona las estrellas para calificar"
+    )
+    
+    comentario = forms.CharField(
+        label="Comentario",
+        required=False,
+        widget=forms.Textarea(attrs={
+            "rows": 3,
+            "placeholder": "Comparte tu experiencia...",
+            "class": "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+        })
+    )
+    
+    class Meta:
+        model = Rating
+        fields = ['valoracion', 'comentario']

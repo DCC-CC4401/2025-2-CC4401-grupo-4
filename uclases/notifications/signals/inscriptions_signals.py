@@ -42,5 +42,12 @@ def notify_inscription_status_change(sender, instance, **kwargs):
                         data={'inscripcion': instance},
                         related_object=instance
                     )
+                elif instance.estado == EstadoInscripcion.COMPLETADO:
+                    NotificationService.send(
+                        receiver=instance.estudiante,
+                        type=NotificationTypes.INSCRIPTION_COMPLETED,
+                        data={'inscripcion': instance},
+                        related_object=instance
+                    )
         except Inscripcion.DoesNotExist:
             pass

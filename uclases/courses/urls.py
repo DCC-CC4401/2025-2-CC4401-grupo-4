@@ -15,6 +15,7 @@ urlpatterns = [
     path('publications/offer/<int:pk>/inscribirse/',  views.inscribirse_view, name='inscribirse'),
     
     # Gestión de inscripciones
+    path('mis-inscripciones/', views.mis_inscripciones_view, name='mis_inscripciones'),
     path('inscripcion/<int:pk>/aceptar/', views.aceptar_inscripcion, name='aceptar_inscripcion'),
     path('inscripcion/<int:pk>/rechazar/', views.rechazar_inscripcion, name='rechazar_inscripcion'),
     path('inscripcion/<int:pk>/cancelar/', views.cancelar_inscripcion, name='cancelar_inscripcion'),
@@ -22,4 +23,15 @@ urlpatterns = [
     # Gestión de propuesta de clases
     path('proponer/<int:solicitud_id>/', views.proponer_oferta_clase, name='proponer_oferta'),
 
+    # Gestión de clases para profesores
+    path('horario/<int:pk>/completar/', views.completar_horario_view, name='completar_horario'),
+    
+    # Ratings
+    path('rating/crear/', views.crear_rating_view, name='crear_rating'),
+
+    
+    #dashboard mis publis
+    path('mis-ofertas/', views.dashboard_mis_ofertas, name='mis_ofertas'),
+    path('mis-ofertas/<int:oferta_id>/', views.mis_ofertas_horarios_view, name='mis_ofertas_horarios'),
+    path('mis-solicitudes/', views.dashboard_mis_solicitudes, name='mis_solicitudes'),
 ]

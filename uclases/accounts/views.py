@@ -238,6 +238,10 @@ def profile_detail_view(request, public_uid):
         - accounts.models.User
         - django.shortcuts.get_object_or_404
     """
+    from courses.models import Inscripcion, Rating
+    from courses.enums import EstadoInscripcion
+    from courses.forms import RatingForm
+    
     user = get_object_or_404(User, public_uid=public_uid)
     
     # Redirigir a mi perfil si es el usuario autenticado
@@ -257,6 +261,26 @@ def profile_detail_view(request, public_uid):
     for solicitud in perfil.solicitudes_creadas.all():
         if solicitud.ramo:
             ramos_solicitados.add(solicitud.ramo)
+    
+    # Verificar si el usuario actual puede dejar un rating
+    can_rate = False
+    completed_inscriptions = []
+    rating_form = None
+    
+    if request.user.is_authenticated:
+        # Buscar inscripciones completadas del usuario actual con este profesor
+        completed_inscriptions = Inscripcion.objects.filter(
+            estudiante=request.user.perfil,
+            horario_ofertado__oferta__profesor=perfil,
+            estado=EstadoInscripcion.COMPLETADO
+        ).select_related('horario_ofertado__oferta')
+        
+        # Verificar si alguna inscripción completada NO tiene rating
+        for inscripcion in completed_inscriptions:
+            if not Rating.objects.filter(inscripcion=inscripcion).exists():
+                can_rate = True
+                rating_form = RatingForm()
+                break
 
     context = {
         'profile_user': user,
@@ -266,6 +290,9 @@ def profile_detail_view(request, public_uid):
         'share_url': request.build_absolute_uri(
             reverse('accounts:profile_detail', args=[user.public_uid])
         ),
+        'can_rate': can_rate,
+        'rating_form': rating_form,
+        'completed_inscriptions': completed_inscriptions,
     }
 
     return render(request, 'profile/profile_detail_view.html', context)

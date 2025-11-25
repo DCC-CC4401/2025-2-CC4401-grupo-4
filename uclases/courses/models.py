@@ -254,10 +254,11 @@ class Rating(models.Model):
     Calificación de una clase completada, dada por un usuario que recibió una clase a otro que dio la clase.
 
     Permite que un estudiante califique a su profesor después
-    de completar una clase, con una valoración de 1 a 5 estrellas.
+    de completar una clase, con una valoración de 1 a 5 estrellas y un comentario opcional.
     
     Attributes:
         valoracion (IntegerField): Puntuación de 1 a 5 estrellas.
+        comentario (TextField): Comentario o reseña escrita (opcional).
         fecha_rating (DateTimeField): Fecha y hora en que se dio la calificación.
         calificador (ForeignKey): Usuario que otorga la calificación.
         calificado (ForeignKey): Usuario que recibe la calificación.
@@ -270,6 +271,7 @@ class Rating(models.Model):
     """
     #ID Rating (PK) se crea automaticamente como 'id'
     valoracion = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    comentario = models.TextField(blank=True, null=True, verbose_name='Comentario')
     fecha_rating = models.DateTimeField(auto_now_add=True)
 
     #ID Usuario (CALIFICADOR) (FK) - Relación N:1 con PERFIL
