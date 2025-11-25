@@ -43,6 +43,12 @@
                            class="px-4 py-2 bg-yellow-600/70 text-foreground rounded-lg hover:bg-yellow-600">
                             Editar
                         </a>
+                        <form action="{% url 'courses:eliminar_oferta' oferta.id %}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta oferta?');">
+                            {% csrf_token %}
+                            <button type="submit" class="px-4 py-2 bg-red-600/70 text-white rounded-lg hover:bg-red-600">
+                                Eliminar
+                            </button>
+                        </form>
                     </div>
                 </div>
                 {% endfor %}
