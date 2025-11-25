@@ -13,7 +13,7 @@
             <h2 class="text-2xl font-semibold text-foreground mb-4">Ofertas Publicadas</h2>
 
             {% if mis_ofertas %}
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="grid md:grid-cols-1 gap-6">
                 {% for oferta in mis_ofertas %}
                 <div class="bg-card border border-border rounded-xl p-6 shadow-lg">
                     <h3 class="text-xl font-semibold text-foreground">
@@ -25,27 +25,27 @@
                     </p>
 
                     {% if oferta.ramo %}
-                    <p class="mt-2 inline-block px-3 py-1 bg-blue-500/20 text-blue-500 rounded-lg text-sm font-medium">
+                    <p class="badge text-red-500 border-red-500/30 bg-red-500/10">
                         {{ oferta.ramo.name }}
                     </p>
                     {% endif %}
 
                     <div class="mt-4 flex gap-2">
                         <a href="{% url 'courses:mis_ofertas_horarios' oferta.id %}"
-                           class="px-4 py-2 cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
+                           class="px-4 py-2 rounded-lg cosmic-button flex-1 text-center justify-center inline-flex items-center badge-info hover:bg-blue-100 font-medium gap-2">
                             Ver Horarios
                         </a>
                         <a href="{% url 'courses:oferta_detail' oferta.id %}"
-                           class="px-4 py-2 cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
+                           class="px-4 py-2 rounded-lg cosmic-button flex-1 text-center justify-center inline-flex items-center badge-info hover:bg-blue-100 font-medium gap-2">
                             Ver
                         </a>
                         <a href="{% url 'courses:editar_oferta' oferta.id %}"
-                           class="px-4 py-2 cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
+                           class="px-4 py-2 rounded-lg cosmic-button flex-1 text-center justify-center inline-flex items-center badge-info hover:bg-blue-100 font-medium gap-2">
                             Editar
                         </a>
                         <button type="button" 
                                 onclick="openDeleteModal({{ oferta.id }}, '{{ oferta.titulo|escapejs }}')"
-                                class="px-4 py-2 bg-red-600/70 text-white rounded-lg hover:bg-red-600">
+                                class="px-4 py-2 rounded-lg cosmic-button flex items-center bg-red-500/10 text-red-500 border-red-500/30 hover:bg-red-500/20 font-medium gap-2">
                             Eliminar
                         </button>
                     </div>
@@ -61,54 +61,58 @@
 </section>
 
 <!-- Modal de confirmación de eliminación -->
-<div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
-    <div class="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
-        <div class="flex items-start gap-4">
-            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-            </div>
-            <div class="flex-1">
-                <h3 class="text-xl font-bold text-foreground mb-2">Eliminar oferta</h3>
-                <p class="text-sm text-foreground/80 mb-1">Estás a punto de eliminar:</p>
-                <p class="text-sm font-semibold text-foreground mb-4" id="ofertaTitulo"></p>
-                
-                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mb-4">
-                    <p class="text-sm text-yellow-700 dark:text-yellow-400 font-medium mb-2">⚠️ Esta acción es irreversible</p>
-                    <p class="text-xs text-foreground/70">Si hay estudiantes inscritos en esta oferta, se les notificará automáticamente sobre la cancelación de la clase.</p>
+<div id="deleteModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-card border border-border rounded-lg shadow-xl max-w-md w-full animate-in fade-in zoom-in duration-200">
+        <div class="px-6 py-4 border-b border-border">
+            <h3 class="text-lg font-semibold text-foreground">Eliminar oferta</h3>
+        </div>
+        <div class="px-6 py-4">
+            <div class="flex items-start gap-3 mb-4">
+                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
                 </div>
-                
-                <div class="mb-4">
-                    <label for="confirmText" class="block text-sm font-medium text-foreground mb-2">
-                        Para confirmar, escribe: <span class="font-bold text-red-600">CONFIRMO ELIMINAR</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="confirmText" 
-                        class="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-foreground"
-                        placeholder="CONFIRMO ELIMINAR"
-                        autocomplete="off"
-                    />
-                    <p id="errorMessage" class="text-xs text-red-600 mt-1 hidden">El texto no coincide. Debes escribir exactamente: CONFIRMO ELIMINAR</p>
-                </div>
-                
-                <div class="flex gap-3 justify-end">
-                    <button 
-                        type="button" 
-                        onclick="closeDeleteModal()"
-                        class="px-4 py-2 bg-background border border-border text-foreground rounded-lg hover:bg-accent transition-colors">
-                        Cancelar
-                    </button>
-                    <button 
-                        type="button" 
-                        id="confirmDeleteBtn"
-                        onclick="confirmDelete()"
-                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                        Eliminar oferta
-                    </button>
+
+                <div class="flex-1">
+                    <p class="text-foreground/90 mb-2">Estás a punto de eliminar:</p>
+                    <p class="text-sm font-semibold text-foreground mb-4" id="ofertaTitulo"></p>
                 </div>
             </div>
+                
+            <div class="badge-warning rounded-md p-3 mb-4">
+                <p class="text-sm text-yellow-700 dark:text-yellow-400 font-medium mb-2">⚠️ Esta acción es irreversible</p>
+                <p class="text-xs text-foreground/70">Si hay estudiantes inscritos en esta oferta, se les notificará automáticamente sobre la cancelación de la clase.</p>
+            </div>
+            <div class="mb-4">
+                <label for="confirmText" class="text-sm font-medium text-foreground mb-2">
+                    Para confirmar, escribe: <span class="font-bold text-red-600">CONFIRMO ELIMINAR</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="confirmText" 
+                    class="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-foreground"
+                    placeholder="CONFIRMO ELIMINAR"
+                    autocomplete="off"
+                />
+                <p id="errorMessage" class="text-xs text-red-600 mt-1 hidden">El texto no coincide. Debes escribir exactamente: CONFIRMO ELIMINAR</p>
+            </div>
+        </div>
+                
+        <div class="px-6 py-4 bg-muted/50 border-t border-border flex justify-center gap-3 rounded-b-lg">
+            <button 
+                type="button" 
+                onclick="closeDeleteModal()"
+                class="px-4 py-2 bg-green-600/10 text-green-700 border-green-600/30 hover:bg-green-600/20 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                Cancelar
+            </button>
+            <button 
+                type="button" 
+                id="confirmDeleteBtn"
+                onclick="confirmDelete()"
+                class="px-4 py-2 bg-red-600/10 text-red-600 border-red-600/30 hover:bg-red-600/20 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                Eliminar oferta
+            </button>
         </div>
     </div>
 </div>
