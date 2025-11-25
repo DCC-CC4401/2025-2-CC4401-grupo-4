@@ -44,7 +44,7 @@ class NewCommentStrategy(NotificationStrategy):
             if offer_id:
                 return [
                     {
-                        'label': 'Ir al comentario en la oferta',
+                        'label': 'Ir a oferta',
                         'url': reverse('courses:oferta_detail', args=[offer_id]),
                         'method': 'GET',
                         'style': 'primary'
@@ -57,7 +57,7 @@ class NewCommentStrategy(NotificationStrategy):
             if solicitud_id:
                 return [
                     {
-                        'label': 'Ir al comentario en la solicitud',
+                        'label': 'Ir a solicitud',
                         'url': reverse('courses:solicitud_detail', args=[solicitud_id]),
                         'method': 'GET',
                         'style': 'primary'
