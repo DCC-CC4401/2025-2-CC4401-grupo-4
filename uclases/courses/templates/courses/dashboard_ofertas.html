@@ -43,6 +43,11 @@
                            class="px-4 py-2 cosmic-button flex-1 text-center justify-center inline-flex items-center bg-foreground/10 text-foreground gap-2">
                             Editar
                         </a>
+                        <button type="button" 
+                                onclick="openDeleteModal({{ oferta.id }}, '{{ oferta.titulo|escapejs }}')"
+                                class="px-4 py-2 bg-red-600/70 text-white rounded-lg hover:bg-red-600">
+                            Eliminar
+                        </button>
                     </div>
                 </div>
                 {% endfor %}
@@ -54,4 +59,130 @@
         </div>
     </div>
 </section>
+
+<!-- Modal de confirmación de eliminación -->
+<div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-xl font-bold text-foreground mb-2">Eliminar oferta</h3>
+                <p class="text-sm text-foreground/80 mb-1">Estás a punto de eliminar:</p>
+                <p class="text-sm font-semibold text-foreground mb-4" id="ofertaTitulo"></p>
+                
+                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mb-4">
+                    <p class="text-sm text-yellow-700 dark:text-yellow-400 font-medium mb-2">⚠️ Esta acción es irreversible</p>
+                    <p class="text-xs text-foreground/70">Si hay estudiantes inscritos en esta oferta, se les notificará automáticamente sobre la cancelación de la clase.</p>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="confirmText" class="block text-sm font-medium text-foreground mb-2">
+                        Para confirmar, escribe: <span class="font-bold text-red-600">CONFIRMO ELIMINAR</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="confirmText" 
+                        class="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-foreground"
+                        placeholder="CONFIRMO ELIMINAR"
+                        autocomplete="off"
+                    />
+                    <p id="errorMessage" class="text-xs text-red-600 mt-1 hidden">El texto no coincide. Debes escribir exactamente: CONFIRMO ELIMINAR</p>
+                </div>
+                
+                <div class="flex gap-3 justify-end">
+                    <button 
+                        type="button" 
+                        onclick="closeDeleteModal()"
+                        class="px-4 py-2 bg-background border border-border text-foreground rounded-lg hover:bg-accent transition-colors">
+                        Cancelar
+                    </button>
+                    <button 
+                        type="button" 
+                        id="confirmDeleteBtn"
+                        onclick="confirmDelete()"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        Eliminar oferta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formulario oculto para enviar la eliminación -->
+<form id="deleteForm" method="post" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<script>
+let currentOfertaId = null;
+
+function openDeleteModal(ofertaId, ofertaTitulo) {
+    currentOfertaId = ofertaId;
+    document.getElementById('ofertaTitulo').textContent = ofertaTitulo;
+    document.getElementById('confirmText').value = '';
+    document.getElementById('errorMessage').classList.add('hidden');
+    document.getElementById('deleteModal').classList.remove('hidden');
+    document.getElementById('deleteModal').classList.add('flex');
+    
+    // Focus en el input
+    setTimeout(() => {
+        document.getElementById('confirmText').focus();
+    }, 100);
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+    document.getElementById('deleteModal').classList.remove('flex');
+    currentOfertaId = null;
+}
+
+function confirmDelete() {
+    const confirmText = document.getElementById('confirmText').value;
+    const errorMessage = document.getElementById('errorMessage');
+    
+    if (confirmText === 'CONFIRMO ELIMINAR') {
+        // Enviar formulario
+        const form = document.getElementById('deleteForm');
+        form.action = `/courses/eliminar-oferta/${currentOfertaId}/`;
+        form.submit();
+    } else {
+        // Mostrar error
+        errorMessage.classList.remove('hidden');
+        document.getElementById('confirmText').classList.add('border-red-500');
+        
+        // Remover error después de 3 segundos
+        setTimeout(() => {
+            errorMessage.classList.add('hidden');
+            document.getElementById('confirmText').classList.remove('border-red-500');
+        }, 3000);
+    }
+}
+
+// Cerrar modal con tecla Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && !document.getElementById('deleteModal').classList.contains('hidden')) {
+        closeDeleteModal();
+    }
+});
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('deleteModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDeleteModal();
+    }
+});
+
+// Permitir enviar con Enter si el texto es correcto
+document.getElementById('confirmText')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        confirmDelete();
+    }
+});
+</script>
+
 {% endblock %}

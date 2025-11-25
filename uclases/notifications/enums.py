@@ -23,6 +23,9 @@ class NotificationTypes:
     OFERTA_PROPOSED = 'oferta_proposed'
     INSCRIPTION_COMPLETED = 'inscription_completed'
     
+    # Notificaciones de ofertas
+    OFFER_DELETED = 'offer_deleted'
+    
     # Notificaciones de comentarios
     NEW_COMMENT = 'new_comment'
     COMMENT_REPLY = 'comment_reply'

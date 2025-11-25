@@ -10,7 +10,6 @@ from . import inscriptions_signals
 from . import slots_signals
 from . import comments_signals
 from . import ratings_signals
+from . import offers_signals
 
 # Al agregar nuevos signals, importarlos aquí:
-# from . import ratings_signals
-# from . import ofertas_signals

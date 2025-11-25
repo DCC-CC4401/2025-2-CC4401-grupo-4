@@ -823,7 +823,7 @@ def completar_horario_view(request, pk):
     """
     Marca un horario como completado, actualizando todas las inscripciones
     aceptadas a estado COMPLETADO.
-    
+
     Solo el profesor propietario de la oferta puede completar el horario.
     Notifica a todos los estudiantes afectados.
     
@@ -956,3 +956,31 @@ def crear_rating_view(request):
     messages.success(request, f'¡Gracias por tu reseña! Has calificado con {rating.valoracion} estrellas.')
     return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)
 
+
+@login_required
+def eliminar_oferta(request, oferta_id):
+    """
+    Elimina una oferta de clase.
+    
+    La notificación a estudiantes inscritos se maneja automáticamente
+    mediante el signal pre_delete en notifications.signals.offers_signals.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP.
+        oferta_id (int): ID de la oferta a eliminar.
+    
+    Returns:
+        HttpResponse: Redirecciona a la lista de ofertas del profesor.
+    
+    Business Logic:
+        - Verifica que el usuario sea el profesor de la oferta
+        - Elimina la oferta (el signal se encarga de notificar a estudiantes)
+        - CASCADE eliminará horarios e inscripciones asociadas
+    """
+    oferta = get_object_or_404(OfertaClase, id=oferta_id, profesor=request.user.perfil)
+    
+    oferta_titulo = oferta.titulo
+    oferta.delete()  # El signal pre_delete se encargará de las notificaciones
+    
+    messages.success(request, f"La oferta '{oferta_titulo}' ha sido eliminada correctamente.")
+    return redirect('courses:mis_ofertas')

@@ -34,4 +34,5 @@ urlpatterns = [
     path('mis-ofertas/', views.dashboard_mis_ofertas, name='mis_ofertas'),
     path('mis-ofertas/<int:oferta_id>/', views.mis_ofertas_horarios_view, name='mis_ofertas_horarios'),
     path('mis-solicitudes/', views.dashboard_mis_solicitudes, name='mis_solicitudes'),
+    path('eliminar-oferta/<int:oferta_id>/', views.eliminar_oferta, name='eliminar_oferta'),
 ]
