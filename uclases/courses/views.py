@@ -5,12 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
-from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion, Rating
-
-from .enums import DiaSemana, EstadoInscripcion
-from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm, ComentarioForm, RatingForm
-from .services.inscription_service import InscriptionService
+from .models import OfertaClase, SolicitudClase, HorarioOfertado, Inscripcion, Ramo ,Rating
 from accounts.models import Perfil
+from .enums import DiaSemana , EstadoInscripcion
+from .forms import HorarioFormSet, OfertaForm, SolicitudClaseForm,  ComentarioForm, RatingForm
+from .services.inscription_service import InscriptionService
+from notifications.services.notification_service import NotificationService
+from notifications.enums import NotificationTypes
+
 
 
 def publications_view(request):
@@ -107,6 +109,11 @@ def solicitud_detail(request, pk):
         - courses.models.SolicitudClase
     """
     solicitud = get_object_or_404(SolicitudClase, pk=pk)
+
+    puede_proponer_clase = False
+    if request.user.is_authenticated:
+        if request.user.perfil.ramos_cursados.filter(pk=solicitud.ramo.pk).exists():
+             puede_proponer_clase = True
     if request.method == "POST":
         form = ComentarioForm(request.POST)
         if form.is_valid():
@@ -122,7 +129,8 @@ def solicitud_detail(request, pk):
     context = {
         'solicitud': solicitud,
         'comentario_form': form,
-        'comentarios': solicitud.comentarios.all()
+        'comentarios': solicitud.comentarios.all(),
+        'puede_proponer_clase': puede_proponer_clase,
     }
     return render(request, 'courses/solicitud_detail.html', context)
 
@@ -450,10 +458,105 @@ def cancelar_inscripcion(request, pk):
             messages.success(request, message)
         else:
             messages.error(request, message)
-    
     # Redirigir a la página anterior o a mis inscripciones
     next_url = request.GET.get('next') or request.POST.get('next') or 'courses:mis_inscripciones'
     return redirect(next_url)
+
+@login_required
+def proponer_oferta_clase(request, solicitud_id):
+    """
+    Permite a un profesor crear y enviar una OfertaClase privada en respuesta
+    a una SolicitudClase específica. La oferta queda automáticamente vinculada
+    al Ramo de la solicitud y marcada como 'privada'.
+    
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP. Contiene los datos del
+                               OfertaForm y HorarioFormSet en el método POST.
+        solicitud_id (int): ID de la SolicitudClase a la que se está respondiendo.
+    
+    Returns:
+        HttpResponse: Renderiza el formulario de propuesta de clase.
+        HttpResponseRedirect: 
+            1. Redirige al detalle de la Solicitud (almacenamiento exitoso).
+            2. Redirige a la lista de solicitudes (si el profesor es el mismo solicitante).
+    
+    Template:
+        'courses/proponer_oferta.html'
+    
+    Dependencies:
+        - courses.forms.OfertaForm
+        - courses.forms.HorarioFormSet (inline formset)
+        - courses.models.SolicitudClase
+        - courses.models.OfertaClase
+        - django.contrib.auth.decorators.login_required
+    """
+    
+    solicitud = get_object_or_404(SolicitudClase, id=solicitud_id)
+    ramo = solicitud.ramo
+    solicitante_perfil = solicitud.solicitante
+    profesor_perfil = request.user.perfil
+    
+    if profesor_perfil.user.id == solicitante_perfil.user.id:
+        messages.error(request, 'No puedes proponer una clase a tu propia solicitud. Usa el botón de editar.')
+        return redirect('courses:solicitud_detail', solicitud_id) 
+    
+    if not request.user.perfil.ramos_cursados.filter(pk=ramo.pk).exists():
+        messages.error(request, f'No tienes permiso para proponer clases de {ramo.name}.')
+        return redirect('courses:solicitud_detail', solicitud_id)
+    
+    if request.method == 'POST':
+        form = OfertaForm(request.POST, user=request.user)
+        formset = HorarioFormSet(request.POST) 
+        if form.is_valid() and formset.is_valid():
+            oferta = form.save(commit=False)
+            oferta.profesor = profesor_perfil
+            
+            oferta.ramo = ramo
+
+            oferta.public = False
+
+            oferta.save()
+            
+            formset.instance = oferta 
+            formset.save()
+            # Intentar enviar notificación al solicitante (si el módulo notifications está disponible)
+            
+
+            NotificationService.send(
+                receiver=solicitante_perfil,
+                type=NotificationTypes.OFERTA_PROPOSED,
+                data={'oferta': oferta},
+                related_object=oferta
+            )
+
+
+            messages.success(request, f'Tu oferta de clase de {ramo.name} ha sido publicada y el solicitante ha sido notificado.')
+            
+            return redirect('courses:solicitud_detail', solicitud_id) 
+
+    else:
+
+        initial_data = {
+            'ramo': ramo.id,
+            'titulo': f'Clase propuesta: {ramo.name}', 
+            'descripcion': f'Propuesta en respuesta a la solicitud de {solicitante_perfil.user.username}.',
+        }
+        
+        form = OfertaForm(initial=initial_data, user=request.user) 
+        formset = HorarioFormSet()
+        
+        form.fields['ramo'].initial = ramo
+        form.fields['ramo'].widget.attrs['disabled'] = 'disabled'
+        form.fields['ramo'].widget.attrs['class'] += ' opacity-50 cursor-not-allowed'
+        
+    context = {
+        'form': form,
+        'formset': formset,
+        'ramo': ramo,
+        'solicitante': solicitante_perfil,
+    }
+    return render(request, 'courses/proponer_oferta.html', context)
+   
 
 
 @login_required
@@ -808,3 +911,4 @@ def crear_rating_view(request):
     
     messages.success(request, f'¡Gracias por tu reseña! Has calificado con {rating.valoracion} estrellas.')
     return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)
+

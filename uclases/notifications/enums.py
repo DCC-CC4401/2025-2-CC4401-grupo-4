@@ -19,6 +19,8 @@ class NotificationTypes:
     INSCRIPTION_ACCEPTED = 'inscription_accepted'
     INSCRIPTION_REJECTED = 'inscription_rejected'
     INSCRIPTION_CANCELED = 'inscription_canceled'
+    # Notificación cuando un profesor propone una oferta en respuesta a una solicitud
+    OFERTA_PROPOSED = 'oferta_proposed'
     INSCRIPTION_COMPLETED = 'inscription_completed'
     
     # Notificaciones de comentarios

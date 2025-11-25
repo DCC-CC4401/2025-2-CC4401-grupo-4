@@ -20,6 +20,9 @@ urlpatterns = [
     path('inscripcion/<int:pk>/rechazar/', views.rechazar_inscripcion, name='rechazar_inscripcion'),
     path('inscripcion/<int:pk>/cancelar/', views.cancelar_inscripcion, name='cancelar_inscripcion'),
 
+    # Gestión de propuesta de clases
+    path('proponer/<int:solicitud_id>/', views.proponer_oferta_clase, name='proponer_oferta'),
+
     # Gestión de clases para profesores
     path('horario/<int:pk>/completar/', views.completar_horario_view, name='completar_horario'),
     
