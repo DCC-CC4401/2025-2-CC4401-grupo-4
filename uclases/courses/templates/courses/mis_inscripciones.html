@@ -260,37 +260,50 @@
 
 <!-- Modal de confirmación de cancelación -->
 <div id="cancelModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
-        <div class="flex items-start gap-4 mb-4">
-            <div class="flex-shrink-0 w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                </svg>
+    <div class="bg-card border border-border rounded-lg shadow-xl max-w-md w-full animate-in fade-in zoom-in duration-200">
+        <div class="px-6 py-4 border-b border-border">
+            <h3 class="text-lg font-semibold text-foreground">¿Cancelar clase?</h3>
+        </div>
+        
+        <div class="px-6 py-4">
+            <div class="flex items-start gap-3 mb-4">
+                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+
+                <div class="flex-1">
+                    <p class="text-foreground/90 mb-2">Estás a punto de cancelar esta clase aceptada.</p>
+                </div>
             </div>
-            <div class="flex-1">
-                <h3 class="text-lg font-bold text-foreground mb-2">¿Cancelar clase?</h3>
-                <p class="text-foreground/70 text-sm mb-2">
-                    Estás a punto de cancelar esta clase aceptada.
-                </p>
-                <p class="text-red-600 dark:text-red-400 text-sm font-medium mb-2">
-                    🚫 Esta acción es irreversible
-                </p>
-                <p class="text-foreground/60 text-sm">
-                    <span class="font-medium text-foreground/80">ℹ️ El profesor será notificado</span> automáticamente y se liberará el cupo.
-                </p>
+                
+            <div class="badge-warning rounded-md p-3 mb-4">
+                <p class="text-sm font-medium mb-2">⚠️ Esta acción es irreversible.</p>
+            </div>
+            
+            <div class="badge-info rounded-md p-3 mb-4">
+                <div class="flex gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-sm">
+                        El profesor será notificado automáticamente y se liberará el cupo.
+                    </p>
+                </div>
             </div>
         </div>
         
-        <div class="flex gap-3 justify-end mt-6">
+        <div class="px-6 py-4 bg-muted/50 border-t border-border flex justify-center gap-3 rounded-b-lg">
             <button type="button" 
                     onclick="closeCancelModal()"
-                    class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-foreground rounded-lg text-sm font-medium transition-colors">
+                    class="px-4 py-2 badge-info hover:bg-blue-100 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
                 No, mantener
             </button>
             <form id="cancelForm" method="post" action="" class="inline">
                 {% csrf_token %}
                 <button type="submit" 
-                        class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors">
+                        class="px-4 py-2 bg-red-600/10 text-red-600 border-red-600/30 hover:bg-red-600/20 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
                     Sí, cancelar clase
                 </button>
             </form>
