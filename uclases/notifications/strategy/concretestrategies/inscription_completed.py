@@ -20,7 +20,32 @@ class InscriptionCompletedStrategy(NotificationStrategy):
                 f"Ayúdanos a mejorar calificando tu experiencia.")
 
     def get_actions(self, notification):
-        return []
+        # Ofrecer un botón para ir al perfil del profesor y permitir al estudiante calificarlo
+        if not notification.related_object:
+            return []
+
+        inscription = notification.related_object
+        try:
+            offer = inscription.horario_ofertado.oferta
+            profesor = getattr(offer, 'profesor', None)
+        except Exception:
+            profesor = None
+
+        if not profesor:
+            return []
+
+        profile_uid = getattr(profesor.user, 'public_uid', None)
+        if not profile_uid:
+            return []
+
+        return [
+            {
+                'label': 'Ir a calificar',
+                'url': reverse('accounts:profile_detail', args=[profile_uid]),
+                'method': 'GET',
+                'style': 'primary'
+            }
+        ]
 
     def get_icon(self):
         return "🎓"
