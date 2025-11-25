@@ -8,7 +8,7 @@ class SlotsFullStrategy(NotificationStrategy):
     """Estrategia para notificar al profesor cuando se agotan los cupos de un horario."""
 
     def get_title(self, data):
-        return ""
+        return "¡Cupos llenos!"
 
     def get_message(self, data):
         schedule = data['horario']

@@ -8,7 +8,7 @@ class InscriptionCanceledStrategy(NotificationStrategy):
     """Estrategia para notificar al profesor cuando un estudiante cancela su inscripción."""
 
     def get_title(self, data):
-        return "Inscripción Cancelada"
+        return "Inscripción cancelada"
 
     def get_message(self, data):
         inscription = data['inscripcion']

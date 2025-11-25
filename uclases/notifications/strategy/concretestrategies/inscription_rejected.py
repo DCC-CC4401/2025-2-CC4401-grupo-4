@@ -8,7 +8,7 @@ class InscriptionRejectedStrategy(NotificationStrategy):
     """Estrategia para notificar al estudiante cuando su inscripción es rechazada."""
 
     def get_title(self, data):
-        return "Inscripción Rechazada"
+        return "Inscripción rechazada"
 
     def get_message(self, data):
         inscription = data['inscripcion']

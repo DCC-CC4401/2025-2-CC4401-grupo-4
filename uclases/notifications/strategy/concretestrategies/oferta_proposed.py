@@ -8,7 +8,7 @@ class OfertaProposedStrategy(NotificationStrategy):
     """Estrategia para notificar al estudiante cuando se le propone una oferta de clase."""
 
     def get_title(self, data):
-        return "Nueva Propuesta de Oferta de Clase"
+        return "Nueva propuesta de clase"
 
     def get_message(self, data):
         oferta = data['oferta']

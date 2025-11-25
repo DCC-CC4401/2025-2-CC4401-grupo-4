@@ -8,7 +8,7 @@ class RatingReceivedStrategy(NotificationStrategy):
     """Estrategia para notificar al profesor cuando recibe una calificación/review."""
 
     def get_title(self, data):
-        return "Nueva Calificación Recibida"
+        return "Nueva calificación recibida"
 
     def get_message(self, data):
         rating = data['calificacion']

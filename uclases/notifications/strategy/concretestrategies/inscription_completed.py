@@ -8,7 +8,7 @@ class InscriptionCompletedStrategy(NotificationStrategy):
     """Estrategia para notificar al estudiante cuando completa una clase."""
 
     def get_title(self, data):
-        return ""
+        return "¡Clase completada!"
 
     def get_message(self, data):
         inscription = data['inscripcion']
