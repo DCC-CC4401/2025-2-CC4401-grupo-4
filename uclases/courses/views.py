@@ -823,7 +823,7 @@ def completar_horario_view(request, pk):
     """
     Marca un horario como completado, actualizando todas las inscripciones
     aceptadas a estado COMPLETADO.
-    
+
     Solo el profesor propietario de la oferta puede completar el horario.
     Notifica a todos los estudiantes afectados.
     
@@ -956,3 +956,10 @@ def crear_rating_view(request):
     messages.success(request, f'¡Gracias por tu reseña! Has calificado con {rating.valoracion} estrellas.')
     return redirect('accounts:profile_detail', public_uid=profesor.user.public_uid)
 
+
+@login_required
+def eliminar_oferta(request, oferta_id):
+    oferta = get_object_or_404(OfertaClase, id=oferta_id, profesor=request.user.perfil)
+    oferta.delete()
+    messages.success(request, "La oferta ha sido eliminada correctamente.")
+    return redirect('courses:mis_ofertas')
