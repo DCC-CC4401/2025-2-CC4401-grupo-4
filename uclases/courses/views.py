@@ -329,7 +329,18 @@ def inscribirse_view(request, pk):
 
     if request.method == "POST":
         horario_id = request.POST.get("horario")
-        horario = get_object_or_404(HorarioOfertado, id=horario_id, oferta=oferta)
+        
+        # Validar que se haya seleccionado un horario
+        if not horario_id:
+            messages.error(request, "Debes seleccionar un horario válido.")
+            return redirect("courses:inscribirse", pk=oferta.pk)
+        
+        # Validar que el horario existe y pertenece a esta oferta
+        try:
+            horario = HorarioOfertado.objects.get(id=horario_id, oferta=oferta)
+        except HorarioOfertado.DoesNotExist:
+            messages.error(request, "El horario seleccionado no es válido.")
+            return redirect("courses:inscribirse", pk=oferta.pk)
 
         # Verificar cupos
         inscripciones_activas = horario.inscripciones.filter(

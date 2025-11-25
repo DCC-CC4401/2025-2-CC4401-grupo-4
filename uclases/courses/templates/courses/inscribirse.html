@@ -11,10 +11,10 @@
       {% csrf_token %}
       <div class="space-y-4">
         {% for horario in horarios_ordenados %}
-          <label class="flex items-center justify-between border border-border rounded-xl p-4 cursor-pointer hover:bg-muted/40 {% if horario.cupos_totales == 0 %}opacity-60 cursor-not-allowed{% endif %}">
+          <label class="flex items-center justify-between border border-border rounded-xl p-4 {% if horario.cupos_totales > 0 %}cursor-pointer hover:bg-muted/40{% else %}opacity-60 cursor-not-allowed bg-muted/20{% endif %}">
             <div>
-              <p class="font-semibold">{{ horario.get_dia_display }}</p>
-              <p class="text-sm text-foreground/70">
+              <p class="font-semibold {% if horario.cupos_totales == 0 %}text-foreground/50{% endif %}">{{ horario.get_dia_display }}</p>
+              <p class="text-sm {% if horario.cupos_totales == 0 %}text-foreground/40{% else %}text-foreground/70{% endif %}">
                 {{ horario.hora_inicio|time:"H:i" }} - {{ horario.hora_fin|time:"H:i" }}
               </p>
             </div>
@@ -23,6 +23,7 @@
                 <input type="radio" name="horario" value="{{ horario.id }}" required class="accent-primary">
                 <p class="text-sm text-foreground/80">Cupos: {{ horario.cupos_totales }}</p>
               {% else %}
+                <input type="radio" name="horario" value="{{ horario.id }}" disabled class="accent-primary opacity-50">
                 <p class="text-sm text-red-500 font-semibold">Sin cupos</p>
               {% endif %}
             </div>
@@ -33,7 +34,9 @@
       </div>
 
       <div class="mt-8 flex gap-3">
-        <button type="submit" class="cosmic-button flex-1 bg-blue-500/60 hover:bg-blue-500 text-foreground">
+        <button type="submit" 
+                class="cosmic-button flex-1 bg-blue-500/60 hover:bg-blue-500 text-foreground disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500/60"
+                id="submit-btn">
           Confirmar inscripción
         </button>
         <a href="{% url 'courses:oferta_detail' oferta.pk %}"
@@ -41,6 +44,19 @@
           Cancelar
         </a>
       </div>
+      
+      <script>
+      // Deshabilitar botón si no hay horarios con cupos disponibles
+      document.addEventListener('DOMContentLoaded', function() {
+        const submitBtn = document.getElementById('submit-btn');
+        const horariosDisponibles = document.querySelectorAll('input[name="horario"]:not([disabled])');
+        
+        if (horariosDisponibles.length === 0) {
+          submitBtn.disabled = true;
+          submitBtn.title = "No hay horarios disponibles";
+        }
+      });
+      </script>
     </form>
   </div>
 </section>
