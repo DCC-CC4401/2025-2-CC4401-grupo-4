@@ -231,7 +231,7 @@
 							{% if rating.comentario %}
 							<p class="mt-2 text-sm text-foreground/80">{{ rating.comentario }}</p>
 							{% endif %}
-							<p class="mt-1 text-xs text-muted-foreground">Clase: {{ rating.inscripcion.horario_ofertado.oferta.titulo }}</p>
+							<p class="mt-1 text-xs text-muted-foreground">Ramo: {{ rating.inscripcion.horario_ofertado.oferta.ramo.name }}</p>
 						</div>
 						{% endfor %}
 					{% else %}
