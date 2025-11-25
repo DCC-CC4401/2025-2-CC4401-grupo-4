@@ -11,6 +11,7 @@ from . import inscription_created
 from . import inscription_accepted
 from . import inscription_rejected
 from . import inscription_canceled
+from . import oferta_proposed
 from . import inscription_completed
 
 # Notificaciones de comentarios
