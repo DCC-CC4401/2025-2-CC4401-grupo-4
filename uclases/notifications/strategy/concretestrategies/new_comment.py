@@ -32,41 +32,39 @@ class NewCommentStrategy(NotificationStrategy):
             return f"{commenter} comentó en tu solicitud '{publication_title}': '{content_preview}'"
 
     def get_actions(self, notification):
-        # Usar el related_object (Comentario) almacenado en la Notification
-        comment = getattr(notification, 'related_object', None)
-        if not comment:
+        
+        if not notification.related_object:
             return []
 
-        if comment.oferta_clase:
-            return [
-                {
-                    "label": "Ver oferta",
-                    "url": reverse('courses:oferta_detail', args=[comment.oferta_clase.id]),
-                    "method": "GET",
-                    "style": "primary"
-                },
-            {
-                'label': 'Ver comentador',
-                'url': reverse('accounts:profile_detail', args=[comment.publicador.user.public_uid]),
-                'method': 'GET',
-                'style': 'info'
-            }
-            ]
-        else:
-            return [
-                {
-                    "label": "Ver solicitud",
-                    "url": reverse('courses:solicitud_detail', args=[comment.solicitud_clase.id]),
-                    "method": "GET",
-                    "style": "primary"
-                },
-            {
-                'label': 'Ver comentador',
-                'url': reverse('accounts:profile_detail', args=[comment.publicador.user.public_uid]),
-                'method': 'GET',
-                'style': 'info'
-            }
-            ]
+        comment = notification.related_object
+
+        oferta = getattr(comment, 'oferta_clase', None)
+        if oferta:
+            offer_id = getattr(oferta, 'pk', None)
+            if offer_id:
+                return [
+                    {
+                        'label': 'Ir al comentario en la oferta',
+                        'url': reverse('courses:oferta_detail', args=[offer_id]),
+                        'method': 'GET',
+                        'style': 'primary'
+                    }
+                ]
+
+        solicitud = getattr(comment, 'solicitud_clase', None)
+        if solicitud:
+            solicitud_id = getattr(solicitud, 'pk', None)
+            if solicitud_id:
+                return [
+                    {
+                        'label': 'Ir al comentario en la solicitud',
+                        'url': reverse('courses:solicitud_detail', args=[solicitud_id]),
+                        'method': 'GET',
+                        'style': 'primary'
+                    }
+                ]
+
+        return []
 
     def get_icon(self):
         return "💬"

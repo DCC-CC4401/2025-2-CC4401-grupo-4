@@ -8,7 +8,7 @@ class RatingReceivedStrategy(NotificationStrategy):
     """Estrategia para notificar al profesor cuando recibe una calificación/review."""
 
     def get_title(self, data):
-        return ""
+        return "Nueva Calificación Recibida"
 
     def get_message(self, data):
         rating = data['calificacion']
@@ -28,10 +28,28 @@ class RatingReceivedStrategy(NotificationStrategy):
         return message
 
     def get_actions(self, notification):
+        # Siempre intentar ofrecer navegación al perfil del calificado si existe
+        if not notification.related_object:
+            return []
+
         rating = notification.related_object
-        myself = rating.calificado
-        # Boton para ir a perfil a ver ratings
-        return []
+        # `calificado` es el perfil que recibe la calificación
+        calificado = getattr(rating, 'calificado', None)
+        if not calificado:
+            return []
+
+        profile_uid = getattr(calificado.user, 'public_uid', None)
+        if not profile_uid:
+            return []
+
+        return [
+            {
+                'label': 'Ir a mi perfil',
+                'url': reverse('accounts:profile_detail', args=[profile_uid]),
+                'method': 'GET',
+                'style': 'primary'
+            }
+        ]
 
     def get_icon(self):
         return "⭐"

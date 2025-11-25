@@ -21,7 +21,29 @@ class SlotsFullStrategy(NotificationStrategy):
                 f"de tu oferta '{offer.titulo}' están llenos! 🎉")
 
     def get_actions(self, notification):
-        return []
+        if not notification.related_object:
+            return []
+
+        schedule = notification.related_object
+        offer = getattr(schedule, 'oferta', None)
+        if not offer and hasattr(schedule, 'pk') and schedule.__class__.__name__ in ('OfertaClase', 'Oferta'):
+            offer = schedule
+
+        if not offer:
+            return []
+
+        offer_id = getattr(offer, 'pk', None)
+        if not offer_id:
+            return []
+
+        return [
+            {
+                'label': 'Ver oferta',
+                'url': reverse('courses:oferta_detail', args=[offer_id]),
+                'method': 'GET',
+                'style': 'primary'
+            }
+        ]
 
     def get_icon(self):
         return "🎉"
