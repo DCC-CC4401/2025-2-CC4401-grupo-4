@@ -2,32 +2,38 @@ from django.urls import reverse
 from notifications.models import Notification
 from .test_base import NotificationBaseTests
 
-class NotificationViewsTests(NotificationBaseTests):
+class NotificationViewTest(NotificationBaseTests):
+    
     def setUp(self):
         super().setUp()
         self.url = reverse('notifications:list')
 
-        self.notif_propia = Notification.objects.create(
-            recipient=self.perfil_estudiante,
-            type="NOTIFICATION_TEST_TYPE",
-            title="Notificación Propia",
-            message="Mensaje de Notificación Propia"
+    def test_view_content_with_notifications(self):
+        """El usuario ve sus notificaciones listadas."""
+        Notification.objects.create(
+            receiver=self.perfil_estudiante, 
+            type="generic_type", title="Tienes una notificación", message="Msg"
         )
+        
+        self.client.force_login(self.estudiante)
+        resp = self.client.get(self.url)
+        
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Tienes una notificación")
+        self.assertEqual(len(resp.context['notifications']), 1)
 
-        self.notif_ajena = Notification.objects.create(
-            recipient=self.perfil_profe,
-            type="NOTIFICATION_TEST_TYPE",
-            title="Notificación Ajena",
-            message="Mensaje de Notificación Ajena"
-        )
+    def test_view_empty_state(self):
+        """Si no hay notificaciones, la vista no debe explotar."""
+        self.client.force_login(self.estudiante)
+        resp = self.client.get(self.url)
+        
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(resp.context['notifications']), 0)
+        # Opcional: Si tienes un mensaje de "No hay notificaciones", testéalo aquí:
+        # self.assertContains(resp, "No tienes notificaciones nuevas")
 
-        def test_notifications_list_view(self):
-            self.client.force_login(self.estudiante)
-            response = self.client.get(self.url)
-            self.assertEqual(response.status_code, 200)
-            n = response.context['notifications']
-
-            self.assertEqual(len(n), 1)
-            self.assertIn(self.notif_propia, n)
-            self.assertNotIn(self.notif_ajena, n)
-            
+    def test_security_login_required(self):
+        """Redirige al login si no está autenticado."""
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 302)
+        self.assertTrue(resp.url.startswith('/accounts/login/')) # Ajusta según tu URL de login
